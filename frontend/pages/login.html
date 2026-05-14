@@ -27,7 +27,6 @@
       overflow: hidden;
     }
 
-    /* Panel izquierdo */
     .left-panel {
       width: 45%;
       background: var(--dark);
@@ -59,9 +58,7 @@
       opacity: 0.08;
     }
 
-    .brand {
-      position: relative; z-index: 1;
-    }
+    .brand { position: relative; z-index: 1; }
 
     .brand-icon {
       width: 52px; height: 52px;
@@ -81,13 +78,9 @@
       line-height: 1.3;
     }
 
-    .brand span {
-      color: var(--red);
-    }
+    .brand span { color: var(--red); }
 
-    .hero-text {
-      position: relative; z-index: 1;
-    }
+    .hero-text { position: relative; z-index: 1; }
 
     .hero-text h2 {
       font-family: 'Syne', sans-serif;
@@ -98,10 +91,7 @@
       margin-bottom: 1rem;
     }
 
-    .hero-text h2 em {
-      font-style: normal;
-      color: var(--red);
-    }
+    .hero-text h2 em { font-style: normal; color: var(--red); }
 
     .hero-text p {
       font-size: 0.9rem;
@@ -110,25 +100,21 @@
       max-width: 280px;
     }
 
-    .stats {
-      position: relative; z-index: 1;
-      display: flex; gap: 2rem;
-    }
+    .stats { position: relative; z-index: 1; display: flex; gap: 2rem; }
 
-    .stat-item {}
     .stat-num {
       font-family: 'Syne', sans-serif;
       font-size: 1.6rem;
       font-weight: 700;
       color: var(--white);
     }
+
     .stat-label {
       font-size: 0.75rem;
       color: rgba(255,255,255,0.35);
       margin-top: 2px;
     }
 
-    /* Grid decorativo */
     .grid-deco {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -139,7 +125,6 @@
       pointer-events: none;
     }
 
-    /* Panel derecho */
     .right-panel {
       flex: 1;
       display: flex;
@@ -151,11 +136,10 @@
     .form-container {
       width: 100%;
       max-width: 400px;
+      animation: fadeUp 0.5s ease both;
     }
 
-    .form-header {
-      margin-bottom: 2.5rem;
-    }
+    .form-header { margin-bottom: 2.5rem; }
 
     .form-header h3 {
       font-family: 'Syne', sans-serif;
@@ -165,14 +149,10 @@
       margin-bottom: 0.4rem;
     }
 
-    .form-header p {
-      font-size: 0.88rem;
-      color: var(--gray);
-    }
+    .form-header p { font-size: 0.88rem; color: var(--gray); }
 
     .tabs {
       display: flex;
-      gap: 0;
       background: var(--border);
       border-radius: 10px;
       padding: 4px;
@@ -202,9 +182,7 @@
     .form-section { display: none; }
     .form-section.active { display: block; }
 
-    .field {
-      margin-bottom: 1.1rem;
-    }
+    .field { margin-bottom: 1.1rem; }
 
     .field label {
       display: block;
@@ -233,7 +211,23 @@
       box-shadow: 0 0 0 3px rgba(208,52,44,0.08);
     }
 
+    .field input.invalid {
+      border-color: var(--red);
+      background: var(--red-light);
+    }
+
+    .field input.valid { border-color: #4CAF50; }
+
     .field input::placeholder { color: #C5BFB9; }
+
+    .field-hint {
+      font-size: 0.75rem;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .field-hint.error { display: block; color: var(--red); }
+    .field-hint.success { display: block; color: #2E7D32; }
 
     .submit-btn {
       width: 100%;
@@ -249,36 +243,11 @@
       margin-top: 0.5rem;
       transition: background 0.2s, transform 0.1s;
       letter-spacing: 0.01em;
-      position: relative;
-      overflow: hidden;
     }
 
     .submit-btn:hover { background: var(--red-dark); }
     .submit-btn:active { transform: scale(0.99); }
-
-    .submit-btn.loading {
-      pointer-events: none;
-      opacity: 0.7;
-    }
-
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin: 1.2rem 0;
-    }
-
-    .divider::before, .divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    .divider span {
-      font-size: 0.75rem;
-      color: var(--gray);
-    }
+    .submit-btn.loading { pointer-events: none; opacity: 0.7; }
 
     .alert {
       padding: 0.75rem 1rem;
@@ -309,14 +278,9 @@
       color: var(--gray);
     }
 
-    /* Animación entrada */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(16px); }
       to { opacity: 1; transform: translateY(0); }
-    }
-
-    .form-container {
-      animation: fadeUp 0.5s ease both;
     }
 
     @keyframes pulse-dot {
@@ -336,20 +300,16 @@
 </head>
 <body>
 
-  <!-- Panel izquierdo -->
   <div class="left-panel">
     <div class="grid-deco"></div>
-
     <div class="brand">
       <div class="brand-icon">🚑</div>
       <h1>Sistema de<br><span>Ambulancias</span></h1>
     </div>
-
     <div class="hero-text">
       <h2>Cada segundo<br><em>importa.</em></h2>
       <p>Plataforma de gestión y coordinación de servicios de emergencias médicas en tiempo real.</p>
     </div>
-
     <div class="stats">
       <div class="stat-item">
         <div class="stat-num">24/7</div>
@@ -366,7 +326,6 @@
     </div>
   </div>
 
-  <!-- Panel derecho -->
   <div class="right-panel">
     <div class="form-container">
 
@@ -375,24 +334,24 @@
         <p><span class="online-dot"></span>Sistema en línea</p>
       </div>
 
-      <!-- Tabs -->
       <div class="tabs">
         <button class="tab-btn active" onclick="switchTab('login')">Iniciar sesión</button>
         <button class="tab-btn" onclick="switchTab('register')">Registrarse</button>
       </div>
 
-      <!-- Alert -->
       <div class="alert" id="alert"></div>
 
       <!-- LOGIN -->
       <div class="form-section active" id="section-login">
         <div class="field">
           <label>Correo electrónico</label>
-          <input type="email" id="login-email" placeholder="operador@ambulancias.pe">
+          <input type="email" id="login-email" placeholder="operador@ambulancias.pe" oninput="clearHint('login-email', 'hint-login-email')">
+          <div class="field-hint" id="hint-login-email"></div>
         </div>
         <div class="field">
           <label>Contraseña</label>
-          <input type="password" id="login-password" placeholder="••••••••">
+          <input type="password" id="login-password" placeholder="••••••••" oninput="clearHint('login-password', 'hint-login-pass')">
+          <div class="field-hint" id="hint-login-pass"></div>
         </div>
         <button class="submit-btn" id="btn-login" onclick="handleLogin()">
           Ingresar al sistema
@@ -403,15 +362,18 @@
       <div class="form-section" id="section-register">
         <div class="field">
           <label>Nombre completo</label>
-          <input type="text" id="reg-nombre" placeholder="Favio Yaranga">
+          <input type="text" id="reg-nombre" placeholder="Favio Yaranga" oninput="clearHint('reg-nombre', 'hint-nombre')">
+          <div class="field-hint" id="hint-nombre"></div>
         </div>
         <div class="field">
           <label>Correo electrónico</label>
-          <input type="email" id="reg-email" placeholder="operador@ambulancias.pe">
+          <input type="email" id="reg-email" placeholder="operador@ambulancias.pe" oninput="clearHint('reg-email', 'hint-email')">
+          <div class="field-hint" id="hint-email"></div>
         </div>
         <div class="field">
           <label>Contraseña</label>
-          <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres">
+          <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" oninput="checkPasswordStrength()">
+          <div class="field-hint" id="hint-password"></div>
         </div>
         <button class="submit-btn" id="btn-register" onclick="handleRegister()">
           Crear cuenta
@@ -427,6 +389,7 @@
 
   <script>
     const API = 'http://127.0.0.1:5000/api';
+    const EMAIL_REGEX = /^[\w\.-]+@[\w\.-]+\.\w{2,}$/;
 
     function switchTab(tab) {
       document.querySelectorAll('.tab-btn').forEach((b, i) => {
@@ -435,6 +398,7 @@
       document.getElementById('section-login').classList.toggle('active', tab === 'login');
       document.getElementById('section-register').classList.toggle('active', tab === 'register');
       hideAlert();
+      clearAllHints();
     }
 
     function showAlert(msg, type) {
@@ -447,10 +411,112 @@
       document.getElementById('alert').className = 'alert';
     }
 
-    async function handleLogin() {
+    function setHint(hintId, msg, type) {
+      const el = document.getElementById(hintId);
+      if (!el) return;
+      el.textContent = msg;
+      el.className = 'field-hint ' + type;
+    }
+
+    function clearHint(inputId, hintId) {
+      const input = document.getElementById(inputId);
+      const hint = document.getElementById(hintId);
+      if (input) input.classList.remove('invalid', 'valid');
+      if (hint) { hint.textContent = ''; hint.className = 'field-hint'; }
+    }
+
+    function clearAllHints() {
+      document.querySelectorAll('.field-hint').forEach(h => { h.textContent = ''; h.className = 'field-hint'; });
+      document.querySelectorAll('input').forEach(i => i.classList.remove('invalid', 'valid'));
+    }
+
+    function markInvalid(inputId, hintId, msg) {
+      const input = document.getElementById(inputId);
+      if (input) { input.classList.add('invalid'); input.classList.remove('valid'); }
+      setHint(hintId, msg, 'error');
+    }
+
+    function markValid(inputId) {
+      const input = document.getElementById(inputId);
+      if (input) { input.classList.add('valid'); input.classList.remove('invalid'); }
+    }
+
+    function checkPasswordStrength() {
+      const pass = document.getElementById('reg-password').value;
+      if (pass.length === 0) { clearHint('reg-password', 'hint-password'); return; }
+      if (pass.length < 6) {
+        markInvalid('reg-password', 'hint-password', `Faltan ${6 - pass.length} caracteres más`);
+      } else {
+        markValid('reg-password');
+        setHint('hint-password', '✓ Contraseña válida', 'success');
+      }
+    }
+
+    function validateLogin() {
       const email = document.getElementById('login-email').value.trim();
       const password = document.getElementById('login-password').value;
-      if (!email || !password) return showAlert('Completa todos los campos.', 'error');
+      let valid = true;
+
+      if (!email) {
+        markInvalid('login-email', 'hint-login-email', 'El correo es obligatorio'); valid = false;
+      } else if (!EMAIL_REGEX.test(email)) {
+        markInvalid('login-email', 'hint-login-email', 'Formato inválido (ej: nombre@dominio.com)'); valid = false;
+      } else {
+        markValid('login-email');
+      }
+
+      if (!password) {
+        markInvalid('login-password', 'hint-login-pass', 'La contraseña es obligatoria'); valid = false;
+      } else if (password.length < 6) {
+        markInvalid('login-password', 'hint-login-pass', 'Mínimo 6 caracteres'); valid = false;
+      } else {
+        markValid('login-password');
+      }
+
+      return valid;
+    }
+
+    function validateRegister() {
+      const nombre = document.getElementById('reg-nombre').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const password = document.getElementById('reg-password').value;
+      let valid = true;
+
+      if (!nombre) {
+        markInvalid('reg-nombre', 'hint-nombre', 'El nombre es obligatorio'); valid = false;
+      } else if (nombre.length < 3) {
+        markInvalid('reg-nombre', 'hint-nombre', 'Mínimo 3 caracteres'); valid = false;
+      } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(nombre)) {
+        markInvalid('reg-nombre', 'hint-nombre', 'Solo se permiten letras y espacios'); valid = false;
+      } else {
+        markValid('reg-nombre');
+      }
+
+      if (!email) {
+        markInvalid('reg-email', 'hint-email', 'El correo es obligatorio'); valid = false;
+      } else if (!EMAIL_REGEX.test(email)) {
+        markInvalid('reg-email', 'hint-email', 'Formato inválido (ej: nombre@dominio.com)'); valid = false;
+      } else {
+        markValid('reg-email');
+      }
+
+      if (!password) {
+        markInvalid('reg-password', 'hint-password', 'La contraseña es obligatoria'); valid = false;
+      } else if (password.length < 6) {
+        markInvalid('reg-password', 'hint-password', `Mínimo 6 caracteres (faltan ${6 - password.length})`); valid = false;
+      } else {
+        markValid('reg-password');
+      }
+
+      return valid;
+    }
+
+    async function handleLogin() {
+      hideAlert();
+      if (!validateLogin()) return;
+
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
 
       const btn = document.getElementById('btn-login');
       btn.classList.add('loading');
@@ -478,11 +544,12 @@
     }
 
     async function handleRegister() {
+      hideAlert();
+      if (!validateRegister()) return;
+
       const nombre = document.getElementById('reg-nombre').value.trim();
       const email = document.getElementById('reg-email').value.trim();
       const password = document.getElementById('reg-password').value;
-      if (!nombre || !email || !password) return showAlert('Completa todos los campos.', 'error');
-      if (password.length < 6) return showAlert('La contraseña debe tener al menos 6 caracteres.', 'error');
 
       const btn = document.getElementById('btn-register');
       btn.classList.add('loading');
@@ -509,7 +576,6 @@
       btn.textContent = 'Crear cuenta';
     }
 
-    // Enter para enviar
     document.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
         const loginActive = document.getElementById('section-login').classList.contains('active');
