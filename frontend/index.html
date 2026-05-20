@@ -193,7 +193,7 @@
       letter-spacing: 0.01em;
     }
 
-    .field input {
+    .field input, .field select {
       width: 100%;
       padding: 0.75rem 1rem;
       border: 1.5px solid var(--border);
@@ -206,19 +206,81 @@
       transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    .field input:focus {
+    .field select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B6560' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem; }
+
+    .field input:focus, .field select:focus {
       border-color: var(--red);
       box-shadow: 0 0 0 3px rgba(208,52,44,0.08);
     }
 
-    .field input.invalid {
+    .field input.invalid { border-color: var(--red); background: var(--red-light); }
+    .field input.valid, .field select.valid { border-color: #4CAF50; }
+    .field input::placeholder { color: #C5BFB9; }
+
+    .rol-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .rol-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: var(--white);
+    }
+
+    .rol-card:hover { border-color: var(--red); background: var(--red-light); }
+
+    .rol-card.selected {
       border-color: var(--red);
       background: var(--red-light);
     }
 
-    .field input.valid { border-color: #4CAF50; }
+    .rol-card input[type="radio"] { display: none; }
 
-    .field input::placeholder { color: #C5BFB9; }
+    .rol-icon { font-size: 20px; flex-shrink: 0; }
+
+    .rol-info { flex: 1; }
+
+    .rol-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .rol-desc {
+      font-size: 0.75rem;
+      color: var(--gray);
+      margin-top: 1px;
+    }
+
+    .rol-check {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .rol-card.selected .rol-check {
+      background: var(--red);
+      border-color: var(--red);
+    }
+
+    .rol-card.selected .rol-check::after {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: white;
+    }
 
     .field-hint {
       font-size: 0.75rem;
@@ -375,6 +437,40 @@
           <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" oninput="checkPasswordStrength()">
           <div class="field-hint" id="hint-password"></div>
         </div>
+        <!-- SELECTOR DE ROL -->
+        <div class="field">
+          <label>Rol en el sistema</label>
+          <div class="rol-cards">
+            <label class="rol-card selected" onclick="selectRol(this, 'operador')">
+              <input type="radio" name="rol" value="operador" checked>
+              <div class="rol-icon">🖥️</div>
+              <div class="rol-info">
+                <div class="rol-name">Operador</div>
+                <div class="rol-desc">Registra emergencias y monitorea el mapa</div>
+              </div>
+              <div class="rol-check"></div>
+            </label>
+            <label class="rol-card" onclick="selectRol(this, 'conductor')">
+              <input type="radio" name="rol" value="conductor">
+              <div class="rol-icon">🚑</div>
+              <div class="rol-info">
+                <div class="rol-name">Conductor</div>
+                <div class="rol-desc">Chofer de ambulancia, recibe notificaciones</div>
+              </div>
+              <div class="rol-check"></div>
+            </label>
+            <label class="rol-card" onclick="selectRol(this, 'admin')">
+              <input type="radio" name="rol" value="admin">
+              <div class="rol-icon">👔</div>
+              <div class="rol-info">
+                <div class="rol-name">Administrador</div>
+                <div class="rol-desc">Gestiona ambulancias y recibe reportes</div>
+              </div>
+              <div class="rol-check"></div>
+            </label>
+          </div>
+          <div class="field-hint" id="hint-rol"></div>
+        </div>
         <button class="submit-btn" id="btn-register" onclick="handleRegister()">
           Crear cuenta
         </button>
@@ -390,6 +486,14 @@
   <script>
     const API = 'http://127.0.0.1:5000/api';
     const EMAIL_REGEX = /^[\w\.-]+@[\w\.-]+\.\w{2,}$/;
+    let rolSeleccionado = 'operador';
+
+    function selectRol(card, rol) {
+      document.querySelectorAll('.rol-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      rolSeleccionado = rol;
+      clearHint(null, 'hint-rol');
+    }
 
     function switchTab(tab) {
       document.querySelectorAll('.tab-btn').forEach((b, i) => {
@@ -419,9 +523,11 @@
     }
 
     function clearHint(inputId, hintId) {
-      const input = document.getElementById(inputId);
+      if (inputId) {
+        const input = document.getElementById(inputId);
+        if (input) input.classList.remove('invalid', 'valid');
+      }
       const hint = document.getElementById(hintId);
-      if (input) input.classList.remove('invalid', 'valid');
       if (hint) { hint.textContent = ''; hint.className = 'field-hint'; }
     }
 
@@ -431,12 +537,15 @@
     }
 
     function markInvalid(inputId, hintId, msg) {
-      const input = document.getElementById(inputId);
-      if (input) { input.classList.add('invalid'); input.classList.remove('valid'); }
+      if (inputId) {
+        const input = document.getElementById(inputId);
+        if (input) { input.classList.add('invalid'); input.classList.remove('valid'); }
+      }
       setHint(hintId, msg, 'error');
     }
 
     function markValid(inputId) {
+      if (!inputId) return;
       const input = document.getElementById(inputId);
       if (input) { input.classList.add('valid'); input.classList.remove('invalid'); }
     }
@@ -461,17 +570,13 @@
         markInvalid('login-email', 'hint-login-email', 'El correo es obligatorio'); valid = false;
       } else if (!EMAIL_REGEX.test(email)) {
         markInvalid('login-email', 'hint-login-email', 'Formato inválido (ej: nombre@dominio.com)'); valid = false;
-      } else {
-        markValid('login-email');
-      }
+      } else { markValid('login-email'); }
 
       if (!password) {
         markInvalid('login-password', 'hint-login-pass', 'La contraseña es obligatoria'); valid = false;
       } else if (password.length < 6) {
         markInvalid('login-password', 'hint-login-pass', 'Mínimo 6 caracteres'); valid = false;
-      } else {
-        markValid('login-password');
-      }
+      } else { markValid('login-password'); }
 
       return valid;
     }
@@ -488,24 +593,22 @@
         markInvalid('reg-nombre', 'hint-nombre', 'Mínimo 3 caracteres'); valid = false;
       } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(nombre)) {
         markInvalid('reg-nombre', 'hint-nombre', 'Solo se permiten letras y espacios'); valid = false;
-      } else {
-        markValid('reg-nombre');
-      }
+      } else { markValid('reg-nombre'); }
 
       if (!email) {
         markInvalid('reg-email', 'hint-email', 'El correo es obligatorio'); valid = false;
       } else if (!EMAIL_REGEX.test(email)) {
         markInvalid('reg-email', 'hint-email', 'Formato inválido (ej: nombre@dominio.com)'); valid = false;
-      } else {
-        markValid('reg-email');
-      }
+      } else { markValid('reg-email'); }
 
       if (!password) {
         markInvalid('reg-password', 'hint-password', 'La contraseña es obligatoria'); valid = false;
       } else if (password.length < 6) {
         markInvalid('reg-password', 'hint-password', `Mínimo 6 caracteres (faltan ${6 - password.length})`); valid = false;
-      } else {
-        markValid('reg-password');
+      } else { markValid('reg-password'); }
+
+      if (!rolSeleccionado) {
+        setHint('hint-rol', 'Selecciona un rol', 'error'); valid = false;
       }
 
       return valid;
@@ -550,6 +653,7 @@
       const nombre = document.getElementById('reg-nombre').value.trim();
       const email = document.getElementById('reg-email').value.trim();
       const password = document.getElementById('reg-password').value;
+      const rol = rolSeleccionado;
 
       const btn = document.getElementById('btn-register');
       btn.classList.add('loading');
@@ -559,7 +663,7 @@
         const res = await fetch(API + '/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nombre, email, password })
+          body: JSON.stringify({ nombre, email, password, rol })
         });
         const data = await res.json();
         if (res.ok) {
