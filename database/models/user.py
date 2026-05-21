@@ -9,3 +9,4 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
     rol = db.Column(db.String(50), default='operador')
+    # Roles válidos: 'operador', 'conductor', 'admin'
