@@ -300,7 +300,7 @@
                     <div class="field">
                       <label class="label" for="edad">Edad</label>
                       <div class="control has-icons-left">
-                        <input id="edad" class="input" type="number" placeholder="45" min="0" max="120" />
+                        <input id="edad" class="input" type="number" placeholder="45" min="0" max="120" required />
                         <span class="icon is-left"><i class="fa-solid fa-hashtag"></i></span>
                       </div>
                     </div>
@@ -484,26 +484,85 @@
 
   <script>
     document.getElementById('form-emergencia').addEventListener('submit', function(e) {
-      e.preventDefault();
+    e.preventDefault();
 
-      const emergencia = {
-        paciente:    document.getElementById('paciente').value,
-        edad:        parseInt(document.getElementById('edad').value),
-        descripcion: document.getElementById('descripcion').value,
-        direccion:   document.getElementById('direccion').value,
-        latitud:     parseFloat(document.getElementById('latitud').value) || null,
-        longitud:    parseFloat(document.getElementById('longitud').value) || null,
-        prioridad:   parseInt(document.getElementById('prioridad').value),
-        estado:      document.getElementById('estado').value,
-      };
+    const emergencia = {
+      nombre_paciente: document.getElementById('paciente').value,
+      edad:        parseInt(document.getElementById('edad').value),
+      descripcion: document.getElementById('descripcion').value,
+      direccion:   document.getElementById('direccion').value,
+      latitud:     parseFloat(document.getElementById('latitud').value) || null,
+      longitud:    parseFloat(document.getElementById('longitud').value) || null,
+      prioridad:   parseInt(document.getElementById('prioridad').value),
+      estado:      document.getElementById('estado').value,
+    };
 
-      console.log('Emergencia a registrar:', emergencia);
-
-      // Aquí se conectará con Flask/Supabase en el Paso 3
+      // Aquí se conectará con Flask/Supabase en el Paso 2
+    fetch('http://127.0.0.1:5000/api/emergencias', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(emergencia)
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Error del servidor: ' + response.status);
+      return response.json();
+    })
+    .then(data => {
       document.getElementById('alerta-exito').classList.remove('is-hidden');
+      document.getElementById('alerta-error').classList.add('is-hidden');
       document.getElementById('form-emergencia').reset();
+      cargarEmergencias();
+    })
+    .catch(error => {
+      document.getElementById('alerta-error').classList.remove('is-hidden');
+      document.getElementById('alerta-exito').classList.add('is-hidden');
     });
-  </script>
+  });
 
+  function cargarEmergencias() {
+    fetch('http://127.0.0.1:5000/api/emergencias')
+    .then(response => response.json())
+    .then(data => {
+      const lista = document.getElementById('lista-emergencias');
+      lista.innerHTML = '';
+
+      if (data.length === 0) {
+        lista.innerHTML = '<p style="color:#999; text-align:center; padding:1rem;">No hay emergencias registradas.</p>';
+        return;
+      }
+
+      const esc = t => String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const colores = { 1: 'danger', 2: 'warning', 3: 'success' };
+      const estados = {
+        'pendiente': 'is-info',
+        'en_camino': 'is-warning',
+        'atendida': 'is-success',
+        'cerrada': 'is-light'
+      };
+      data.forEach(e => {
+        lista.innerHTML += `
+          <div class="emergencia-card prioridad-${esc(e.prioridad)}">
+            <div class="emergencia-nombre">
+              <i class="fa-regular fa-user"></i>
+              ${esc(e.nombre_paciente)}, ${esc(e.edad)} años
+            </div>
+            <div class="emergencia-detalle">
+              <i class="fa-solid fa-location-dot"></i>
+              ${esc(e.direccion)}
+            </div>
+            <div class="emergencia-desc">${esc(e.descripcion)}</div>
+            <div class="tags-emergencia">
+              <span class="tag is-${colores[e.prioridad]}">Prioridad ${esc(e.prioridad)}</span>
+              <span class="tag ${estados[e.estado]}">${esc(e.estado)}</span>
+            </div>
+          </div>
+        `;
+      });
+    })
+    .catch(error => console.error('Error cargando emergencias:', error));
+  }
+
+  cargarEmergencias();
+</script>
 </body>
 </html>
