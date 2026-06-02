@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro de Emergencias - SAMU</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+
+    body { background-color: #f0f2f5; }
+
+    /* ── Navbar ── */
+    .navbar-samu {
+      background-color: #b71c1c;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      min-height: 58px;
+    }
+    .navbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 1.2rem;
+      color: white;
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: 0.3px;
+    }
+    .navbar-logo i { font-size: 1.3rem; }
+    .navbar-logo .separador {
+      width: 1px;
+      height: 22px;
+      background: rgba(255,255,255,0.35);
+      margin: 0 10px;
+    }
+    .navbar-logo .subtitulo {
+      font-weight: 400;
+      font-size: 0.85rem;
+      opacity: 0.85;
+    }
+    .operador-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      padding: 5px 14px;
+      color: white;
+      font-size: 0.85rem;
+      margin-right: 1rem;
+    }
+    .operador-badge i { opacity: 0.8; }
+
+    /* ── Encabezado de página ── */
+    .page-header {
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 1rem;
+    }
+    .page-header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .page-header h1 i { color: #b71c1c; }
+    .page-header p { color: #666; font-size: 0.9rem; margin-top: 4px; }
+
+    /* ── Cards ── */
+    .card {
+      border-radius: 10px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+      border: 1px solid #e8e8e8;
+    }
+    .card-header {
+      border-radius: 10px 10px 0 0;
+      background-color: #fff;
+      border-bottom: 1px solid #eee;
+      padding: 0.2rem 0;
+    }
+    .card-header-title {
+      color: #1a1a1a;
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-header-title i { color: #b71c1c; }
+
+    /* ── Secciones del formulario ── */
+    .seccion-titulo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #888;
+      margin-bottom: 1rem;
+    }
+    .seccion-titulo i { color: #b71c1c; font-size: 0.9rem; }
+    .seccion-divider {
+      border: none;
+      border-top: 1px solid #ebebeb;
+      margin: 1.4rem 0;
+    }
+
+    /* ── Inputs ── */
+    .label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 4px;
+    }
+    .input, .textarea, .select select {
+      font-size: 0.9rem;
+      border-color: #ddd;
+      border-radius: 6px;
+      box-shadow: none;
+      transition: border-color 0.2s;
+    }
+    .input:focus, .textarea:focus, .select select:focus {
+      border-color: #b71c1c;
+      box-shadow: 0 0 0 2px rgba(183,28,28,0.1);
+    }
+    .control.has-icons-left .icon { color: #aaa; }
+    .textarea { resize: vertical; min-height: 90px; }
+
+    /* ── Botones ── */
+    .btn-registrar {
+      background-color: #b71c1c;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 10px 22px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-registrar:hover { background-color: #8b0000; color: white; }
+    .btn-limpiar {
+      background-color: #f5f5f5;
+      color: #555;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-limpiar:hover { background-color: #eaeaea; }
+
+    /* ── Tarjetas emergencias recientes ── */
+    .emergencia-card {
+      border-radius: 8px;
+      border: 1px solid #eee;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      background: #fff;
+      transition: box-shadow 0.2s;
+    }
+    .emergencia-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+    .prioridad-1 { border-left: 4px solid #c62828; }
+    .prioridad-2 { border-left: 4px solid #e65100; }
+    .prioridad-3 { border-left: 4px solid #2e7d32; }
+    .emergencia-nombre {
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: #1a1a1a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .emergencia-nombre i { color: #999; font-size: 0.85rem; }
+    .emergencia-detalle {
+      font-size: 0.8rem;
+      color: #777;
+      margin-top: 3px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .emergencia-detalle i { font-size: 0.75rem; }
+    .emergencia-desc {
+      font-size: 0.82rem;
+      color: #444;
+      margin-top: 4px;
+    }
+    .tags-emergencia { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag { border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+
+    /* ── Notificaciones ── */
+    .notification {
+      border-radius: 8px;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-main { padding: 1.8rem 1.5rem; }
+    .alerta { margin-bottom: 1rem; }
+    #lista-emergencias { padding: 1rem; }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-samu" role="navigation" aria-label="navegación principal">
+    <div class="navbar-brand">
+      <div class="navbar-logo">
+        <i class="fa-solid fa-truck-medical"></i>
+        <span>SAMU</span>
+        <div class="separador"></div>
+        <span class="subtitulo">Sistema de Atención Móvil de Urgencias</span>
+      </div>
+    </div>
+    <div class="navbar-end">
+      <div class="navbar-item">
+        <div class="operador-badge">
+          <i class="fa-regular fa-circle-user"></i>
+          <span>Juan Colqui</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <section class="section section-main">
+    <div class="container">
+
+      <!-- Encabezado de página -->
+      <div class="page-header">
+        <h1>
+          <i class="fa-solid fa-file-medical"></i>
+          Registro de Emergencias
+        </h1>
+        <p>Complete los datos del incidente para asignar una ambulancia disponible</p>
+      </div>
+
+      <!-- Notificación de éxito (oculta por defecto) -->
+      <div id="alerta-exito" class="notification is-success is-light is-hidden alerta">
+        <button class="delete" aria-label="cerrar" onclick="document.getElementById('alerta-exito').classList.add('is-hidden')"></button>
+        <i class="fa-solid fa-circle-check"></i>
+        Emergencia registrada correctamente.
+      </div>
+
+      <!-- Notificación de error (oculta por defecto) -->
+      <div id="alerta-error" class="notification is-danger is-light is-hidden alerta">
+        <button class="delete" aria-label="cerrar" onclick="document.getElementById('alerta-error').classList.add('is-hidden')"></button>
+        <i class="fa-solid fa-circle-xmark"></i>
+        Error al registrar la emergencia. Intente nuevamente.
+      </div>
+
+      <div class="columns">
+
+        <!-- Columna izquierda: Formulario -->
+        <div class="column is-7">
+          <div class="card">
+            <div class="card-header">
+              <p class="card-header-title">
+                <i class="fa-solid fa-plus"></i>
+                Nueva Emergencia
+              </p>
+            </div>
+            <div class="card-content">
+              <form id="form-emergencia">
+
+                <!-- HU05: Datos del paciente -->
+                <div class="seccion-titulo">
+                  <i class="fa-solid fa-user-injured"></i>
+                  Datos del Paciente
+                </div>
+
+                <div class="columns">
+                  <div class="column is-8">
+                    <div class="field">
+                      <label class="label" for="paciente">Nombre completo</label>
+                      <div class="control has-icons-left">
+                        <input id="paciente" class="input" type="text" placeholder="Ej: Carlos Pérez" required />
+                        <span class="icon is-left"><i class="fa-regular fa-user"></i></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="column is-4">
+                    <div class="field">
+                      <label class="label" for="edad">Edad</label>
+                      <div class="control has-icons-left">
+                        <input id="edad" class="input" type="number" placeholder="45" min="0" max="120" required />
+                        <span class="icon is-left"><i class="fa-solid fa-hashtag"></i></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label class="label" for="descripcion">Descripción de la emergencia</label>
+                  <div class="control">
+                    <textarea id="descripcion" class="textarea" placeholder="Describa el tipo de incidente, síntomas o situación observada..." required></textarea>
+                  </div>
+                </div>
+
+                <!-- HU05: Ubicación -->
+                <hr class="seccion-divider" />
+                <div class="seccion-titulo">
+                  <i class="fa-solid fa-location-dot"></i>
+                  Ubicación del Incidente
+                </div>
+
+                <div class="field">
+                  <label class="label" for="direccion">Dirección</label>
+                  <div class="control has-icons-left">
+                    <input id="direccion" class="input" type="text" placeholder="Ej: Av. Abancay 123, Cercado de Lima" required />
+                    <span class="icon is-left"><i class="fa-solid fa-map-pin"></i></span>
+                  </div>
+                </div>
+
+                <div class="columns">
+                  <div class="column">
+                    <div class="field">
+                      <label class="label" for="latitud">Latitud</label>
+                      <div class="control has-icons-left">
+                        <input id="latitud" class="input" type="number" step="any" placeholder="-12.0464" />
+                        <span class="icon is-left"><i class="fa-solid fa-arrows-up-down"></i></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="column">
+                    <div class="field">
+                      <label class="label" for="longitud">Longitud</label>
+                      <div class="control has-icons-left">
+                        <input id="longitud" class="input" type="number" step="any" placeholder="-77.0428" />
+                        <span class="icon is-left"><i class="fa-solid fa-arrows-left-right"></i></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- HU06: Prioridad -->
+                <hr class="seccion-divider" />
+                <div class="seccion-titulo">
+                  <i class="fa-solid fa-triangle-exclamation"></i>
+                  Clasificación
+                </div>
+
+                <div class="columns">
+                  <div class="column">
+                    <div class="field">
+                      <label class="label" for="prioridad">Nivel de Prioridad</label>
+                      <div class="control has-icons-left">
+                        <div class="select is-fullwidth">
+                          <select id="prioridad" required>
+                            <option value="">Seleccionar prioridad</option>
+                            <option value="1">Prioridad 1 — Riesgo vital inmediato</option>
+                            <option value="2">Prioridad 2 — Urgencia relativa</option>
+                            <option value="3">Prioridad 3 — Consulta o traslado</option>
+                          </select>
+                        </div>
+                        <span class="icon is-left"><i class="fa-solid fa-gauge-high"></i></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="column">
+                    <!-- HU07: Estado -->
+                    <div class="field">
+                      <label class="label" for="estado">Estado Inicial</label>
+                      <div class="control has-icons-left">
+                        <div class="select is-fullwidth">
+                          <select id="estado">
+                            <option value="pendiente">Pendiente</option>
+                            <option value="en_camino">En camino</option>
+                            <option value="atendida">Atendida</option>
+                            <option value="cerrada">Cerrada</option>
+                          </select>
+                        </div>
+                        <span class="icon is-left"><i class="fa-solid fa-circle-half-stroke"></i></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Botones -->
+                <hr class="seccion-divider" />
+                <div class="field is-grouped">
+                  <div class="control">
+                    <button type="submit" class="btn-registrar">
+                      <i class="fa-solid fa-floppy-disk"></i>
+                      Registrar Emergencia
+                    </button>
+                  </div>
+                  <div class="control">
+                    <button type="reset" class="btn-limpiar">
+                      <i class="fa-solid fa-rotate-left"></i>
+                      Limpiar
+                    </button>
+                  </div>
+                </div>
+
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna derecha: Lista de emergencias recientes -->
+        <div class="column is-5">
+          <div class="card">
+            <div class="card-header">
+              <p class="card-header-title">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                Emergencias Recientes
+              </p>
+            </div>
+            <div class="card-content" id="lista-emergencias">
+
+              <div class="emergencia-card prioridad-1">
+                <div class="emergencia-nombre">
+                  <i class="fa-regular fa-user"></i>
+                  Carlos Pérez, 45 años
+                </div>
+                <div class="emergencia-detalle">
+                  <i class="fa-solid fa-location-dot"></i>
+                  Av. Abancay 123, Lima
+                </div>
+                <div class="emergencia-desc">Paro cardiaco</div>
+                <div class="tags-emergencia">
+                  <span class="tag is-danger">Prioridad 1</span>
+                  <span class="tag is-warning">En camino</span>
+                </div>
+              </div>
+
+              <div class="emergencia-card prioridad-2">
+                <div class="emergencia-nombre">
+                  <i class="fa-regular fa-user"></i>
+                  María López, 32 años
+                </div>
+                <div class="emergencia-detalle">
+                  <i class="fa-solid fa-location-dot"></i>
+                  Jr. Huallaga 456, Lima
+                </div>
+                <div class="emergencia-desc">Fractura de pierna</div>
+                <div class="tags-emergencia">
+                  <span class="tag is-warning">Prioridad 2</span>
+                  <span class="tag is-info">Pendiente</span>
+                </div>
+              </div>
+
+              <div class="emergencia-card prioridad-3">
+                <div class="emergencia-nombre">
+                  <i class="fa-regular fa-user"></i>
+                  Roberto Silva, 67 años
+                </div>
+                <div class="emergencia-detalle">
+                  <i class="fa-solid fa-location-dot"></i>
+                  Av. Grau 789, Lima
+                </div>
+                <div class="emergencia-desc">Traslado programado</div>
+                <div class="tags-emergencia">
+                  <span class="tag is-success">Prioridad 3</span>
+                  <span class="tag is-success">Atendida</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <script>
+    document.getElementById('form-emergencia').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const emergencia = {
+      nombre_paciente: document.getElementById('paciente').value,
+      edad:        parseInt(document.getElementById('edad').value),
+      descripcion: document.getElementById('descripcion').value,
+      direccion:   document.getElementById('direccion').value,
+      latitud:     parseFloat(document.getElementById('latitud').value) || null,
+      longitud:    parseFloat(document.getElementById('longitud').value) || null,
+      prioridad:   parseInt(document.getElementById('prioridad').value),
+      estado:      document.getElementById('estado').value,
+    };
+
+      // Aquí se conectará con Flask/Supabase en el Paso 2
+    fetch('http://127.0.0.1:5000/api/emergencias', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(emergencia)
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Error del servidor: ' + response.status);
+      return response.json();
+    })
+    .then(data => {
+      document.getElementById('alerta-exito').classList.remove('is-hidden');
+      document.getElementById('alerta-error').classList.add('is-hidden');
+      document.getElementById('form-emergencia').reset();
+      cargarEmergencias();
+    })
+    .catch(error => {
+      document.getElementById('alerta-error').classList.remove('is-hidden');
+      document.getElementById('alerta-exito').classList.add('is-hidden');
+    });
+  });
+
+  function cargarEmergencias() {
+    fetch('http://127.0.0.1:5000/api/emergencias')
+    .then(response => response.json())
+    .then(data => {
+      const lista = document.getElementById('lista-emergencias');
+      lista.innerHTML = '';
+
+      if (data.length === 0) {
+        lista.innerHTML = '<p style="color:#999; text-align:center; padding:1rem;">No hay emergencias registradas.</p>';
+        return;
+      }
+
+      const esc = t => String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const colores = { 1: 'danger', 2: 'warning', 3: 'success' };
+      const estados = {
+        'pendiente': 'is-info',
+        'en_camino': 'is-warning',
+        'atendida': 'is-success',
+        'cerrada': 'is-light'
+      };
+      data.forEach(e => {
+        lista.innerHTML += `
+          <div class="emergencia-card prioridad-${esc(e.prioridad)}">
+            <div class="emergencia-nombre">
+              <i class="fa-regular fa-user"></i>
+              ${esc(e.nombre_paciente)}, ${esc(e.edad)} años
+            </div>
+            <div class="emergencia-detalle">
+              <i class="fa-solid fa-location-dot"></i>
+              ${esc(e.direccion)}
+            </div>
+            <div class="emergencia-desc">${esc(e.descripcion)}</div>
+            <div class="tags-emergencia">
+              <span class="tag is-${colores[e.prioridad]}">Prioridad ${esc(e.prioridad)}</span>
+              <span class="tag ${estados[e.estado]}">${esc(e.estado)}</span>
+            </div>
+          </div>
+        `;
+      });
+    })
+    .catch(error => console.error('Error cargando emergencias:', error));
+  }
+
+  cargarEmergencias();
+</script>
+</body>
+</html>
