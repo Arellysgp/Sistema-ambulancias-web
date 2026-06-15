@@ -559,7 +559,10 @@
         `;
       });
     })
-    .catch(error => console.error('Error cargando emergencias:', error));
+    .catch(error => {
+      const lista = document.getElementById('lista-emergencias');
+      lista.innerHTML = '<p style="color:#e53935; text-align:center; padding:1rem;"><i class="fa-solid fa-triangle-exclamation"></i> No se pudo conectar con el servidor.</p>';
+    });
   }
 
   cargarEmergencias();
