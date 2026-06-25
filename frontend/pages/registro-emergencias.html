@@ -8,6 +8,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     * { font-family: 'Inter', sans-serif; }
 
@@ -215,30 +218,57 @@
     }
     .section-main { padding: 1.8rem 1.5rem; }
     .alerta { margin-bottom: 1rem; }
-    #lista-emergencias { padding: 1rem; }
+/* ── Contenedor con Scroll para emergencias ── */
+    #lista-emergencias { 
+      padding: 1rem; 
+      max-height: 550px; /* Altura máxima antes de que aparezca la barra */
+      overflow-y: auto;  /* Activa el scroll vertical automáticamente */
+    }
+
+    /* Diseño moderno para la barra de scroll */
+    #lista-emergencias::-webkit-scrollbar {
+      width: 6px;
+    }
+    #lista-emergencias::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 8px;
+    }
+    #lista-emergencias::-webkit-scrollbar-thumb {
+      background: #cccccc;
+      border-radius: 8px;
+    }
+    #lista-emergencias::-webkit-scrollbar-thumb:hover {
+      background: #b71c1c; /* Se pone roja al pasar el mouse */
+    }
+/* --- CORRECCIÓN DEL MENÚ BLANCO AL PASAR EL MOUSE --- */
+    .navbar-samu .navbar-item.has-dropdown:hover .navbar-link,
+    .navbar-samu .navbar-item.has-dropdown.is-active .navbar-link,
+    .navbar-samu .navbar-link:hover,
+    .navbar-samu .navbar-link:focus {
+        background-color: #901616 !important; /* Un rojo oscuro elegante */
+        color: #ffffff !important;
+    }
+
+    /* Obliga a la flechita desplegable a mantenerse blanca */
+    .navbar-samu .navbar-link::after {
+        border-color: #ffffff !important;
+    }
+    
+    /* Diseño del menú desplegable (Cerrar Sesión) */
+    .navbar-dropdown {
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .navbar-dropdown .navbar-item:hover {
+        background-color: #f5f5f5 !important;
+    }
+
+
   </style>
 </head>
 <body>
 
-  <!-- Navbar -->
-  <nav class="navbar navbar-samu" role="navigation" aria-label="navegación principal">
-    <div class="navbar-brand">
-      <div class="navbar-logo">
-        <i class="fa-solid fa-truck-medical"></i>
-        <span>SAMU</span>
-        <div class="separador"></div>
-        <span class="subtitulo">Sistema de Atención Móvil de Urgencias</span>
-      </div>
-    </div>
-    <div class="navbar-end">
-      <div class="navbar-item">
-        <div class="operador-badge">
-          <i class="fa-regular fa-circle-user"></i>
-          <span>Juan Colqui</span>
-        </div>
-      </div>
-    </div>
-  </nav>
+ <div id="header-container"></div>
 
   <section class="section section-main">
     <div class="container">
@@ -279,6 +309,8 @@
             </div>
             <div class="card-content">
               <form id="form-emergencia">
+                <input type="hidden" id="emergencia_id" value="" />
+
 
                 <!-- HU05: Datos del paciente -->
                 <div class="seccion-titulo">
@@ -349,13 +381,18 @@
                     </div>
                   </div>
                 </div>
-
-                <!-- HU06: Prioridad -->
+          
+                <div class="field" style="margin-top: 1rem;">
+                  <label class="label">Ubicación en el Mapa</label>
+                  <div class="control">
+                    <div id="mapa-operador" style="height: 250px; border-radius: 8px; border: 1px solid #ddd; z-index: 1;"></div>
+                  </div>
+                </div>
                 <hr class="seccion-divider" />
                 <div class="seccion-titulo">
                   <i class="fa-solid fa-triangle-exclamation"></i>
                   Clasificación
-                </div>
+                  </div>
 
                 <div class="columns">
                   <div class="column">
@@ -394,29 +431,35 @@
                 </div>
 
                 <!-- Botones -->
-                <hr class="seccion-divider" />
-                <div class="field is-grouped">
-                  <div class="control">
-                    <button type="submit" class="btn-registrar">
-                      <i class="fa-solid fa-floppy-disk"></i>
-                      Registrar Emergencia
-                    </button>
-                  </div>
-                  <div class="control">
-                    <button type="reset" class="btn-limpiar">
-                      <i class="fa-solid fa-rotate-left"></i>
-                      Limpiar
-                    </button>
-                  </div>
-                </div>
+<hr class="seccion-divider" />
+<div class="field is-grouped">
+  <div class="control">
+    <button type="submit" class="btn-registrar" id="btn-submit-emergencia">
+      <i class="fa-solid fa-floppy-disk"></i>
+      Registrar Emergencia
+    </button>
+  </div>
+  
+  <div class="control">
+    <button type="button" class="button is-danger is-light is-hidden" id="btn-cancelar-emergencia" onclick="limpiarFormulario()">
+      Atrás
+    </button>
+  </div>
 
+  <div class="control">
+    <button type="button" class="btn-limpiar" id="btn-limpiar-emergencia" onclick="limpiarFormulario()">
+      <i class="fa-solid fa-rotate-left"></i>
+      Limpiar
+    </button>
+  </div>
+</div>
               </form>
             </div>
           </div>
         </div>
 
         <!-- Columna derecha: Lista de emergencias recientes -->
-        <div class="column is-5">
+ <div class="column is-5">
           <div class="card">
             <div class="card-header">
               <p class="card-header-title">
@@ -425,81 +468,131 @@
               </p>
             </div>
             <div class="card-content" id="lista-emergencias">
-
-              <div class="emergencia-card prioridad-1">
-                <div class="emergencia-nombre">
-                  <i class="fa-regular fa-user"></i>
-                  Carlos Pérez, 45 años
-                </div>
-                <div class="emergencia-detalle">
-                  <i class="fa-solid fa-location-dot"></i>
-                  Av. Abancay 123, Lima
-                </div>
-                <div class="emergencia-desc">Paro cardiaco</div>
-                <div class="tags-emergencia">
-                  <span class="tag is-danger">Prioridad 1</span>
-                  <span class="tag is-warning">En camino</span>
-                </div>
-              </div>
-
-              <div class="emergencia-card prioridad-2">
-                <div class="emergencia-nombre">
-                  <i class="fa-regular fa-user"></i>
-                  María López, 32 años
-                </div>
-                <div class="emergencia-detalle">
-                  <i class="fa-solid fa-location-dot"></i>
-                  Jr. Huallaga 456, Lima
-                </div>
-                <div class="emergencia-desc">Fractura de pierna</div>
-                <div class="tags-emergencia">
-                  <span class="tag is-warning">Prioridad 2</span>
-                  <span class="tag is-info">Pendiente</span>
-                </div>
-              </div>
-
-              <div class="emergencia-card prioridad-3">
-                <div class="emergencia-nombre">
-                  <i class="fa-regular fa-user"></i>
-                  Roberto Silva, 67 años
-                </div>
-                <div class="emergencia-detalle">
-                  <i class="fa-solid fa-location-dot"></i>
-                  Av. Grau 789, Lima
-                </div>
-                <div class="emergencia-desc">Traslado programado</div>
-                <div class="tags-emergencia">
-                  <span class="tag is-success">Prioridad 3</span>
-                  <span class="tag is-success">Atendida</span>
-                </div>
-              </div>
-
+               <p style="color:#999; text-align:center; padding:1rem;">
+                 <i class="fa-solid fa-spinner fa-spin" style="margin-right: 8px;"></i> Cargando emergencias...
+               </p>
             </div>
           </div>
         </div>
-
-      </div>
-    </div>
   </section>
 
   <script>
-    document.getElementById('form-emergencia').addEventListener('submit', function(e) {
+// 1. Mostrar nombre del usuario al cargar la página
+// 1. Mostrar nombre del usuario al cargar la página
+  document.addEventListener('DOMContentLoaded', () => {
+    cargarEmergencias();
+    iniciarMapa();
+    // RADAR DEL OPERADOR: Actualiza la tabla automáticamente cada 5 segundos
+    setInterval(() => {
+        cargarEmergencias();
+    }, 5000);
+  });
+
+  // --- BUSCADOR AUTOMÁTICO DE DIRECCIONES ---
+  // Se activa cuando el operador termina de escribir y sale de la casilla "Dirección"
+  document.getElementById('direccion').addEventListener('blur', function() {
+    const direccionTexto = this.value.trim();
+    if (!direccionTexto) return;
+
+    // Le agregamos "Lima, Perú" ocultamente para que no busque calles en otros países
+    const busqueda = `${direccionTexto}, Lima, Perú`;
+    const urlBusqueda = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(busqueda)}`;
+
+    // Llamamos al buscador gratuito de OpenStreetMap
+    fetch(urlBusqueda)
+      .then(response => response.json())
+      .then(data => {
+        if (data.length > 0) {
+          // Si encuentra la calle, sacamos la latitud y longitud
+          const lat = parseFloat(data[0].lat);
+          const lng = parseFloat(data[0].lon);
+
+          // 1. Volamos hacia esa ubicación con un zoom de 15 (bien de cerca)
+          mapa.setView([lat, lng], 15);
+
+          // 2. Llenamos las casillas automáticamente
+          document.getElementById('latitud').value = lat.toFixed(6);
+          document.getElementById('longitud').value = lng.toFixed(6);
+
+          // 3. Ponemos o movemos el pin rojo del accidente
+          if (marcador) {
+            marcador.setLatLng([lat, lng]);
+          } else {
+            marcador = L.marker([lat, lng]).addTo(mapa);
+          }
+          mostrarAmbulanciaEstatica(lat, lng);
+        } else {
+          console.warn("No se encontró la dirección exacta. Ubíquela haciendo clic en el mapa.");
+        }
+      })
+      .catch(error => console.error("Error en la búsqueda de dirección:", error));
+  });
+
+  // 2. Función para cerrar sesión
+  function cerrarSesion() {
+    localStorage.clear(); // Limpia los datos
+    window.location.href = '/index.html'; // Te manda al login
+  }
+
+  // Variable global para guardar temporalmente las emergencias
+  let emergenciasGlobales = [];
+
+  // --- CONFIGURACIÓN DEL MAPA (LEAFLET) ---
+  let mapa;
+  let marcador;
+  let rutaActual = null;
+  let marcadorAmbulancia = null;
+  let intervaloAmbulancia = null;
+  let idPeticionRuta = 0;
+
+  function iniciarMapa() {
+    // Centramos el mapa en Lima por defecto
+    mapa = L.map('mapa-operador').setView([-12.0464, -77.0428], 12); 
+
+    // Cargamos el diseño de las calles desde OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(mapa);
+
+    // Evento: Al hacer clic en el mapa, llenamos las coordenadas y ponemos un pin rojo
+    mapa.on('click', function(e) {
+      const lat = e.latlng.lat;
+      const lng = e.latlng.lng;
+
+      document.getElementById('latitud').value = lat.toFixed(6);
+      document.getElementById('longitud').value = lng.toFixed(6);
+
+      if (marcador) {
+        marcador.setLatLng(e.latlng);
+      } else {
+        marcador = L.marker([lat, lng]).addTo(mapa);
+      }
+      mostrarAmbulanciaEstatica(lat, lng);
+    });
+  }
+
+  // 3. Procesar el formulario (Sirve tanto para Registrar como para Editar)
+  document.getElementById('form-emergencia').addEventListener('submit', function(e) {
     e.preventDefault();
 
+    const idEmergencia = document.getElementById('emergencia_id').value;
     const emergencia = {
       nombre_paciente: document.getElementById('paciente').value,
-      edad:        parseInt(document.getElementById('edad').value),
+      edad: parseInt(document.getElementById('edad').value),
       descripcion: document.getElementById('descripcion').value,
-      direccion:   document.getElementById('direccion').value,
-      latitud:     parseFloat(document.getElementById('latitud').value) || null,
-      longitud:    parseFloat(document.getElementById('longitud').value) || null,
-      prioridad:   parseInt(document.getElementById('prioridad').value),
-      estado:      document.getElementById('estado').value,
+      direccion: document.getElementById('direccion').value,
+      latitud: parseFloat(document.getElementById('latitud').value) || null,
+      longitud: parseFloat(document.getElementById('longitud').value) || null,
+      prioridad: parseInt(document.getElementById('prioridad').value),
+      estado: document.getElementById('estado').value,
     };
 
-      // Aquí se conectará con Flask/Supabase en el Paso 2
-    fetch('http://127.0.0.1:5000/api/emergencias', {
-      method: 'POST',
+    // Si hay ID oculto es PUT (Editar), si está vacío es POST (Registrar)
+    const url = idEmergencia ? `http://127.0.0.1:5000/api/emergencias/${idEmergencia}` : 'http://127.0.0.1:5000/api/emergencias';
+    const metodo = idEmergencia ? 'PUT' : 'POST';
+
+    fetch(url, {
+      method: metodo,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(emergencia)
     })
@@ -508,10 +601,18 @@
       return response.json();
     })
     .then(data => {
+      // Muestra el mensaje correcto dependiendo de lo que se hizo
+      document.getElementById('alerta-exito').textContent = idEmergencia ? 'Emergencia actualizada correctamente.' : 'Emergencia registrada correctamente.';
       document.getElementById('alerta-exito').classList.remove('is-hidden');
       document.getElementById('alerta-error').classList.add('is-hidden');
-      document.getElementById('form-emergencia').reset();
+      
+      // Limpia todo el formulario y vuelve el botón a su estado normal
+      limpiarFormulario();
+      limpiarMapaRuta();
       cargarEmergencias();
+
+      // Oculta la alerta verde a los 3 segundos
+      setTimeout(() => document.getElementById('alerta-exito').classList.add('is-hidden'), 3000);
     })
     .catch(error => {
       document.getElementById('alerta-error').classList.remove('is-hidden');
@@ -519,10 +620,12 @@
     });
   });
 
+  // 4. Cargar la lista de la derecha desde la base de datos
   function cargarEmergencias() {
     fetch('http://127.0.0.1:5000/api/emergencias')
     .then(response => response.json())
     .then(data => {
+      emergenciasGlobales = data; // Guarda en la variable global
       const lista = document.getElementById('lista-emergencias');
       lista.innerHTML = '';
 
@@ -539,12 +642,26 @@
         'atendida': 'is-success',
         'cerrada': 'is-light'
       };
+
+      const textoEstados = {
+        'pendiente': 'Pendiente',
+        'en_camino': 'En camino',
+        'atendida': 'Atendida',
+        'cerrada': 'Cerrada'
+      };
+
       data.forEach(e => {
         lista.innerHTML += `
           <div class="emergencia-card prioridad-${esc(e.prioridad)}">
-            <div class="emergencia-nombre">
-              <i class="fa-regular fa-user"></i>
-              ${esc(e.nombre_paciente)}, ${esc(e.edad)} años
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div class="emergencia-nombre">
+                <i class="fa-regular fa-user"></i>
+                ${esc(e.nombre_paciente)}, ${esc(e.edad)} años
+              </div>
+              <div style="display: flex; gap: 12px;">
+                <button type="button" onclick="editarEmergencia(${e.id})" style="background: none; border: none; cursor: pointer; color: #1976d2;" title="Editar"><i class="fa-solid fa-eye"></i></button>
+                <button type="button" onclick="eliminarEmergencia(${e.id})" style="background: none; border: none; cursor: pointer; color: #c62828;" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+              </div>
             </div>
             <div class="emergencia-detalle">
               <i class="fa-solid fa-location-dot"></i>
@@ -553,7 +670,7 @@
             <div class="emergencia-desc">${esc(e.descripcion)}</div>
             <div class="tags-emergencia">
               <span class="tag is-${colores[e.prioridad]}">Prioridad ${esc(e.prioridad)}</span>
-              <span class="tag ${estados[e.estado]}">${esc(e.estado)}</span>
+              <span class="tag ${estados[e.estado]}">${textoEstados[e.estado] || esc(e.estado)}</span>
             </div>
           </div>
         `;
@@ -565,7 +682,204 @@
     });
   }
 
-  cargarEmergencias();
-</script>
+// 5. Cargar los datos de una tarjeta en el formulario (Modo Edición)
+  function editarEmergencia(id) {
+    const emergencia = emergenciasGlobales.find(e => e.id === id);
+    if(emergencia) {
+      // 1. Llenar los textos
+      document.getElementById('emergencia_id').value = emergencia.id;
+      document.getElementById('paciente').value = emergencia.nombre_paciente;
+      document.getElementById('edad').value = emergencia.edad;
+      document.getElementById('descripcion').value = emergencia.descripcion;
+      document.getElementById('direccion').value = emergencia.direccion;
+      document.getElementById('latitud').value = emergencia.latitud || '';
+      document.getElementById('longitud').value = emergencia.longitud || '';
+      document.getElementById('prioridad').value = emergencia.prioridad;
+      document.getElementById('estado').value = emergencia.estado;
+      
+      // 👇 ¡NUEVO! 2. Actualizar el mapa automáticamente
+      if (emergencia.latitud && emergencia.longitud) {
+        const lat = parseFloat(emergencia.latitud);
+        const lng = parseFloat(emergencia.longitud);
+        
+        // Volamos a esa ubicación
+        mapa.setView([lat, lng], 15);
+        
+        // Ponemos o movemos el pin rojo
+        if (marcador) {
+          marcador.setLatLng([lat, lng]);
+        } else {
+          marcador = L.marker([lat, lng]).addTo(mapa);
+        }
+        trazarRutaInteligente(lat, lng);
+      }
+      
+      // 3. Cambiar los botones visualmente
+      const btnSubmit = document.getElementById('btn-submit-emergencia');
+      if (btnSubmit) {
+        btnSubmit.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Editar Emergencia';
+        btnSubmit.style.backgroundColor = '#1976d2';
+      }
+      
+      const btnCancelar = document.getElementById('btn-cancelar-emergencia');
+      if (btnCancelar) btnCancelar.classList.remove('is-hidden');
+
+      const btnLimpiar = document.getElementById('btn-limpiar-emergencia');
+      if (btnLimpiar) btnLimpiar.classList.add('is-hidden');
+      
+    }
+  }
+
+  // 6. Eliminar una emergencia de la base de datos
+  function eliminarEmergencia(id) {
+    if(confirm("¿Estás seguro de que deseas eliminar esta emergencia?")) {
+      fetch(`http://127.0.0.1:5000/api/emergencias/${id}`, {
+        method: 'DELETE'
+      })
+      .then(response => {
+        if(response.ok) {
+          cargarEmergencias(); // Recarga la lista limpia
+        } else {
+          alert("Error al eliminar la emergencia.");
+        }
+      })
+      .catch(err => alert("Error de conexión al eliminar."));
+    }
+  }
+
+// 7. Limpiar el formulario por completo y regresar el botón a su estado original
+  function limpiarFormulario() {
+    document.getElementById('form-emergencia').reset();
+    document.getElementById('emergencia_id').value = '';
+    
+    const btnSubmit = document.getElementById('btn-submit-emergencia');
+    if (btnSubmit) {
+      btnSubmit.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Registrar Emergencia';
+      btnSubmit.style.backgroundColor = '#b71c1c';
+    }
+
+    // Volvemos a ocultar el botón de Cancelar
+    const btnCancelar = document.getElementById('btn-cancelar-emergencia');
+    if (btnCancelar) {
+      btnCancelar.classList.add('is-hidden');
+    }
+
+    // 👇 ¡NUEVO: AQUÍ HACEMOS APARECER EL BOTÓN DE LIMPIAR OTRA VEZ!
+    const btnLimpiar = document.getElementById('btn-limpiar-emergencia');
+    if (btnLimpiar) {
+      btnLimpiar.classList.remove('is-hidden');
+    }
+    limpiarMapaRuta();
+  }
+// --- MOSTRAR UNIDAD DISPONIBLE (ESTÁTICA PARA NUEVO REGISTRO) ---
+  function mostrarAmbulanciaEstatica(latDestino, lngDestino) {
+    // 1. Limpiamos cualquier ruta o animación vieja que haya quedado
+    if (rutaActual) { mapa.removeLayer(rutaActual); rutaActual = null; }
+    if (marcadorAmbulancia) mapa.removeLayer(marcadorAmbulancia);
+    if (intervaloAmbulancia) clearInterval(intervaloAmbulancia);
+    
+    const infoDiv = document.getElementById('info-ruta');
+    if (infoDiv) infoDiv.style.display = 'none';
+
+    // 2. Simulamos la ambulancia en un punto cercano
+    const latAmbulancia = latDestino + (Math.random() - 0.5) * 0.03;
+    const lngAmbulancia = lngDestino + (Math.random() - 0.5) * 0.03;
+
+    // 3. Dibujamos el círculo azul y lo dejamos ahí quieto
+    marcadorAmbulancia = L.circleMarker([latAmbulancia, lngAmbulancia], {
+      color: '#ffffff', weight: 2, fillColor: '#1a73e8', fillOpacity: 1, radius: 8
+    }).addTo(mapa).bindPopup('<b>🚑 Unidad libre cercana</b>');
+  }
+
+// --- TRAZADO DE RUTA DINÁMICA (VERSIÓN BLINDADA CONTRA CLICS RÁPIDOS) ---
+  function trazarRutaInteligente(latDestino, lngDestino) {
+    // 1. Generamos un nuevo ticket para ESTE clic y cancelamos lo anterior
+    idPeticionRuta++;
+    const miTicket = idPeticionRuta; 
+
+    if (rutaActual) mapa.removeLayer(rutaActual);
+    if (marcadorAmbulancia) mapa.removeLayer(marcadorAmbulancia);
+    if (intervaloAmbulancia) clearInterval(intervaloAmbulancia);
+
+    const latAmbulancia = latDestino + (Math.random() - 0.5) * 0.03;
+    const lngAmbulancia = lngDestino + (Math.random() - 0.5) * 0.03;
+
+    marcadorAmbulancia = L.circleMarker([latAmbulancia, lngAmbulancia], {
+      color: '#ffffff', weight: 2, fillColor: '#1a73e8', fillOpacity: 1, radius: 8
+    }).addTo(mapa).bindPopup('<b>🚑 Ambulancia Asignada</b>');
+
+    const urlOSRM = `https://router.project-osrm.org/route/v1/driving/${lngAmbulancia},${latAmbulancia};${lngDestino},${latDestino}?overview=full&geometries=geojson`;
+
+    fetch(urlOSRM)
+      .then(response => response.json())
+      .then(data => {
+        // 👇 ¡LA DEFENSA! Si el usuario hizo otro clic o limpió mientras esperábamos, descartamos esto.
+        if (miTicket !== idPeticionRuta) return; 
+
+        if (data.routes && data.routes.length > 0) {
+          const geometriaRuta = data.routes[0].geometry;
+
+          rutaActual = L.geoJSON(geometriaRuta, {
+            style: { color: '#1a73e8', weight: 6, opacity: 0.8 }
+          }).addTo(mapa);
+
+          const distanciaKm = (data.routes[0].distance / 1000).toFixed(1);
+          const tiempoMin = (data.routes[0].duration / 60).toFixed(0);
+
+          let infoDiv = document.getElementById('info-ruta');
+          if (!infoDiv) {
+            infoDiv = document.createElement('div');
+            infoDiv.id = 'info-ruta';
+            infoDiv.className = 'notification is-info is-light has-text-centered has-text-weight-bold mt-3';
+            const mapaContainer = document.getElementById('mapa-operador');
+            if (mapaContainer) mapaContainer.after(infoDiv);
+          }
+          infoDiv.innerHTML = `🚑 Unidad en camino: llegará en aprox. <span>${tiempoMin} min</span> (${distanciaKm} km)`;
+          infoDiv.style.display = 'block';
+
+          const coordenadas = geometriaRuta.coordinates;
+          let pasoActual = 0;
+
+          intervaloAmbulancia = setInterval(() => {
+            if (pasoActual >= coordenadas.length) {
+              clearInterval(intervaloAmbulancia);
+              marcadorAmbulancia.bindPopup('<b>🚑 ¡Unidad en el lugar del incidente!</b>').openPopup();
+              return;
+            }
+            
+            const lngPaso = coordenadas[pasoActual][0];
+            const latPaso = coordenadas[pasoActual][1];
+            
+            marcadorAmbulancia.setLatLng([latPaso, lngPaso]);
+            
+            if (rutaActual) mapa.removeLayer(rutaActual);
+
+            const coordenadasRestantes = coordenadas.slice(pasoActual);
+            if (coordenadasRestantes.length > 1) {
+              const formatoLeaflet = coordenadasRestantes.map(coord => [coord[1], coord[0]]);
+              rutaActual = L.polyline(formatoLeaflet, { 
+                color: '#1a73e8', weight: 6, opacity: 0.8 
+              }).addTo(mapa);
+            }
+
+            pasoActual++;
+          }, 800);
+        }
+      })
+      .catch(error => console.error("Error al calcular la ruta:", error));
+  }
+  // Función para resetear el mapa por completo
+  function limpiarMapaRuta() {
+    idPeticionRuta++;
+    if (rutaActual) { mapa.removeLayer(rutaActual); rutaActual = null; }
+    if (marcadorAmbulancia) { mapa.removeLayer(marcadorAmbulancia); marcadorAmbulancia = null; }
+    if (marcador) { mapa.removeLayer(marcador); marcador = null; }
+    
+    // Ocultamos el banner de tiempo
+    const infoDiv = document.getElementById('info-ruta');
+    if (infoDiv) infoDiv.style.display = 'none';
+  }
+  
+</script><script src="../src/header.js"></script>
 </body>
 </html>

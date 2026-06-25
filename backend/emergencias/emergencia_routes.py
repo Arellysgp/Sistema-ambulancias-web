@@ -61,3 +61,39 @@ def actualizar_estado(id):
     emergencia.estado = datos.get('estado', emergencia.estado)
     db.session.commit()
     return jsonify({'mensaje': 'Estado actualizado correctamente'}), 200
+
+
+    ## ESTE ES EL METODO PUT PARA ACTUALIZAR TODA LA EMERGENCIA (EDITAR)
+@emergencias_bp.route('/emergencias/<int:id>', methods=['PUT'])
+def actualizar_emergencia(id):
+    emergencia = db.session.get(Emergencia, id)
+    if not emergencia:
+        return jsonify({'error': 'Emergencia no encontrada'}), 404
+
+    datos = request.get_json()
+    if not datos:
+        return jsonify({'error': 'No se enviaron datos'}), 400
+
+    # Actualiza todos los campos con los nuevos datos, o deja los que ya estaban
+    emergencia.nombre_paciente = datos.get('nombre_paciente', emergencia.nombre_paciente)
+    emergencia.edad = datos.get('edad', emergencia.edad)
+    emergencia.descripcion = datos.get('descripcion', emergencia.descripcion)
+    emergencia.direccion = datos.get('direccion', emergencia.direccion)
+    emergencia.latitud = datos.get('latitud', emergencia.latitud)
+    emergencia.longitud = datos.get('longitud', emergencia.longitud)
+    emergencia.prioridad = datos.get('prioridad', emergencia.prioridad)
+    emergencia.estado = datos.get('estado', emergencia.estado)
+
+    db.session.commit()
+    return jsonify({'mensaje': 'Emergencia actualizada correctamente'}), 200
+
+## ESTE ES EL METODO DELETE PARA ELIMINAR UNA EMERGENCIA
+@emergencias_bp.route('/emergencias/<int:id>', methods=['DELETE'])
+def eliminar_emergencia(id):
+    emergencia = db.session.get(Emergencia, id)
+    if not emergencia:
+        return jsonify({'error': 'Emergencia no encontrada'}), 404
+
+    db.session.delete(emergencia)
+    db.session.commit()
+    return jsonify({'mensaje': 'Emergencia eliminada correctamente'}), 200
