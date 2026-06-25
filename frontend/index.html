@@ -24,7 +24,6 @@
       background: var(--cream);
       min-height: 100vh;
       display: flex;
-      overflow: hidden;
     }
 
     .left-panel {
@@ -358,6 +357,38 @@
       margin-right: 6px;
       animation: pulse-dot 2s infinite;
     }
+
+    /* --- BOTÓN DE VER CONTRASEÑA --- */
+    .password-container {
+      position: relative;
+      display: block;
+      width: 100%;
+    }
+    
+    .password-container input {
+      width: 100%;
+      padding-right: 45px !important; /* Espacio para que el texto no pise el ojo */
+    }
+
+    .btn-toggle-pass {
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      transform: translateY(-50%); /* Centra el icono verticalmente perfecto */
+      background: transparent; /* Fondo transparente, sin cuadro gris */
+      border: none; /* Sin bordes */
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0;
+      margin: 0;
+      z-index: 10;
+    }
+
+    .btn-toggle-pass:hover {
+      transform: translateY(-50%) scale(1.1); /* Efecto al pasar el mouse */
+    }
+
+
   </style>
 </head>
 <body>
@@ -410,9 +441,12 @@
           <input type="email" id="login-email" placeholder="operador@ambulancias.pe" oninput="clearHint('login-email', 'hint-login-email')">
           <div class="field-hint" id="hint-login-email"></div>
         </div>
-        <div class="field">
+       <div class="field">
           <label>Contraseña</label>
-          <input type="password" id="login-password" placeholder="••••••••" oninput="clearHint('login-password', 'hint-login-pass')">
+          <div class="password-container">
+            <input type="password" id="login-password" placeholder="••••••••" oninput="clearHint('login-password', 'hint-login-pass')">
+            <button type="button" class="btn-toggle-pass" onclick="togglePassword('login-password', this)">👁️</button>
+          </div>
           <div class="field-hint" id="hint-login-pass"></div>
         </div>
         <button class="submit-btn" id="btn-login" onclick="handleLogin()">
@@ -434,7 +468,10 @@
         </div>
         <div class="field">
           <label>Contraseña</label>
-          <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" oninput="checkPasswordStrength()">
+          <div class="password-container">
+            <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" oninput="checkPasswordStrength()">
+            <button type="button" class="btn-toggle-pass" onclick="togglePassword('reg-password', this)">👁️</button>
+          </div>
           <div class="field-hint" id="hint-password"></div>
         </div>
         <!-- SELECTOR DE ROL -->
@@ -632,12 +669,30 @@
           body: JSON.stringify({ email, password })
         });
         const data = await res.json();
-        if (res.ok) {
-          showAlert('✓ Acceso concedido. Redirigiendo...', 'success');
-          setTimeout(() => { window.location.href = '/dashboard'; }, 1500);
-        } else {
-          showAlert(data.error || 'Credenciales incorrectas.', 'error');
-        }
+  if (res.ok) {
+        // LA MAGIA ESTÁ AQUÍ: Guardamos el nombre en la mochila del navegador
+        const nombreUsuario = data.nombre || data.usuario || email.split('@')[0];
+        localStorage.setItem('nombre_usuario', nombreUsuario);
+        
+        showAlert('Acceso concedido. Redirigiendo...', 'success');
+        
+        // Redirección inteligente basada en el rol
+        setTimeout(() => {
+            const rolUsuario = data.rol; // El backend debe enviarnos esto
+            
+            if (rolUsuario === 'conductor') {
+                window.location.href = 'pages/panel-conductor.html';
+            } else if (rolUsuario === 'admin') {
+                window.location.href = 'pages/panel-admin.html';
+            } else {
+                // Por defecto, o si es operador, va a registro de emergencias
+                window.location.href = 'pages/registro-emergencias.html';
+            }
+        }, 1500);
+
+      } else {
+        showAlert(data.error || 'Credenciales incorrectas.', 'error');
+      }
       } catch (e) {
         showAlert('No se pudo conectar al servidor.', 'error');
       }
@@ -686,6 +741,20 @@
         loginActive ? handleLogin() : handleRegister();
       }
     });
+
+  // Alternar visibilidad de la contraseña (Versión limpia sin emojis de animales)
+    function togglePassword(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🔒'; // Cambia a candado cuando la contraseña es visible
+        btn.style.opacity = '0.5'; // Se pone un poco más tenue
+      } else {
+        input.type = 'password';
+        btn.textContent = '👁️'; // Vuelve al ojo cuando está oculta
+        btn.style.opacity = '1'; // Recupera el brillo total
+      }
+    }
   </script>
 </body>
 </html>

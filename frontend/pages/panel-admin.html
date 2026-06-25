@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAMU - Dashboard (Administrador)</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+</head>
+<body style="background-color: #f4f6f8; min-height: 100vh;">
+
+  <div id="header-container"></div>
+
+  <div class="container is-fluid mt-5">
+    
+    <div class="columns">
+      <div class="column">
+        <div class="box has-text-centered">
+          <p class="heading">Ambulancias Libres</p>
+          <p class="title has-text-success">4</p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="box has-text-centered">
+          <p class="heading">Emergencias Activas</p>
+          <p class="title has-text-danger">2</p>
+        </div>
+      </div>
+      <div class="column">
+        <div class="box has-text-centered">
+          <p class="heading">Total Atendidas (Hoy)</p>
+          <p class="title has-text-info">15</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns">
+      <div class="column is-12">
+        <div class="box">
+          <h2 class="title is-4">Monitoreo Global de Unidades</h2>
+          <table class="table is-fullwidth is-striped">
+            <thead>
+              <tr>
+                <th>Unidad</th>
+                <th>Conductor</th>
+                <th>Estado</th>
+                <th>Última Ubicación</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Ambulancia A-01</td>
+                <td>Carlos Pérez</td>
+                <td><span class="tag is-warning">En Camino</span></td>
+                <td>Av. Central, Sector 2</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../src/header.js"></script>
+</body>
+</html>

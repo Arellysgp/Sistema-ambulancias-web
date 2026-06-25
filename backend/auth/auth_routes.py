@@ -18,9 +18,16 @@ def login():
     user, error = verificar_login(data['email'], data['password'])
     if error:
         return jsonify({'error': error}), 401
+    
     session['user_id'] = user.id
     session['rol'] = user.rol
-    return jsonify({'mensaje': 'Login exitoso', 'rol': user.rol}), 200
+    
+    # 👇 Aquí está la magia: le enviamos el nombre al frontend
+    return jsonify({
+        'mensaje': 'Login exitoso', 
+        'rol': user.rol,
+        'nombre': user.nombre  
+    }), 200
 
 @auth_bp.route('/logout', methods=['POST'])
 def logout():

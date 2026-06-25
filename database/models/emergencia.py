@@ -4,7 +4,8 @@ from datetime import datetime, timezone
 
 class Emergencia(db.Model):
     __tablename__ = 'emergencia'
-
+    __table_args__ = {'schema': 'public'}
+    
     id =db.Column(db.Integer, primary_key=True)
     nombre_paciente= db.Column(db.String(100), nullable=False)
     edad = db.Column(db.Integer, nullable=False)
