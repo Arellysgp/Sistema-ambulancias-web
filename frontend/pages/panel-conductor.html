@@ -86,7 +86,28 @@
       <div class="column is-8">
         <div class="box">
           <h2 class="title is-4"><i class="fa-solid fa-map-location-dot" style="color: #1a73e8;"></i> Ruta hacia el Incidente</h2>
-          <div id="mapa-conductor" style="height: 500px; border-radius: 8px; border: 1px solid #ddd; z-index: 1;"></div>
+          <div id="mapa-conductor" style="height: 400px; border-radius: 8px; border: 1px solid #ddd; z-index: 1;"></div>
+        </div>
+
+        <!-- ── Acciones rápidas ── -->
+        <div class="box mt-4" style="border-top: 4px solid #D0342C;">
+          <h2 class="title is-5 mb-3">
+            <i class="fa-solid fa-user-circle" style="color:#D0342C;"></i> Mi cuenta
+          </h2>
+          <div class="columns is-mobile">
+            <div class="column">
+              <button class="button is-danger is-fullwidth has-text-weight-bold" onclick="descargarMiReporte()">
+                <span class="icon"><i class="fa-solid fa-file-pdf"></i></span>
+                <span>Descargar mi reporte PDF</span>
+              </button>
+            </div>
+            <div class="column">
+              <a href="perfil-conductor.html" class="button is-light is-fullwidth has-text-weight-bold">
+                <span class="icon"><i class="fa-solid fa-gear"></i></span>
+                <span>Mi perfil</span>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
       
@@ -95,6 +116,15 @@
 
   <script src="../src/header.js"></script>
   <script src="../src/conductor.js"></script>
+  <script>
+    const API      = 'http://127.0.0.1:5000/api';
+    const USER_ID  = localStorage.getItem('user_id');
+
+    function descargarMiReporte() {
+      if (!USER_ID) { alert('Sesión no encontrada. Vuelve a iniciar sesión.'); return; }
+      window.open(`${API}/reportes/conductor/${USER_ID}/pdf?user_id=${USER_ID}`, '_blank');
+    }
+  </script>
 </body>
 
 </html>

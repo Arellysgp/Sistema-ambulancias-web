@@ -13,3 +13,7 @@ class User(db.Model):
     activo        = db.Column(db.Boolean, default=True)
     # Roles válidos: 'operador', 'conductor'  (admin solo vía SQL)
     
+    # Nuevas columnas (ya en Supabase gracias al ALTER TABLE)
+    telefono      = db.Column(db.String(20), nullable=True)
+    foto_url      = db.Column(db.Text, nullable=True)
+    fecha_registro= db.Column(db.DateTime, nullable=True)

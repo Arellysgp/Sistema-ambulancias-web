@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SAMU — Mi Perfil</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    .navbar-samu { background-color: #D0342C; box-shadow: 0 2px 8px rgba(0,0,0,0.18); min-height: 58px; }
+    .navbar-samu .navbar-item, .navbar-samu .navbar-link { color: white !important; }
+    .navbar-samu .navbar-link::after { border-color: white !important; }
+    .navbar-samu .navbar-item.has-dropdown:hover .navbar-link,
+    .navbar-samu .navbar-link:hover { background-color: #A0251F !important; }
+    .navbar-dropdown .navbar-item { color: #333 !important; }
+    .navbar-dropdown .navbar-item:hover { background-color: #f5f5f5 !important; }
+
+    body { background-color: #f4f6f8; }
+
+    .avatar-wrap {
+      width: 96px; height: 96px; border-radius: 50%;
+      background: #fdecea; border: 3px solid #D0342C;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; font-weight: 700; color: #D0342C;
+      overflow: hidden; cursor: pointer; position: relative; margin: 0 auto;
+    }
+    .avatar-wrap img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+    .avatar-wrap:hover::after {
+      content: '📷'; position: absolute; inset: 0;
+      background: rgba(0,0,0,.4); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+    }
+    .strength-bar-wrap { height: 4px; background: #e8e4e0; border-radius: 2px; margin-top: .4rem; overflow: hidden; }
+    .strength-bar { height: 100%; width: 0; border-radius: 2px; transition: width .3s, background .3s; }
+    .pw-wrap { position: relative; }
+    .pw-toggle {
+      position: absolute; right: .75rem; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; color: #6B6560;
+    }
+    .toast {
+      position: fixed; bottom: 1.5rem; right: 1.5rem; padding: .75rem 1.25rem;
+      border-radius: 10px; font-size: .85rem; opacity: 0; transform: translateY(10px);
+      transition: all .3s; z-index: 999; pointer-events: none; color: #fff;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-samu" role="navigation">
+  <div class="navbar-brand">
+    <a class="navbar-item" href="panel-conductor.html" style="font-weight:bold;">
+      🚑 SAMU
+      <span style="font-weight:normal;margin-left:10px;border-left:1px solid rgba(255,255,255,.3);padding-left:10px;font-size:.9em;">
+        Sistema de Atención Móvil de Urgencias
+      </span>
+    </a>
+  </div>
+  <div class="navbar-menu">
+    <div class="navbar-end">
+      <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">👤 <span id="nav-nombre">Conductor</span></a>
+        <div class="navbar-dropdown is-right">
+          <a class="navbar-item" href="panel-conductor.html">
+            <i class="fa-solid fa-arrow-left mr-2"></i> Volver al panel
+          </a>
+          <hr class="navbar-divider"/>
+          <a class="navbar-item" onclick="cerrarSesion()">
+            🚪 Cerrar sesión
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<section class="section">
+  <div class="container">
+    <h1 class="title is-4 mb-1">Mi perfil</h1>
+    <br>
+    
+    <p class="subtitle is-6 mb-5">Gestiona tu información personal y foto de perfil</p>
+
+    <div class="columns">
+
+      <!-- Columna izquierda — Avatar -->
+      <div class="column is-3">
+        <div class="box has-text-centered" style="border-top: 4px solid #D0342C;">
+          <div class="avatar-wrap mb-3" id="avatar-preview" onclick="document.getElementById('input-foto').click()">
+            <span id="avatar-initials">?</span>
+            <img id="avatar-img" src="" alt="" style="display:none"/>
+          </div>
+          <input type="file" id="input-foto" accept="image/*" style="display:none" onchange="previsualizarFoto(event)"/>
+          <p style="font-size:.78rem;color:#D0342C;cursor:pointer;text-decoration:underline;"
+             onclick="document.getElementById('input-foto').click()">📷 Cambiar foto</p>
+
+          <p class="has-text-weight-bold mt-3" id="av-nombre">—</p>
+          <span class="tag is-danger is-light mt-1" id="av-rol">—</span>
+          <p class="is-size-7 has-text-grey mt-2" id="av-email">—</p>
+
+          <div class="mt-4">
+            <div class="box p-3 mb-2" style="background:#f4f6f8;">
+              <p class="is-size-7 has-text-grey">En el sistema desde</p>
+              <p class="has-text-weight-bold is-size-7" id="av-desde">—</p>
+            </div>
+            <div class="box p-3" style="background:#f4f6f8;">
+              <p class="is-size-7 has-text-grey">Estado de cuenta</p>
+              <p class="has-text-weight-bold is-size-7 has-text-success" id="av-estado">—</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna derecha — Formularios -->
+      <div class="column">
+
+        <!-- Datos personales -->
+        <div class="box mb-4">
+          <h2 class="title is-5 mb-4">Datos personales</h2>
+          <div class="columns">
+            <div class="column">
+              <div class="field">
+                <label class="label is-small">Nombre</label>
+                <div class="control">
+                  <input class="input" type="text" id="p-nombre" placeholder="Tu nombre"/>
+                </div>
+              </div>
+            </div>
+            <div class="column">
+              <div class="field">
+                <label class="label is-small">Apellido</label>
+                <div class="control">
+                  <input class="input" type="text" id="p-apellido" placeholder="Tu apellido"/>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="columns">
+            <div class="column">
+              <div class="field">
+                <label class="label is-small">Correo electrónico</label>
+                <div class="control">
+                  <input class="input" type="email" id="p-email" disabled/>
+                </div>
+              </div>
+            </div>
+            <div class="column">
+              <div class="field">
+                <label class="label is-small">Teléfono</label>
+                <div class="control">
+                  <input class="input" type="tel" id="p-telefono" placeholder="Ej: 987654321"/>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="field" style="max-width:300px">
+            <label class="label is-small">Rol</label>
+            <div class="control">
+              <input class="input" type="text" id="p-rol" disabled/>
+            </div>
+          </div>
+          <div class="field mt-4">
+            <div class="control">
+              <button class="button is-dark" onclick="guardarPerfil()">
+                <span class="icon"><i class="fa-solid fa-floppy-disk"></i></span>
+                <span>Guardar cambios</span>
+              </button>
+              <span id="fb-perfil" class="ml-3 is-size-7"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cambiar contraseña -->
+        <div class="box">
+          <h2 class="title is-5 mb-4">Cambiar contraseña</h2>
+          <div class="field">
+            <label class="label is-small">Contraseña actual</label>
+            <div class="control pw-wrap">
+              <input class="input" type="password" id="pw-actual" placeholder="••••••••"/>
+              <button class="pw-toggle" type="button" onclick="togglePw('pw-actual',this)">👁</button>
+            </div>
+          </div>
+          <div class="columns">
+            <div class="column">
+              <div class="field">
+                <label class="label is-small">Nueva contraseña</label>
+                <div class="control pw-wrap">
+                  <input class="input" type="password" id="pw-nueva" placeholder="••••••••" oninput="checkStrength(this.value)"/>
+                  <button class="pw-toggle" type="button" onclick="togglePw('pw-nueva',this)">👁</button>
+                </div>
+                <div class="strength-bar-wrap mt-1"><div class="strength-bar" id="strength-bar"></div></div>
+                <p class="is-size-7 has-text-grey mt-1" id="strength-text"></p>
+              </div>
+            </div>
+            <div class="column">
+              <div class="field">
+                <label class="label is-small">Confirmar nueva contraseña</label>
+                <div class="control pw-wrap">
+                  <input class="input" type="password" id="pw-confirma" placeholder="••••••••"/>
+                  <button class="pw-toggle" type="button" onclick="togglePw('pw-confirma',this)">👁</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="field mt-2">
+            <div class="control">
+              <button class="button is-danger" onclick="cambiarPassword()">
+                <span class="icon"><i class="fa-solid fa-lock"></i></span>
+                <span>Actualizar contraseña</span>
+              </button>
+              <span id="fb-pw" class="ml-3 is-size-7"></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const API     = 'http://127.0.0.1:5000/api';
+  const USER_ID = localStorage.getItem('user_id');
+  if (!USER_ID) window.location.href = '../index.html';
+
+  let fotoBase64 = null;
+
+  const nombreGuardado = localStorage.getItem('nombre_usuario') || 'Conductor';
+  document.getElementById('nav-nombre').textContent = nombreGuardado;
+
+  function toast(msg, ok=false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.style.background = ok ? '#27ae60' : '#D0342C';
+    t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  async function apiFetch(url, opts={}) {
+    const headers = { 'X-User-Id': USER_ID, ...(opts.headers || {}) };
+    const { headers: _, ...restOpts } = opts;
+    return fetch(API + url, { credentials: 'include', headers, ...restOpts });
+  }
+
+  function feedback(id, msg, ok=true) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.style.color = ok ? '#27ae60' : '#D0342C';
+    setTimeout(() => el.textContent = '', 4000);
+  }
+
+  async function cargarPerfil() {
+    try {
+      const res = await apiFetch('/perfil');
+      if (!res.ok) throw new Error();
+      const u = await res.json();
+      const nombre = `${u.nombre||''} ${u.apellido||''}`.trim();
+      document.getElementById('nav-nombre').textContent = u.nombre || 'Conductor';
+      document.getElementById('av-nombre').textContent  = nombre || '—';
+      document.getElementById('av-rol').textContent     = rolLabel(u.rol);
+      document.getElementById('av-email').textContent   = u.email || '—';
+      document.getElementById('av-estado').textContent  = u.activo ? 'Activo ✓' : 'Inactivo';
+      document.getElementById('av-desde').textContent   = u.fecha_registro
+        ? new Date(u.fecha_registro).toLocaleDateString('es-PE', {month:'long', year:'numeric'})
+        : '—';
+      document.getElementById('p-nombre').value   = u.nombre || '';
+      document.getElementById('p-apellido').value = u.apellido || '';
+      document.getElementById('p-email').value    = u.email || '';
+      document.getElementById('p-telefono').value = u.telefono || '';
+      document.getElementById('p-rol').value      = rolLabel(u.rol);
+      actualizarAvatar(u.nombre, u.foto_url);
+    } catch { toast('Error al cargar el perfil'); }
+  }
+
+  function actualizarAvatar(nombre, url) {
+    const img = document.getElementById('avatar-img');
+    const ini = document.getElementById('avatar-initials');
+    if (url) {
+      img.src = url; img.style.display = 'block'; ini.style.display = 'none';
+    } else {
+      img.style.display = 'none'; ini.style.display = '';
+      ini.textContent = (nombre||'?').split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase() || '?';
+    }
+  }
+
+  function previsualizarFoto(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 3*1024*1024) { toast('La imagen no debe superar 3 MB'); return; }
+    const reader = new FileReader();
+    reader.onload = ev => {
+      fotoBase64 = ev.target.result;
+      const img = document.getElementById('avatar-img');
+      img.src = fotoBase64; img.style.display = 'block';
+      document.getElementById('avatar-initials').style.display = 'none';
+      toast('Foto seleccionada. Guarda los cambios para aplicarla.', true);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function guardarPerfil() {
+    const nombre = document.getElementById('p-nombre').value.trim();
+    if (!nombre) { toast('El nombre es obligatorio'); return; }
+    const payload = {
+      nombre,
+      apellido: document.getElementById('p-apellido').value.trim(),
+      telefono: document.getElementById('p-telefono').value.trim(),
+    };
+    if (fotoBase64) payload.foto_base64 = fotoBase64;
+    try {
+      const res  = await apiFetch('/perfil', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error');
+      localStorage.setItem('nombre_usuario', nombre);
+      if (data.foto_url) localStorage.setItem('foto_url', data.foto_url);
+      document.getElementById('nav-nombre').textContent = nombre;
+      document.getElementById('av-nombre').textContent  = `${nombre} ${document.getElementById('p-apellido').value}`.trim();
+      actualizarAvatar(nombre, data.foto_url);
+      feedback('fb-perfil', '✓ Cambios guardados');
+      toast('Perfil actualizado', true);
+      fotoBase64 = null;
+    } catch(err) {
+      feedback('fb-perfil', err.message, false);
+      toast(err.message);
+    }
+  }
+
+  async function cambiarPassword() {
+    const actual   = document.getElementById('pw-actual').value;
+    const nueva    = document.getElementById('pw-nueva').value;
+    const confirma = document.getElementById('pw-confirma').value;
+    if (!actual||!nueva||!confirma) { toast('Completa todos los campos'); return; }
+    if (nueva !== confirma)         { toast('Las contraseñas no coinciden'); return; }
+    if (nueva.length < 6)           { toast('Mínimo 6 caracteres'); return; }
+    try {
+      const res  = await apiFetch('/perfil/password', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password_actual: actual, password_nueva: nueva, password_confirma: confirma })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error');
+      ['pw-actual','pw-nueva','pw-confirma'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('strength-bar').style.width = '0';
+      document.getElementById('strength-text').textContent = '';
+      feedback('fb-pw', '✓ Contraseña actualizada');
+      toast('Contraseña cambiada', true);
+    } catch(err) {
+      feedback('fb-pw', err.message, false);
+      toast(err.message);
+    }
+  }
+
+  function checkStrength(pw) {
+    const bar = document.getElementById('strength-bar');
+    const txt = document.getElementById('strength-text');
+    if (!pw) { bar.style.width='0'; txt.textContent=''; return; }
+    let score = 0;
+    if (pw.length>=8)            score++;
+    if (/[A-Z]/.test(pw))        score++;
+    if (/[0-9]/.test(pw))        score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    const map = [
+      ['0%','#e8e4e0',''],
+      ['25%','#D0342C','Muy débil'],
+      ['50%','#f39c12','Débil'],
+      ['75%','#3498db','Moderada'],
+      ['100%','#27ae60','Fuerte ✓'],
+    ];
+    const [w,c,l] = map[score] || map[0];
+    bar.style.width=w; bar.style.background=c; txt.textContent=l;
+  }
+
+  function togglePw(id, btn) {
+    const input = document.getElementById(id);
+    input.type = input.type === 'password' ? 'text' : 'password';
+    btn.textContent = input.type === 'password' ? '👁' : '🙈';
+  }
+
+  function rolLabel(r) {
+    return { admin:'Administrador', operador:'Operador', conductor:'Conductor' }[r] || r || '—';
+  }
+
+  function cerrarSesion() {
+    apiFetch('/logout', { method: 'POST' }).catch(()=>{});
+    localStorage.clear();
+    window.location.href = '../index.html';
+  }
+
+  cargarPerfil();
+</script>
+</body>
+</html>
