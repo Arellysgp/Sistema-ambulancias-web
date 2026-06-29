@@ -7,8 +7,6 @@ from datetime import datetime, date
 
 admin_bp = Blueprint('admin', __name__)
 
-
-# ── Estadísticas generales ──────────────────────────────────────────────────
 @admin_bp.route('/admin/stats', methods=['GET'])
 @requiere_rol('admin')
 def estadisticas():
@@ -33,27 +31,19 @@ def estadisticas():
     }), 200
 
 
-# ── Historial de emergencias con filtros ────────────────────────────────────
 @admin_bp.route('/admin/emergencias', methods=['GET'])
 @requiere_rol('admin')
 def historial_emergencias():
-    fecha_desde = request.args.get('desde')
-    fecha_hasta = request.args.get('hasta')
-    estado      = request.args.get('estado')
-
-    query = Emergencia.query
-
-    if fecha_desde:
-        query = query.filter(
-            Emergencia.fecha_registro >= datetime.strptime(fecha_desde, '%Y-%m-%d')
-        )
-    if fecha_hasta:
-        hasta = datetime.strptime(fecha_hasta, '%Y-%m-%d').replace(hour=23, minute=59)
-        query = query.filter(Emergencia.fecha_registro <= hasta)
+    estado = request.args.get('estado')
+    query  = Emergencia.query
     if estado:
         query = query.filter_by(estado=estado)
-
     emergencias = query.order_by(Emergencia.fecha_registro.desc()).all()
+
+    def fmt_fecha(e):
+        if not e.fecha_registro:
+            return 'Sin fecha'
+        return e.fecha_registro.strftime('%Y-%m-%d %H:%M')
 
     return jsonify([{
         'id':              e.id,
@@ -63,11 +53,10 @@ def historial_emergencias():
         'direccion':       e.direccion,
         'prioridad':       e.prioridad,
         'estado':          e.estado,
-        'fecha_registro':  e.fecha_registro.strftime('%Y-%m-%d %H:%M'),
+        'fecha_registro':  fmt_fecha(e),
     } for e in emergencias]), 200
 
 
-# ── Stats por conductor ─────────────────────────────────────────────────────
 @admin_bp.route('/admin/conductores/stats', methods=['GET'])
 @requiere_rol('admin')
 def stats_conductores():
@@ -77,11 +66,10 @@ def stats_conductores():
         'nombre':                c.nombre,
         'email':                 c.email,
         'activo':                c.activo,
-        'emergencias_atendidas': 0,  # placeholder hasta implementar conductor_id
+        'emergencias_atendidas': 0,
     } for c in conductores]), 200
 
 
-# ── Listar usuarios (sin admins) ────────────────────────────────────────────
 @admin_bp.route('/admin/usuarios', methods=['GET'])
 @requiere_rol('admin')
 def listar_usuarios():
@@ -95,23 +83,19 @@ def listar_usuarios():
     } for u in usuarios]), 200
 
 
-# ── Crear usuario ───────────────────────────────────────────────────────────
 @admin_bp.route('/admin/usuarios', methods=['POST'])
 @requiere_rol('admin')
 def crear_usuario():
     data = request.get_json()
     user, error = registrar_usuario(
-        data.get('nombre'),
-        data.get('email'),
-        data.get('password'),
-        data.get('rol', 'operador')
+        data.get('nombre'), data.get('email'),
+        data.get('password'), data.get('rol', 'operador')
     )
     if error:
         return jsonify({'error': error}), 400
     return jsonify({'mensaje': f'Usuario {user.nombre} creado correctamente'}), 201
 
 
-# ── Eliminar usuario ────────────────────────────────────────────────────────
 @admin_bp.route('/admin/usuarios/<int:id>', methods=['DELETE'])
 @requiere_rol('admin')
 def eliminar_usuario(id):
@@ -125,7 +109,6 @@ def eliminar_usuario(id):
     return jsonify({'mensaje': 'Usuario eliminado'}), 200
 
 
-# ── Suspender usuario ───────────────────────────────────────────────────────
 @admin_bp.route('/admin/usuarios/<int:id>/suspender', methods=['PUT'])
 @requiere_rol('admin')
 def suspender_usuario(id):
@@ -137,7 +120,6 @@ def suspender_usuario(id):
     return jsonify({'mensaje': f'{usuario.nombre} suspendido'}), 200
 
 
-# ── Reactivar usuario ───────────────────────────────────────────────────────
 @admin_bp.route('/admin/usuarios/<int:id>/reactivar', methods=['PUT'])
 @requiere_rol('admin')
 def reactivar_usuario(id):

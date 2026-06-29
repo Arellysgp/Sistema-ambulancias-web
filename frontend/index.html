@@ -673,6 +673,7 @@
 
       if (res.ok) {
         const nombreUsuario = data.nombre || data.usuario || email.split('@')[0];
+        localStorage.setItem('user_id', data.user_id); 
         localStorage.setItem('nombre_usuario', nombreUsuario);
         localStorage.setItem('rol_usuario', data.rol);  // ← línea nueva
 

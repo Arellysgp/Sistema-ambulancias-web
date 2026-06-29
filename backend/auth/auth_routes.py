@@ -6,7 +6,7 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/register', methods=['POST'])
 def register():
     data = request.json
-    rol = data.get('rol', 'operador')  # ← agrega esta línea
+    rol = data.get('rol', 'operador')
     user, error = registrar_usuario(data['nombre'], data['email'], data['password'], rol)
     if error:
         return jsonify({'error': error}), 400
@@ -18,15 +18,15 @@ def login():
     user, error = verificar_login(data['email'], data['password'])
     if error:
         return jsonify({'error': error}), 401
-    
+    session.permanent = True
     session['user_id'] = user.id
-    session['rol'] = user.rol
-    
-    # 👇 Aquí está la magia: le enviamos el nombre al frontend
+    session['rol']     = user.rol
+    session['nombre']  = user.nombre
     return jsonify({
-        'mensaje': 'Login exitoso', 
-        'rol': user.rol,
-        'nombre': user.nombre  
+        'mensaje': 'Login exitoso',
+        'rol':     user.rol,
+        'nombre':  user.nombre,
+        'user_id': user.id        # ← enviamos el id al frontend
     }), 200
 
 @auth_bp.route('/logout', methods=['POST'])
