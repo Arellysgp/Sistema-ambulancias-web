@@ -655,7 +655,7 @@
       hideAlert();
       if (!validateLogin()) return;
 
-      const email = document.getElementById('login-email').value.trim();
+      const email    = document.getElementById('login-email').value.trim();
       const password = document.getElementById('login-password').value;
 
       const btn = document.getElementById('btn-login');
@@ -666,40 +666,38 @@
         const res = await fetch(API + '/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',                          // ← línea nueva
           body: JSON.stringify({ email, password })
-        });
-        const data = await res.json();
-  if (res.ok) {
-        // LA MAGIA ESTÁ AQUÍ: Guardamos el nombre en la mochila del navegador
+      });
+      const data = await res.json();
+
+      if (res.ok) {
         const nombreUsuario = data.nombre || data.usuario || email.split('@')[0];
+        localStorage.setItem('user_id', data.user_id); 
         localStorage.setItem('nombre_usuario', nombreUsuario);
-        
-        showAlert('Acceso concedido. Redirigiendo...', 'success');
-        
-        // Redirección inteligente basada en el rol
-        setTimeout(() => {
-            const rolUsuario = data.rol; // El backend debe enviarnos esto
-            
-            if (rolUsuario === 'conductor') {
-                window.location.href = 'pages/panel-conductor.html';
-            } else if (rolUsuario === 'admin') {
-                window.location.href = 'pages/panel-admin.html';
-            } else {
-                // Por defecto, o si es operador, va a registro de emergencias
-                window.location.href = 'pages/registro-emergencias.html';
-            }
-        }, 1500);
+        localStorage.setItem('rol_usuario', data.rol);  // ← línea nueva
+
+      showAlert('Acceso concedido. Redirigiendo...', 'success');
+
+      setTimeout(() => {
+        const rutas = {
+          admin:     'pages/panel-admin.html',
+          operador:  'pages/registro-emergencias.html',
+          conductor: 'pages/panel-conductor.html'
+        };
+        window.location.href = rutas[data.rol] ?? 'pages/registro-emergencias.html';
+      }, 1500);
 
       } else {
         showAlert(data.error || 'Credenciales incorrectas.', 'error');
       }
-      } catch (e) {
-        showAlert('No se pudo conectar al servidor.', 'error');
-      }
-
-      btn.classList.remove('loading');
-      btn.textContent = 'Ingresar al sistema';
+      }   catch (e) {
+      showAlert('No se pudo conectar al servidor.', 'error');
     }
+
+    btn.classList.remove('loading');
+    btn.textContent = 'Ingresar al sistema';
+  }
 
     async function handleRegister() {
       hideAlert();
