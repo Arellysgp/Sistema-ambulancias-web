@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SAMU — Mi Perfil</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --red:#D0342C;--red-dark:#A0251F;--red-light:#fdecea;
+      --dark:#1A1410;--gray:#6B6560;--border:#e8e4e0;
+      --cream:#FAF8F5;--white:#fff;
+      --success:#27ae60;--warning:#f39c12;--info:#3498db;
+      --sidebar-w:240px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--cream);display:flex;min-height:100vh;}
+
+    /* ── Sidebar ── */
+    .sidebar{width:var(--sidebar-w);background:var(--dark);color:#fff;display:flex;flex-direction:column;padding:2rem 1.25rem;position:fixed;top:0;left:0;height:100vh;z-index:100;}
+    .sidebar-brand{display:flex;align-items:center;gap:.75rem;margin-bottom:2.5rem;}
+    .brand-icon{width:40px;height:40px;background:var(--red);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;}
+    .brand-text h1{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;line-height:1.2;}
+    .brand-text span{color:var(--red);}
+    .nav-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:#555;margin:1.5rem 0 .5rem .5rem;}
+    .nav-item{display:flex;align-items:center;gap:.6rem;padding:.6rem .75rem;border-radius:8px;cursor:pointer;color:#c8c3be;font-size:.875rem;transition:background .15s,color .15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;text-decoration:none;}
+    .nav-item:hover{background:rgba(208,52,44,.15);color:#fff;}
+    .nav-item.active{background:rgba(208,52,44,.2);color:var(--red);font-weight:500;}
+    .sidebar-footer{margin-top:auto;}
+    .admin-badge{background:rgba(255,255,255,.05);border-radius:10px;padding:.75rem;display:flex;align-items:center;gap:.6rem;}
+    .admin-avatar{width:34px;height:34px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0;overflow:hidden;}
+    .admin-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+    .admin-info strong{display:block;color:#fff;font-size:.8rem;}
+    .admin-info span{color:#666;font-size:.72rem;}
+    .btn-logout{width:100%;margin-top:.75rem;padding:.5rem;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:transparent;color:#c8c3be;cursor:pointer;font-size:.8rem;transition:background .15s;}
+    .btn-logout:hover{background:rgba(208,52,44,.25);color:#fff;}
+
+    /* ── Layout ── */
+    .main{margin-left:var(--sidebar-w);flex:1;padding:2rem;}
+    .page-title{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:700;color:var(--dark);margin-bottom:.25rem;}
+    .page-sub{color:var(--gray);font-size:.875rem;margin-bottom:1.5rem;}
+
+    /* ── Card box ── */
+    .card-box{background:var(--white);border-radius:14px;padding:1.5rem;border:1px solid var(--border);margin-bottom:1.5rem;}
+    .box-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
+    .box-header h2{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:var(--dark);}
+
+    /* ── Layout de perfil ── */
+    .perfil-layout{display:grid;grid-template-columns:260px 1fr;gap:1.5rem;align-items:start;}
+
+    /* ── Tarjeta avatar ── */
+    .avatar-card{background:var(--white);border-radius:14px;padding:1.75rem 1.5rem;border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:1rem;text-align:center;position:sticky;top:2rem;}
+    .avatar-circle{width:96px;height:96px;border-radius:50%;background:var(--red-light);border:3px solid var(--red);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:2rem;font-weight:700;color:var(--red);overflow:hidden;position:relative;cursor:pointer;}
+    .avatar-circle img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:50%;}
+    .avatar-circle:hover::after{content:'📷';position:absolute;inset:0;background:rgba(0,0,0,.4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;}
+    .avatar-nombre{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:700;color:var(--dark);}
+    .avatar-sub{color:var(--gray);font-size:.8rem;}
+    .badge-rol{display:inline-block;padding:.25rem .75rem;border-radius:20px;font-size:.72rem;font-weight:600;background:var(--red-light);color:var(--red-dark);}
+    .avatar-stats{width:100%;display:flex;flex-direction:column;gap:.5rem;}
+    .astat{background:var(--cream);border-radius:8px;padding:.65rem .85rem;text-align:left;}
+    .astat-val{font-weight:700;font-size:.88rem;color:var(--dark);display:block;}
+    .astat-lab{color:var(--gray);font-size:.72rem;}
+    .foto-label{font-size:.78rem;color:var(--red);text-decoration:underline;cursor:pointer;text-underline-offset:2px;}
+
+    /* ── Formularios ── */
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+    .f-field{margin-bottom:1rem;}
+    .f-field label{display:block;font-size:.78rem;font-weight:500;color:var(--gray);margin-bottom:.3rem;}
+    .f-field input{width:100%;padding:.6rem .85rem;border:1px solid var(--border);border-radius:8px;font-size:.875rem;color:var(--dark);font-family:inherit;background:var(--white);}
+    .f-field input:focus{outline:none;border-color:var(--red);}
+    .f-field input:disabled{background:var(--cream);color:var(--gray);cursor:not-allowed;}
+    .f-field-full{grid-column:1/-1;}
+
+    /* ── Botones ── */
+    .btn{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem .9rem;border-radius:8px;font-size:.8rem;font-weight:500;cursor:pointer;border:none;transition:opacity .15s;font-family:inherit;}
+    .btn:hover{opacity:.82;}
+    .btn-dark{background:var(--dark);color:#fff;}
+    .btn-red{background:var(--red);color:#fff;}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--gray);}
+    .form-actions{display:flex;align-items:center;gap:1rem;margin-top:.5rem;}
+    .feedback{font-size:.8rem;opacity:0;transition:opacity .3s;}
+    .feedback.show{opacity:1;}
+    .feedback.ok{color:var(--success);}
+    .feedback.err{color:var(--red);}
+
+    /* ── Password ── */
+    .pw-wrap{position:relative;}
+    .pw-wrap input{padding-right:2.5rem;}
+    .pw-toggle{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gray);font-size:.9rem;}
+    .strength-bar-wrap{height:4px;background:var(--border);border-radius:2px;margin-top:.4rem;overflow:hidden;}
+    .strength-bar{height:100%;width:0;border-radius:2px;transition:width .3s,background .3s;}
+    .strength-text{font-size:.72rem;color:var(--gray);margin-top:.25rem;display:block;}
+
+    /* ── Toast ── */
+    .toast{position:fixed;bottom:1.5rem;right:1.5rem;padding:.75rem 1.25rem;border-radius:10px;font-size:.85rem;opacity:0;transform:translateY(10px);transition:all .3s;z-index:999;pointer-events:none;color:#fff;}
+    .toast.show{opacity:1;transform:translateY(0);}
+
+    @media(max-width:900px){
+      .perfil-layout{grid-template-columns:1fr;}
+      .avatar-card{position:static;}
+      .form-grid{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">🚑</div>
+    <div class="brand-text"><h1>SAMU <span>Admin</span></h1></div>
+  </div>
+  <span class="nav-label">Principal</span>
+  <a class="nav-item" href="panel-admin.html">📊 Dashboard</a>
+  <span class="nav-label">Gestión</span>
+  <a class="nav-item" href="panel-admin.html">📋 Historial Emergencias</a>
+  <a class="nav-item" href="panel-admin.html">🚘 Conductores</a>
+  <a class="nav-item" href="panel-admin.html">👥 Usuarios</a>
+  <span class="nav-label">Reportes</span>
+  <a class="nav-item" href="reportes.html">📄 Reportes y exportación</a>
+  <a class="nav-item active" href="perfil.html">⚙️ Mi perfil</a>
+  <div class="sidebar-footer">
+    <div class="admin-badge">
+      <div class="admin-avatar" id="sb-avatar">A</div>
+      <div class="admin-info">
+        <strong id="sb-nombre">Administrador</strong>
+        <span>Admin</span>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="cerrarSesion()">🚪 Cerrar sesión</button>
+  </div>
+</aside>
+
+<main class="main">
+  <h2 class="page-title">Mi perfil</h2>
+  <p class="page-sub">Gestiona tu información personal y foto de perfil</p>
+
+  <div class="perfil-layout">
+
+    <!-- Columna izquierda — Avatar -->
+    <div class="avatar-card">
+      <div class="avatar-circle" id="avatar-preview" onclick="document.getElementById('input-foto').click()">
+        <span id="avatar-initials">?</span>
+        <img id="avatar-img" src="" alt="" style="display:none"/>
+      </div>
+      <label class="foto-label" for="input-foto">📷 Cambiar foto</label>
+      <input type="file" id="input-foto" accept="image/*" style="display:none" onchange="previsualizarFoto(event)"/>
+      <div class="avatar-nombre" id="av-nombre">—</div>
+      <span class="badge-rol" id="av-rol">—</span>
+      <div class="avatar-sub" id="av-email">—</div>
+      <div class="avatar-stats">
+        <div class="astat">
+          <span class="astat-val" id="av-desde">—</span>
+          <span class="astat-lab">En el sistema desde</span>
+        </div>
+        <div class="astat">
+          <span class="astat-val" style="color:var(--success)" id="av-estado">—</span>
+          <span class="astat-lab">Estado de cuenta</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna derecha — Formularios -->
+    <div>
+
+      <!-- Datos personales -->
+      <div class="card-box">
+        <div class="box-header"><h2>Datos personales</h2></div>
+        <div class="form-grid">
+          <div class="f-field">
+            <label>Nombre</label>
+            <input type="text" id="p-nombre" placeholder="Tu nombre"/>
+          </div>
+          <div class="f-field">
+            <label>Apellido</label>
+            <input type="text" id="p-apellido" placeholder="Tu apellido"/>
+          </div>
+          <div class="f-field">
+            <label>Correo electrónico</label>
+            <input type="email" id="p-email" disabled/>
+          </div>
+          <div class="f-field">
+            <label>Teléfono</label>
+            <input type="tel" id="p-telefono" placeholder="Ej: 987654321"/>
+          </div>
+          <div class="f-field">
+            <label>Rol</label>
+            <input type="text" id="p-rol" disabled/>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-dark" onclick="guardarPerfil()">💾 Guardar cambios</button>
+          <span class="feedback" id="fb-perfil"></span>
+        </div>
+      </div>
+
+      <!-- Cambiar contraseña -->
+      <div class="card-box">
+        <div class="box-header"><h2>Cambiar contraseña</h2></div>
+        <div class="f-field">
+          <label>Contraseña actual</label>
+          <div class="pw-wrap">
+            <input type="password" id="pw-actual" placeholder="••••••••"/>
+            <button class="pw-toggle" type="button" onclick="togglePw('pw-actual',this)">👁</button>
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="f-field">
+            <label>Nueva contraseña</label>
+            <div class="pw-wrap">
+              <input type="password" id="pw-nueva" placeholder="••••••••" oninput="checkStrength(this.value)"/>
+              <button class="pw-toggle" type="button" onclick="togglePw('pw-nueva',this)">👁</button>
+            </div>
+            <div class="strength-bar-wrap"><div class="strength-bar" id="strength-bar"></div></div>
+            <span class="strength-text" id="strength-text"></span>
+          </div>
+          <div class="f-field">
+            <label>Confirmar nueva contraseña</label>
+            <div class="pw-wrap">
+              <input type="password" id="pw-confirma" placeholder="••••••••"/>
+              <button class="pw-toggle" type="button" onclick="togglePw('pw-confirma',this)">👁</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-red" onclick="cambiarPassword()">🔒 Actualizar contraseña</button>
+          <span class="feedback" id="fb-pw"></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+ const API = 'http://127.0.0.1:5000/api';
+
+  const USER_ID = localStorage.getItem('user_id');
+  if (!USER_ID) window.location.href = '../index.html';
+
+  let fotoBase64 = null;
+
+  // Init sidebar
+  const nombreAdmin = localStorage.getItem('nombre_usuario') || 'Admin';
+  const fotoGuardada = localStorage.getItem('foto_url') || '';
+  document.getElementById('sb-nombre').textContent = nombreAdmin;
+  const sbAvatar = document.getElementById('sb-avatar');
+  if (fotoGuardada) { sbAvatar.innerHTML = `<img src="${fotoGuardada}" alt="foto"/>`; }
+  else { sbAvatar.textContent = nombreAdmin[0].toUpperCase(); }
+
+  function toast(msg, ok=false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.style.background = ok?'#27ae60':'#D0342C';
+    t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000);
+  }
+
+ async function apiFetch(url, opts={}) {
+    const headers = {
+      'X-User-Id': USER_ID,
+      ...(opts.headers || {})
+    };
+    const { headers: _, ...restOpts } = opts;
+    return fetch(API+url, { credentials:'include', headers, ...restOpts });
+}
+
+
+
+  function feedback(id, msg, ok=true) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.className = `feedback show ${ok?'ok':'err'}`;
+    setTimeout(()=>el.classList.remove('show'),4000);
+  }
+
+  // ── CARGAR PERFIL ─────────────────────────────────────────────────────────
+  async function cargarPerfil() {
+    try {
+      const res = await apiFetch('/perfil');
+      if (!res.ok) throw new Error();
+      const u = await res.json();
+      poblarFormulario(u);
+    } catch { toast('Error al cargar el perfil'); }
+  }
+
+  function poblarFormulario(u) {
+    const nombre = `${u.nombre||''} ${u.apellido||''}`.trim();
+    // Sidebar
+    document.getElementById('sb-nombre').textContent = u.nombre||'Admin';
+    // Panel izquierdo
+    document.getElementById('av-nombre').textContent = nombre || '—';
+    document.getElementById('av-rol').textContent    = rolLabel(u.rol);
+    document.getElementById('av-email').textContent  = u.email||'—';
+    document.getElementById('av-estado').textContent = u.activo ? 'Activo ✓' : 'Inactivo';
+    document.getElementById('av-desde').textContent  = u.fecha_registro
+      ? new Date(u.fecha_registro).toLocaleDateString('es-PE',{month:'long',year:'numeric'})
+      : '—';
+    actualizarAvatar(u.nombre, u.foto_url);
+    // Formulario
+    document.getElementById('p-nombre').value   = u.nombre||'';
+    document.getElementById('p-apellido').value = u.apellido||'';
+    document.getElementById('p-email').value    = u.email||'';
+    document.getElementById('p-telefono').value = u.telefono||'';
+    document.getElementById('p-rol').value      = rolLabel(u.rol);
+  }
+
+  function actualizarAvatar(nombre, url) {
+    const img      = document.getElementById('avatar-img');
+    const initials = document.getElementById('avatar-initials');
+    if (url) {
+      img.src = url; img.style.display = 'block';
+      initials.style.display = 'none';
+    } else {
+      img.style.display = 'none'; initials.style.display = '';
+      initials.textContent = (nombre||'?').split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase()||'?';
+    }
+  }
+
+  // ── FOTO ─────────────────────────────────────────────────────────────────
+  function previsualizarFoto(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 3*1024*1024) { toast('La imagen no debe superar 3 MB'); return; }
+    const reader = new FileReader();
+    reader.onload = ev => {
+      fotoBase64 = ev.target.result;
+      const img = document.getElementById('avatar-img');
+      img.src = fotoBase64; img.style.display = 'block';
+      document.getElementById('avatar-initials').style.display = 'none';
+      toast('Foto seleccionada. Guarda los cambios para aplicarla.', true);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ── GUARDAR PERFIL ────────────────────────────────────────────────────────
+  async function guardarPerfil() {
+    const nombre = document.getElementById('p-nombre').value.trim();
+    if (!nombre) { toast('El nombre es obligatorio'); return; }
+    const payload = {
+      nombre,
+      apellido: document.getElementById('p-apellido').value.trim(),
+      telefono: document.getElementById('p-telefono').value.trim(),
+    };
+    if (fotoBase64) payload.foto_base64 = fotoBase64;
+    try {
+      const res  = await apiFetch('/perfil', {
+        method:'PUT', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error||'Error');
+      // Actualizar sidebar y localStorage
+      localStorage.setItem('nombre_usuario', nombre);
+      if (data.foto_url) {
+        localStorage.setItem('foto_url', data.foto_url);
+        sbAvatar.innerHTML = `<img src="${data.foto_url}" alt="foto"/>`;
+      }
+      document.getElementById('av-nombre').textContent = `${nombre} ${document.getElementById('p-apellido').value}`.trim();
+      feedback('fb-perfil','✓ Cambios guardados');
+      toast('Perfil actualizado', true);
+      fotoBase64 = null;
+    } catch(err) {
+      feedback('fb-perfil', err.message, false);
+      toast(err.message);
+    }
+  }
+
+  // ── CAMBIAR CONTRASEÑA ────────────────────────────────────────────────────
+  async function cambiarPassword() {
+    const actual   = document.getElementById('pw-actual').value;
+    const nueva    = document.getElementById('pw-nueva').value;
+    const confirma = document.getElementById('pw-confirma').value;
+    if (!actual||!nueva||!confirma) { toast('Completa todos los campos'); return; }
+    if (nueva !== confirma)         { toast('Las contraseñas no coinciden'); return; }
+    if (nueva.length < 6)           { toast('Mínimo 6 caracteres'); return; }
+    try {
+      const res  = await apiFetch('/perfil/password', {
+        method:'PUT', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({password_actual:actual, password_nueva:nueva, password_confirma:confirma})
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error||'Error');
+      ['pw-actual','pw-nueva','pw-confirma'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('strength-bar').style.width = '0';
+      document.getElementById('strength-text').textContent = '';
+      feedback('fb-pw','✓ Contraseña actualizada');
+      toast('Contraseña cambiada', true);
+    } catch(err) {
+      feedback('fb-pw', err.message, false);
+      toast(err.message);
+    }
+  }
+
+  // ── FORTALEZA DE CONTRASEÑA ───────────────────────────────────────────────
+  function checkStrength(pw) {
+    const bar = document.getElementById('strength-bar');
+    const txt = document.getElementById('strength-text');
+    if (!pw) { bar.style.width='0'; txt.textContent=''; return; }
+    let score = 0;
+    if (pw.length>=8)           score++;
+    if (/[A-Z]/.test(pw))       score++;
+    if (/[0-9]/.test(pw))       score++;
+    if (/[^A-Za-z0-9]/.test(pw))score++;
+    const map = [
+      ['0%','#e8e4e0',''],
+      ['25%','#D0342C','Muy débil'],
+      ['50%','#f39c12','Débil'],
+      ['75%','#3498db','Moderada'],
+      ['100%','#27ae60','Fuerte ✓'],
+    ];
+    const [w,c,l] = map[score]||map[0];
+    bar.style.width=w; bar.style.background=c; txt.textContent=l;
+  }
+
+  function togglePw(id, btn) {
+    const input = document.getElementById(id);
+    input.type = input.type==='password'?'text':'password';
+    btn.textContent = input.type==='password'?'👁':'🙈';
+  }
+
+  function rolLabel(r) {
+    return {admin:'Administrador',operador:'Operador',conductor:'Conductor'}[r]||r||'—';
+  }
+
+  async function cerrarSesion() {
+    try { await apiFetch('/logout',{method:'POST'}); } catch(e) {}
+    localStorage.clear(); window.location.href='../index.html';
+  }
+
+  cargarPerfil();
+</script>
+</body>
+</html>
