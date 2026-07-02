@@ -623,7 +623,7 @@
 
   // 4. Cargar la lista de la derecha desde la base de datos
   function cargarEmergencias() {
-    fetch('${API_URL}/api/emergencias')
+    fetch(`${API_URL}/api/emergencias`) 
     .then(response => response.json())
     .then(data => {
       emergenciasGlobales = data; // Guarda en la variable global
