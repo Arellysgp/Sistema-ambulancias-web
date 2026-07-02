@@ -7,11 +7,11 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 load_dotenv()
 
 from database.models.user import db
-from backend.emergencias.emergencia_routes import emergencias_bp
-from backend.auth.auth_routes import auth_bp
-from backend.admin.admin_routes import admin_bp
-from backend.routes.reportes import reportes_bp   # ← ruta correcta en tu proyecto
-from backend.routes.perfil   import perfil_bp     # ← ruta correcta en tu proyecto
+from emergencias.emergencia_routes import emergencias_bp
+from auth.auth_routes import auth_bp
+from admin.admin_routes import admin_bp
+from routes.reportes import reportes_bp
+from routes.perfil import perfil_bp
 
 app = Flask(__name__)
 app.config['SECRET_KEY']                     = os.getenv('SECRET_KEY')
