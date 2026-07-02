@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SAMU — Panel Administrador</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --red:#D0342C;--red-dark:#A0251F;--red-light:#fdecea;
+      --dark:#1A1410;--gray:#6B6560;--border:#e8e4e0;
+      --cream:#FAF8F5;--white:#fff;
+      --success:#27ae60;--warning:#f39c12;--info:#3498db;
+      --sidebar-w:240px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--cream);display:flex;min-height:100vh;}
+
+    .sidebar{width:var(--sidebar-w);background:var(--dark);color:#fff;display:flex;flex-direction:column;padding:2rem 1.25rem;position:fixed;top:0;left:0;height:100vh;z-index:100;}
+    .sidebar-brand{display:flex;align-items:center;gap:.75rem;margin-bottom:2.5rem;}
+    .brand-icon{width:40px;height:40px;background:var(--red);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;}
+    .brand-text h1{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;line-height:1.2;}
+    .brand-text span{color:var(--red);}
+    .nav-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:#555;margin:1.5rem 0 .5rem .5rem;}
+    .nav-item{display:flex;align-items:center;gap:.6rem;padding:.6rem .75rem;border-radius:8px;cursor:pointer;color:#c8c3be;font-size:.875rem;transition:background .15s,color .15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;}
+    .nav-item:hover{background:rgba(208,52,44,.15);color:#fff;}
+    .nav-item.active{background:rgba(208,52,44,.2);color:var(--red);font-weight:500;}
+    .sidebar-footer{margin-top:auto;}
+    .admin-badge{background:rgba(255,255,255,.05);border-radius:10px;padding:.75rem;display:flex;align-items:center;gap:.6rem;}
+    .admin-avatar{width:34px;height:34px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0;}
+    .admin-info strong{display:block;color:#fff;font-size:.8rem;}
+    .admin-info span{color:#666;font-size:.72rem;}
+    .btn-logout{width:100%;margin-top:.75rem;padding:.5rem;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:transparent;color:#c8c3be;cursor:pointer;font-size:.8rem;transition:background .15s;}
+    .btn-logout:hover{background:rgba(208,52,44,.25);color:#fff;}
+
+    .main{margin-left:var(--sidebar-w);flex:1;padding:2rem;}
+    .page-section{display:none;}
+    .page-section.active{display:block;}
+    .page-title{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:700;color:var(--dark);margin-bottom:1.5rem;}
+
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2rem;}
+    .stat-card{background:var(--white);border-radius:14px;padding:1.25rem 1rem;border:1px solid var(--border);position:relative;overflow:hidden;}
+    .stat-card::after{content:attr(data-icon);position:absolute;top:.75rem;right:.75rem;font-size:1.4rem;opacity:.25;}
+    .s-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--gray);margin-bottom:.4rem;}
+    .s-value{font-family:'Syne',sans-serif;font-size:2rem;font-weight:700;line-height:1;}
+    .s-sub{font-size:.72rem;color:var(--gray);margin-top:.25rem;}
+    .s-red{color:var(--red);}.s-warn{color:var(--warning);}.s-ok{color:var(--success);}.s-blue{color:var(--info);}
+
+    .card-box{background:var(--white);border-radius:14px;padding:1.5rem;border:1px solid var(--border);margin-bottom:1.5rem;}
+    .box-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
+    .box-header h2{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:var(--dark);}
+
+    .t{width:100%;border-collapse:collapse;font-size:.875rem;}
+    .t th{padding:.6rem 1rem;text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--gray);border-bottom:2px solid var(--border);}
+    .t td{padding:.75rem 1rem;border-bottom:1px solid var(--border);color:var(--dark);vertical-align:middle;}
+    .t tbody tr:hover{background:#faf6f5;}
+    .t tbody tr:last-child td{border-bottom:none;}
+
+    .badge{display:inline-block;padding:.2rem .65rem;border-radius:20px;font-size:.72rem;font-weight:600;}
+    .b-operador{background:#e8f4fd;color:#2980b9;}
+    .b-conductor{background:#fef9e7;color:#d68910;}
+    .b-activo{background:#eafaf1;color:#1e8449;}
+    .b-suspendido{background:var(--red-light);color:var(--red-dark);}
+    .b-pendiente{background:#fef9e7;color:#d68910;}
+    .b-atendida{background:#eafaf1;color:#1e8449;}
+    .b-en_camino{background:#eaf4fe;color:#2980b9;}
+    .b-alta{background:var(--red-light);color:var(--red);}
+    .b-media{background:#fef9e7;color:#d68910;}
+    .b-baja{background:#eafaf1;color:#1e8449;}
+
+    .btn{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem .9rem;border-radius:8px;font-size:.8rem;font-weight:500;cursor:pointer;border:none;transition:opacity .15s;font-family:inherit;}
+    .btn:hover{opacity:.82;}
+    .btn-dark{background:var(--dark);color:#fff;}
+    .btn-red{background:var(--red);color:#fff;}
+    .btn-green{background:var(--success);color:#fff;}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--gray);}
+    .btn-sm{padding:.3rem .65rem;font-size:.75rem;}
+
+    .filters{display:flex;gap:.75rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:1.25rem;}
+    .filters label{font-size:.75rem;color:var(--gray);display:block;margin-bottom:.3rem;}
+    .filters select{padding:.45rem .75rem;border:1px solid var(--border);border-radius:8px;font-size:.85rem;color:var(--dark);background:var(--white);font-family:inherit;}
+    .filters select:focus{outline:none;border-color:var(--red);}
+
+    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;}
+    .overlay.open{display:flex;}
+    .modal-box{background:var(--white);border-radius:16px;padding:2rem;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.15);}
+    .modal-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:1.25rem;color:var(--dark);}
+    .f-field{margin-bottom:1rem;}
+    .f-field label{display:block;font-size:.78rem;font-weight:500;color:var(--gray);margin-bottom:.3rem;}
+    .f-field input,.f-field select{width:100%;padding:.6rem .85rem;border:1px solid var(--border);border-radius:8px;font-size:.875rem;color:var(--dark);font-family:inherit;}
+    .f-field input:focus,.f-field select:focus{outline:none;border-color:var(--red);}
+    .modal-actions{display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.5rem;}
+    .err-msg{color:var(--red);font-size:.8rem;margin-top:.4rem;min-height:1rem;}
+
+    .empty-state{text-align:center;padding:3rem 1rem;color:var(--gray);}
+    .empty-state .ei{font-size:2.5rem;margin-bottom:.5rem;}
+    .spin{display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin .6s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .loading-row td{text-align:center;padding:2rem;}
+
+    .toast{position:fixed;bottom:1.5rem;right:1.5rem;padding:.75rem 1.25rem;border-radius:10px;font-size:.85rem;opacity:0;transform:translateY(10px);transition:all .3s;z-index:999;pointer-events:none;color:#fff;}
+    .toast.show{opacity:1;transform:translateY(0);}
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">🚑</div>
+    <div class="brand-text"><h1>SAMU <span>Admin</span></h1></div>
+  </div>
+  <span class="nav-label">Principal</span>
+  <button class="nav-item active" onclick="showSection('dashboard',this)">📊 Dashboard</button>
+  <button class="nav-item" onclick="showSection('historial',this)">📋 Historial Emergencias</button>
+  <span class="nav-label">Gestión</span>
+  <button class="nav-item" onclick="showSection('conductores',this)">🚘 Conductores</button>
+  <button class="nav-item" onclick="showSection('usuarios',this)">👥 Usuarios</button>
+
+
+  <span class="nav-label">Reportes</span>
+
+<button class="nav-item" onclick="window.location.href='reportes.html'">
+📄 Reportes y exportación
+</button>
+
+<button class="nav-item" onclick="window.location.href='perfil.html'">
+⚙️ Mi perfil
+</button>
+
+  <div class="sidebar-footer">
+    <div class="admin-badge">
+      <div class="admin-avatar" id="admin-avatar">A</div>
+      <div class="admin-info">
+        <strong id="admin-nombre">Administrador</strong>
+        <span>Cuenta única · Admin</span>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="cerrarSesion()">🚪 Cerrar sesión</button>
+  </div>
+</aside>
+
+<main class="main">
+  <!-- DASHBOARD -->
+  <section id="sec-dashboard" class="page-section active">
+    <h2 class="page-title">Dashboard general</h2>
+    <div class="stats-grid">
+      <div class="stat-card" data-icon="🔴"><div class="s-label">Emergencias hoy</div><div class="s-value s-red" id="st-hoy">—</div><div class="s-sub">registradas hoy</div></div>
+      <div class="stat-card" data-icon="⏳"><div class="s-label">Pendientes</div><div class="s-value s-warn" id="st-pend">—</div><div class="s-sub">sin atender</div></div>
+      <div class="stat-card" data-icon="✅"><div class="s-label">Atendidas total</div><div class="s-value s-ok" id="st-atend">—</div><div class="s-sub">historial completo</div></div>
+      <div class="stat-card" data-icon="🚘"><div class="s-label">Conductores activos</div><div class="s-value s-blue" id="st-cond">—</div><div class="s-sub" id="st-cond-sub">—</div></div>
+      <div class="stat-card" data-icon="👥"><div class="s-label">Total usuarios</div><div class="s-value" id="st-users">—</div><div class="s-sub">operadores + conductores</div></div>
+    </div>
+    <div class="card-box">
+      <div class="box-header">
+        <h2>Emergencias recientes</h2>
+        <button class="btn btn-ghost btn-sm" onclick="showSection('historial',document.querySelectorAll('.nav-item')[1])">Ver todas →</button>
+      </div>
+      <table class="t">
+        <thead><tr><th>Paciente</th><th>Dirección</th><th>Prioridad</th><th>Estado</th><th>Fecha</th></tr></thead>
+        <tbody id="tbl-recientes"><tr class="loading-row"><td colspan="5"><span class="spin"></span></td></tr></tbody>
+      </table>
+    </div>
+    <div class="card-box">
+      <div class="box-header"><h2>Emergencias por conductor</h2></div>
+      <table class="t">
+        <thead><tr><th>Conductor</th><th>Estado</th><th>Atendidas</th></tr></thead>
+        <tbody id="tbl-cond-dash"><tr class="loading-row"><td colspan="3"><span class="spin"></span></td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- HISTORIAL -->
+  <section id="sec-historial" class="page-section">
+    <h2 class="page-title">Historial de emergencias</h2>
+    <div class="card-box">
+      <div class="filters">
+        <div>
+          <label>Filtrar por estado</label>
+          <select id="f-estado">
+            <option value="">Todos</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="en_camino">En camino</option>
+            <option value="atendida">Atendida</option>
+          </select>
+        </div>
+        <button class="btn btn-dark" onclick="cargarHistorial()">Filtrar</button>
+        <button class="btn btn-ghost" onclick="limpiarFiltros()">Ver todos</button>
+      </div>
+      <table class="t">
+        <thead><tr><th>#</th><th>Paciente</th><th>Edad</th><th>Dirección</th><th>Prioridad</th><th>Estado</th><th>Fecha</th></tr></thead>
+        <tbody id="tbl-historial"><tr class="loading-row"><td colspan="7"><span class="spin"></span></td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- CONDUCTORES -->
+  <section id="sec-conductores" class="page-section">
+    <h2 class="page-title">Gestión de conductores</h2>
+    <div class="card-box">
+      <table class="t">
+        <thead><tr><th>Nombre</th><th>Email</th><th>Estado</th><th>Atendidas</th><th>Acciones</th></tr></thead>
+        <tbody id="tbl-conductores"><tr class="loading-row"><td colspan="5"><span class="spin"></span></td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- USUARIOS -->
+  <section id="sec-usuarios" class="page-section">
+    <h2 class="page-title">Gestión de usuarios</h2>
+    <div class="card-box">
+      <div class="box-header">
+        <h2>Todos los usuarios</h2>
+        <button class="btn btn-dark" onclick="abrirModal()">+ Nuevo usuario</button>
+      </div>
+      <table class="t">
+        <thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody id="tbl-usuarios"><tr class="loading-row"><td colspan="5"><span class="spin"></span></td></tr></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<!-- MODAL -->
+<div class="overlay" id="modal-crear">
+  <div class="modal-box">
+    <div class="modal-title">Nuevo usuario</div>
+    <div class="f-field"><label>Nombre completo</label><input type="text" id="m-nombre" placeholder="Ej. María García"/></div>
+    <div class="f-field"><label>Correo electrónico</label><input type="email" id="m-email" placeholder="correo@ejemplo.com"/></div>
+    <div class="f-field"><label>Contraseña</label><input type="password" id="m-pass" placeholder="Mínimo 6 caracteres"/></div>
+    <div class="f-field">
+      <label>Rol</label>
+      <select id="m-rol"><option value="operador">Operador</option><option value="conductor">Conductor</option></select>
+    </div>
+    <div class="err-msg" id="m-error"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn btn-dark" onclick="crearUsuario()">Crear usuario</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const API     = 'http://localhost:5000/api';
+  const USER_ID = localStorage.getItem('user_id');
+  const ROL     = localStorage.getItem('rol_usuario');
+
+  // ── Guardia ───────────────────────────────────────────────────────────────
+  if (ROL !== 'admin' || !USER_ID) {
+    window.location.href = '../index.html';
+  }
+  const nombreAdmin = localStorage.getItem('nombre_usuario') || 'Admin';
+  document.getElementById('admin-nombre').textContent = nombreAdmin;
+  document.getElementById('admin-avatar').textContent = nombreAdmin[0].toUpperCase();
+
+  // ── Toast ─────────────────────────────────────────────────────────────────
+  function toast(msg, ok = false) {
+    const t = document.getElementById('toast');
+    t.textContent  = msg;
+    t.style.background = ok ? '#27ae60' : '#D0342C';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // ── fetch con header X-User-Id ────────────────────────────────────────────
+  async function api(url, opts = {}) {
+    const headers = { 'X-User-Id': USER_ID, ...(opts.headers || {}) };
+    const res = await fetch(API + url, { credentials: 'include', ...opts, headers });
+    if (res.status === 401) { toast('⚠️ Sesión expirada'); }
+    if (res.status === 403) { toast('⛔ Sin permisos'); }
+    return res;
+  }
+
+  // ── Navegación ────────────────────────────────────────────────────────────
+  function showSection(id, el) {
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('sec-' + id).classList.add('active');
+    if (el) el.classList.add('active');
+    ({ dashboard: initDashboard, historial: cargarHistorial, conductores: cargarConductores, usuarios: cargarUsuarios })[id]?.();
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  const badge    = v => `<span class="badge b-${v}">${v}</span>`;
+  const emptyRow = (c, msg, ic='📭') => `<tr><td colspan="${c}"><div class="empty-state"><div class="ei">${ic}</div>${msg}</div></td></tr>`;
+  const spinRow  = c  => `<tr class="loading-row"><td colspan="${c}"><span class="spin"></span></td></tr>`;
+
+  // ── DASHBOARD ─────────────────────────────────────────────────────────────
+  async function initDashboard() {
+    await Promise.all([cargarStats(), cargarRecientes(), cargarCondDash()]);
+  }
+
+  async function cargarStats() {
+    try {
+      const res = await api('/admin/stats');
+      if (!res.ok) return;
+      const d = await res.json();
+      document.getElementById('st-hoy').textContent    = d.emergencias_hoy;
+      document.getElementById('st-pend').textContent   = d.emergencias_pend;
+      document.getElementById('st-atend').textContent  = d.atendidas_total;
+      document.getElementById('st-cond').textContent   = d.total_conductores;
+      document.getElementById('st-cond-sub').textContent = `${d.conductores_susp} suspendido(s)`;
+      document.getElementById('st-users').textContent  = d.total_usuarios;
+    } catch(e) { console.error(e); }
+  }
+
+  async function cargarRecientes() {
+    try {
+      const res  = await api('/admin/emergencias');
+      if (!res.ok) return;
+      const data = await res.json();
+      const rows = data.slice(0, 8);
+      document.getElementById('tbl-recientes').innerHTML = rows.length
+        ? rows.map(e => `<tr><td>${e.nombre_paciente}</td><td>${e.direccion}</td><td>${badge(e.prioridad)}</td><td>${badge(e.estado)}</td><td>${e.fecha_registro}</td></tr>`).join('')
+        : emptyRow(5, 'Sin emergencias registradas');
+    } catch(e) { console.error(e); }
+  }
+
+  async function cargarCondDash() {
+    try {
+      const res  = await api('/admin/conductores/stats');
+      if (!res.ok) return;
+      const data = await res.json();
+      document.getElementById('tbl-cond-dash').innerHTML = data.length
+        ? data.map(c => `<tr><td>${c.nombre}</td><td>${badge(c.activo?'activo':'suspendido')}</td><td>${c.emergencias_atendidas}</td></tr>`).join('')
+        : emptyRow(3, 'Sin conductores', '🚘');
+    } catch(e) { console.error(e); }
+  }
+
+  // ── HISTORIAL (solo filtro por estado, sin fechas) ────────────────────────
+  async function cargarHistorial() {
+    const estado = document.getElementById('f-estado').value;
+    const url    = '/admin/emergencias' + (estado ? `?estado=${estado}` : '');
+    document.getElementById('tbl-historial').innerHTML = spinRow(7);
+    try {
+      const res  = await api(url);
+      if (!res.ok) return;
+      const data = await res.json();
+      document.getElementById('tbl-historial').innerHTML = data.length
+        ? data.map(e => `<tr>
+            <td>${e.id}</td><td>${e.nombre_paciente}</td><td>${e.edad??'—'}</td>
+            <td>${e.direccion}</td><td>${badge(e.prioridad)}</td>
+            <td>${badge(e.estado)}</td><td>${e.fecha_registro}</td>
+          </tr>`).join('')
+        : emptyRow(7, 'Sin resultados', '🔍');
+    } catch(e) { console.error(e); }
+  }
+
+  function limpiarFiltros() {
+    document.getElementById('f-estado').value = '';
+    cargarHistorial();
+  }
+
+  // ── CONDUCTORES ───────────────────────────────────────────────────────────
+  async function cargarConductores() {
+    try {
+      const res  = await api('/admin/conductores/stats');
+      if (!res.ok) return;
+      const data = await res.json();
+      document.getElementById('tbl-conductores').innerHTML = data.length
+        ? data.map(c => `<tr>
+            <td>${c.nombre}</td><td>${c.email}</td>
+            <td>${badge(c.activo?'activo':'suspendido')}</td>
+            <td>${c.emergencias_atendidas}</td>
+            <td style="display:flex;gap:.4rem;flex-wrap:wrap">
+              ${c.activo
+                ? `<button class="btn btn-sm btn-red" onclick="suspender(${c.id})">Suspender</button>`
+                : `<button class="btn btn-sm btn-green" onclick="reactivar(${c.id})">Reactivar</button>`}
+              <button class="btn btn-sm btn-ghost" onclick="eliminar(${c.id},'${c.nombre}',cargarConductores)">Eliminar</button>
+            </td>
+          </tr>`).join('')
+        : emptyRow(5, 'Sin conductores', '🚘');
+    } catch(e) { console.error(e); }
+  }
+
+  // ── USUARIOS ──────────────────────────────────────────────────────────────
+  async function cargarUsuarios() {
+    try {
+      const res  = await api('/admin/usuarios');
+      if (!res.ok) return;
+      const data = await res.json();
+      document.getElementById('tbl-usuarios').innerHTML = data.length
+        ? data.map(u => `<tr>
+            <td>${u.nombre}</td><td>${u.email}</td>
+            <td>${badge(u.rol)}</td>
+            <td>${badge(u.activo?'activo':'suspendido')}</td>
+            <td style="display:flex;gap:.4rem;flex-wrap:wrap">
+              ${u.activo
+                ? `<button class="btn btn-sm btn-red" onclick="suspender(${u.id})">Suspender</button>`
+                : `<button class="btn btn-sm btn-green" onclick="reactivar(${u.id})">Reactivar</button>`}
+              <button class="btn btn-sm btn-ghost" onclick="eliminar(${u.id},'${u.nombre}',cargarUsuarios)">Eliminar</button>
+            </td>
+          </tr>`).join('')
+        : emptyRow(5, 'Sin usuarios', '👥');
+    } catch(e) { console.error(e); }
+  }
+
+  // ── Acciones ──────────────────────────────────────────────────────────────
+  async function suspender(id) {
+    await api(`/admin/usuarios/${id}/suspender`, {method:'PUT'});
+    initDashboard(); cargarConductores(); cargarUsuarios();
+  }
+  async function reactivar(id) {
+    await api(`/admin/usuarios/${id}/reactivar`, {method:'PUT'});
+    initDashboard(); cargarConductores(); cargarUsuarios();
+  }
+  async function eliminar(id, nombre, recarga) {
+    if (!confirm(`¿Eliminar permanentemente a "${nombre}"?`)) return;
+    await api(`/admin/usuarios/${id}`, {method:'DELETE'});
+    initDashboard(); recarga();
+  }
+
+  // ── Modal ─────────────────────────────────────────────────────────────────
+  function abrirModal()  { document.getElementById('modal-crear').classList.add('open'); }
+  function cerrarModal() {
+    document.getElementById('modal-crear').classList.remove('open');
+    document.getElementById('m-error').textContent = '';
+    ['m-nombre','m-email','m-pass'].forEach(id => document.getElementById(id).value = '');
+  }
+  async function crearUsuario() {
+    const body = {
+      nombre:   document.getElementById('m-nombre').value,
+      email:    document.getElementById('m-email').value,
+      password: document.getElementById('m-pass').value,
+      rol:      document.getElementById('m-rol').value,
+    };
+    try {
+      const res  = await api('/admin/usuarios', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (!res.ok) { document.getElementById('m-error').textContent = data.error; return; }
+      cerrarModal();
+      toast('✅ Usuario creado', true);
+      initDashboard(); cargarUsuarios();
+    } catch(e) { console.error(e); }
+  }
+
+  // ── Logout ────────────────────────────────────────────────────────────────
+  async function cerrarSesion() {
+    try { await api('/logout', {method:'POST'}); } catch(e) {}
+    localStorage.clear();
+    window.location.href = '../index.html';
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  initDashboard();
+</script>
+</body>
+</html>

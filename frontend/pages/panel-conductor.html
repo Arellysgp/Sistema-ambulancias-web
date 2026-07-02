@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAMU - Panel de Navegación (Conductor)</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    /* ── Estilos de la Barra Superior (SAMU) ── */
+    .navbar-samu {
+      background-color: #b71c1c;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      min-height: 58px;
+    }
+    .navbar-logo {
+      display: flex; align-items: center; gap: 10px; padding: 0 1.2rem;
+      color: white; font-weight: 700; font-size: 1.05rem; letter-spacing: 0.3px;
+    }
+    .navbar-logo i { font-size: 1.3rem; }
+    .navbar-logo .separador {
+      width: 1px; height: 22px; background: rgba(255,255,255,0.35); margin: 0 10px;
+    }
+    .navbar-logo .subtitulo { font-weight: 400; font-size: 0.85rem; opacity: 0.85; }
+    
+    .operador-badge {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px; padding: 5px 14px; color: white; font-size: 0.85rem; margin-right: 1rem;
+    }
+    
+    /* ── Corrección del menú desplegable (Hover y flechas) ── */
+    .navbar-samu .navbar-item.has-dropdown:hover .navbar-link,
+    .navbar-samu .navbar-item.has-dropdown.is-active .navbar-link,
+    .navbar-samu .navbar-link:hover,
+    .navbar-samu .navbar-link:focus {
+        background-color: #901616 !important;
+        color: #ffffff !important;
+    }
+    .navbar-samu .navbar-link::after { border-color: #ffffff !important; }
+    
+    .navbar-dropdown { border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .navbar-dropdown .navbar-item:hover { background-color: #f5f5f5 !important; }
+  </style>
+</head>
+
+<body style="background-color: #f4f6f8; min-height: 100vh;">
+
+  <div id="header-container"></div>
+
+  <div class="container is-fluid mt-5">
+    <div class="columns">
+      
+      <div class="column is-4">
+        <div class="box" style="border-top: 4px solid #D0342C;">
+          <h2 class="title is-4"><i class="fa-solid fa-truck-medical" style="color: #D0342C;"></i> Estado de Unidad</h2>
+          
+          <div id="alerta-conductor" class="notification is-info is-light">
+            <i class="fa-solid fa-spinner fa-spin"></i> Buscando emergencias asignadas...
+          </div>
+
+          <div id="detalles-emergencia" class="is-hidden">
+            <p class="mb-2"><strong><i class="fa-regular fa-user"></i> Paciente:</strong> <span id="cond-paciente">-</span></p>
+            <p class="mb-2"><strong><i class="fa-solid fa-location-dot"></i> Dirección:</strong> <span id="cond-direccion">-</span></p>
+            <p class="mb-4"><strong><i class="fa-solid fa-notes-medical"></i> Detalle:</strong> <span id="cond-descripcion">-</span></p>
+            
+            <hr>
+            
+            <div class="buttons">
+              <button class="button is-warning is-fullwidth has-text-weight-bold" id="btn-en-camino">
+                <i class="fa-solid fa-truck-fast" style="margin-right: 8px;"></i> En camino
+              </button>
+              <button class="button is-success is-fullwidth has-text-weight-bold" id="btn-finalizar">
+                <i class="fa-solid fa-check-double" style="margin-right: 8px;"></i> Finalizar Atención
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="column is-8">
+        <div class="box">
+          <h2 class="title is-4"><i class="fa-solid fa-map-location-dot" style="color: #1a73e8;"></i> Ruta hacia el Incidente</h2>
+          <div id="mapa-conductor" style="height: 400px; border-radius: 8px; border: 1px solid #ddd; z-index: 1;"></div>
+        </div>
+
+        <!-- ── Acciones rápidas ── -->
+        <div class="box mt-4" style="border-top: 4px solid #D0342C;">
+          <h2 class="title is-5 mb-3">
+            <i class="fa-solid fa-user-circle" style="color:#D0342C;"></i> Mi cuenta
+          </h2>
+          <div class="columns is-mobile">
+            <div class="column">
+              <button class="button is-danger is-fullwidth has-text-weight-bold" onclick="descargarMiReporte()">
+                <span class="icon"><i class="fa-solid fa-file-pdf"></i></span>
+                <span>Descargar mi reporte PDF</span>
+              </button>
+            </div>
+            <div class="column">
+              <a href="perfil-conductor.html" class="button is-light is-fullwidth has-text-weight-bold">
+                <span class="icon"><i class="fa-solid fa-gear"></i></span>
+                <span>Mi perfil</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <script src="../src/header.js"></script>
+  <script src="../src/conductor.js"></script>
+  <script>
+    const API      = 'http://127.0.0.1:5000/api';
+    const USER_ID  = localStorage.getItem('user_id');
+
+    function descargarMiReporte() {
+      if (!USER_ID) { alert('Sesión no encontrada. Vuelve a iniciar sesión.'); return; }
+      window.open(`${API}/reportes/conductor/${USER_ID}/pdf?user_id=${USER_ID}`, '_blank');
+    }
+  </script>
+</body>
+
+</html>
