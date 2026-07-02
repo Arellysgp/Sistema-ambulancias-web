@@ -241,213 +241,213 @@
 
 <div class="toast" id="toast"></div>
 
-<script>
-  const API     = 'http://localhost:5000/api';
-  const USER_ID = localStorage.getItem('user_id');
-  const ROL     = localStorage.getItem('rol_usuario');
+  <script>
+    const API     = 'https://sistema-ambulancias-web.onrender.com/api';
+    const USER_ID = localStorage.getItem('user_id');
+    const ROL     = localStorage.getItem('rol_usuario');
 
-  // ── Guardia ───────────────────────────────────────────────────────────────
-  if (ROL !== 'admin' || !USER_ID) {
-    window.location.href = '../index.html';
-  }
-  const nombreAdmin = localStorage.getItem('nombre_usuario') || 'Admin';
-  document.getElementById('admin-nombre').textContent = nombreAdmin;
-  document.getElementById('admin-avatar').textContent = nombreAdmin[0].toUpperCase();
+    // ── Guardia ───────────────────────────────────────────────────────────────
+    if (ROL !== 'admin' || !USER_ID) {
+      window.location.href = '../index.html';
+    }
+    const nombreAdmin = localStorage.getItem('nombre_usuario') || 'Admin';
+    document.getElementById('admin-nombre').textContent = nombreAdmin;
+    document.getElementById('admin-avatar').textContent = nombreAdmin[0].toUpperCase();
 
-  // ── Toast ─────────────────────────────────────────────────────────────────
-  function toast(msg, ok = false) {
-    const t = document.getElementById('toast');
-    t.textContent  = msg;
-    t.style.background = ok ? '#27ae60' : '#D0342C';
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3000);
-  }
+    // ── Toast ─────────────────────────────────────────────────────────────────
+    function toast(msg, ok = false) {
+      const t = document.getElementById('toast');
+      t.textContent  = msg;
+      t.style.background = ok ? '#27ae60' : '#D0342C';
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
 
-  // ── fetch con header X-User-Id ────────────────────────────────────────────
-  async function api(url, opts = {}) {
-    const headers = { 'X-User-Id': USER_ID, ...(opts.headers || {}) };
-    const res = await fetch(API + url, { credentials: 'include', ...opts, headers });
-    if (res.status === 401) { toast('⚠️ Sesión expirada'); }
-    if (res.status === 403) { toast('⛔ Sin permisos'); }
-    return res;
-  }
+    // ── fetch con header X-User-Id ────────────────────────────────────────────
+    async function api(url, opts = {}) {
+      const headers = { 'X-User-Id': USER_ID, ...(opts.headers || {}) };
+      const res = await fetch(API + url, { credentials: 'include', ...opts, headers });
+      if (res.status === 401) { toast('⚠️ Sesión expirada'); }
+      if (res.status === 403) { toast('⛔ Sin permisos'); }
+      return res;
+    }
 
-  // ── Navegación ────────────────────────────────────────────────────────────
-  function showSection(id, el) {
-    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById('sec-' + id).classList.add('active');
-    if (el) el.classList.add('active');
-    ({ dashboard: initDashboard, historial: cargarHistorial, conductores: cargarConductores, usuarios: cargarUsuarios })[id]?.();
-  }
+    // ── Navegación ────────────────────────────────────────────────────────────
+    function showSection(id, el) {
+      document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('sec-' + id).classList.add('active');
+      if (el) el.classList.add('active');
+      ({ dashboard: initDashboard, historial: cargarHistorial, conductores: cargarConductores, usuarios: cargarUsuarios })[id]?.();
+    }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
-  const badge    = v => `<span class="badge b-${v}">${v}</span>`;
-  const emptyRow = (c, msg, ic='📭') => `<tr><td colspan="${c}"><div class="empty-state"><div class="ei">${ic}</div>${msg}</div></td></tr>`;
-  const spinRow  = c  => `<tr class="loading-row"><td colspan="${c}"><span class="spin"></span></td></tr>`;
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    const badge    = v => `<span class="badge b-${v}">${v}</span>`;
+    const emptyRow = (c, msg, ic='📭') => `<tr><td colspan="${c}"><div class="empty-state"><div class="ei">${ic}</div>${msg}</div></td></tr>`;
+    const spinRow  = c  => `<tr class="loading-row"><td colspan="${c}"><span class="spin"></span></td></tr>`;
 
-  // ── DASHBOARD ─────────────────────────────────────────────────────────────
-  async function initDashboard() {
-    await Promise.all([cargarStats(), cargarRecientes(), cargarCondDash()]);
-  }
+    // ── DASHBOARD ─────────────────────────────────────────────────────────────
+    async function initDashboard() {
+      await Promise.all([cargarStats(), cargarRecientes(), cargarCondDash()]);
+    }
 
-  async function cargarStats() {
-    try {
-      const res = await api('/admin/stats');
-      if (!res.ok) return;
-      const d = await res.json();
-      document.getElementById('st-hoy').textContent    = d.emergencias_hoy;
-      document.getElementById('st-pend').textContent   = d.emergencias_pend;
-      document.getElementById('st-atend').textContent  = d.atendidas_total;
-      document.getElementById('st-cond').textContent   = d.total_conductores;
-      document.getElementById('st-cond-sub').textContent = `${d.conductores_susp} suspendido(s)`;
-      document.getElementById('st-users').textContent  = d.total_usuarios;
-    } catch(e) { console.error(e); }
-  }
+    async function cargarStats() {
+      try {
+        const res = await api('/admin/stats');
+        if (!res.ok) return;
+        const d = await res.json();
+        document.getElementById('st-hoy').textContent    = d.emergencias_hoy;
+        document.getElementById('st-pend').textContent   = d.emergencias_pend;
+        document.getElementById('st-atend').textContent  = d.atendidas_total;
+        document.getElementById('st-cond').textContent   = d.total_conductores;
+        document.getElementById('st-cond-sub').textContent = `${d.conductores_susp} suspendido(s)`;
+        document.getElementById('st-users').textContent  = d.total_usuarios;
+      } catch(e) { console.error(e); }
+    }
 
-  async function cargarRecientes() {
-    try {
-      const res  = await api('/admin/emergencias');
-      if (!res.ok) return;
-      const data = await res.json();
-      const rows = data.slice(0, 8);
-      document.getElementById('tbl-recientes').innerHTML = rows.length
-        ? rows.map(e => `<tr><td>${e.nombre_paciente}</td><td>${e.direccion}</td><td>${badge(e.prioridad)}</td><td>${badge(e.estado)}</td><td>${e.fecha_registro}</td></tr>`).join('')
-        : emptyRow(5, 'Sin emergencias registradas');
-    } catch(e) { console.error(e); }
-  }
+    async function cargarRecientes() {
+      try {
+        const res  = await api('/admin/emergencias');
+        if (!res.ok) return;
+        const data = await res.json();
+        const rows = data.slice(0, 8);
+        document.getElementById('tbl-recientes').innerHTML = rows.length
+          ? rows.map(e => `<tr><td>${e.nombre_paciente}</td><td>${e.direccion}</td><td>${badge(e.prioridad)}</td><td>${badge(e.estado)}</td><td>${e.fecha_registro}</td></tr>`).join('')
+          : emptyRow(5, 'Sin emergencias registradas');
+      } catch(e) { console.error(e); }
+    }
 
-  async function cargarCondDash() {
-    try {
-      const res  = await api('/admin/conductores/stats');
-      if (!res.ok) return;
-      const data = await res.json();
-      document.getElementById('tbl-cond-dash').innerHTML = data.length
-        ? data.map(c => `<tr><td>${c.nombre}</td><td>${badge(c.activo?'activo':'suspendido')}</td><td>${c.emergencias_atendidas}</td></tr>`).join('')
-        : emptyRow(3, 'Sin conductores', '🚘');
-    } catch(e) { console.error(e); }
-  }
+    async function cargarCondDash() {
+      try {
+        const res  = await api('/admin/conductores/stats');
+        if (!res.ok) return;
+        const data = await res.json();
+        document.getElementById('tbl-cond-dash').innerHTML = data.length
+          ? data.map(c => `<tr><td>${c.nombre}</td><td>${badge(c.activo?'activo':'suspendido')}</td><td>${c.emergencias_atendidas}</td></tr>`).join('')
+          : emptyRow(3, 'Sin conductores', '🚘');
+      } catch(e) { console.error(e); }
+    }
 
-  // ── HISTORIAL (solo filtro por estado, sin fechas) ────────────────────────
-  async function cargarHistorial() {
-    const estado = document.getElementById('f-estado').value;
-    const url    = '/admin/emergencias' + (estado ? `?estado=${estado}` : '');
-    document.getElementById('tbl-historial').innerHTML = spinRow(7);
-    try {
-      const res  = await api(url);
-      if (!res.ok) return;
-      const data = await res.json();
-      document.getElementById('tbl-historial').innerHTML = data.length
-        ? data.map(e => `<tr>
-            <td>${e.id}</td><td>${e.nombre_paciente}</td><td>${e.edad??'—'}</td>
-            <td>${e.direccion}</td><td>${badge(e.prioridad)}</td>
-            <td>${badge(e.estado)}</td><td>${e.fecha_registro}</td>
-          </tr>`).join('')
-        : emptyRow(7, 'Sin resultados', '🔍');
-    } catch(e) { console.error(e); }
-  }
+    // ── HISTORIAL (solo filtro por estado, sin fechas) ────────────────────────
+    async function cargarHistorial() {
+      const estado = document.getElementById('f-estado').value;
+      const url    = '/admin/emergencias' + (estado ? `?estado=${estado}` : '');
+      document.getElementById('tbl-historial').innerHTML = spinRow(7);
+      try {
+        const res  = await api(url);
+        if (!res.ok) return;
+        const data = await res.json();
+        document.getElementById('tbl-historial').innerHTML = data.length
+          ? data.map(e => `<tr>
+              <td>${e.id}</td><td>${e.nombre_paciente}</td><td>${e.edad??'—'}</td>
+              <td>${e.direccion}</td><td>${badge(e.prioridad)}</td>
+              <td>${badge(e.estado)}</td><td>${e.fecha_registro}</td>
+            </tr>`).join('')
+          : emptyRow(7, 'Sin resultados', '🔍');
+      } catch(e) { console.error(e); }
+    }
 
-  function limpiarFiltros() {
-    document.getElementById('f-estado').value = '';
-    cargarHistorial();
-  }
+    function limpiarFiltros() {
+      document.getElementById('f-estado').value = '';
+      cargarHistorial();
+    }
 
-  // ── CONDUCTORES ───────────────────────────────────────────────────────────
-  async function cargarConductores() {
-    try {
-      const res  = await api('/admin/conductores/stats');
-      if (!res.ok) return;
-      const data = await res.json();
-      document.getElementById('tbl-conductores').innerHTML = data.length
-        ? data.map(c => `<tr>
-            <td>${c.nombre}</td><td>${c.email}</td>
-            <td>${badge(c.activo?'activo':'suspendido')}</td>
-            <td>${c.emergencias_atendidas}</td>
-            <td style="display:flex;gap:.4rem;flex-wrap:wrap">
-              ${c.activo
-                ? `<button class="btn btn-sm btn-red" onclick="suspender(${c.id})">Suspender</button>`
-                : `<button class="btn btn-sm btn-green" onclick="reactivar(${c.id})">Reactivar</button>`}
-              <button class="btn btn-sm btn-ghost" onclick="eliminar(${c.id},'${c.nombre}',cargarConductores)">Eliminar</button>
-            </td>
-          </tr>`).join('')
-        : emptyRow(5, 'Sin conductores', '🚘');
-    } catch(e) { console.error(e); }
-  }
+    // ── CONDUCTORES ───────────────────────────────────────────────────────────
+    async function cargarConductores() {
+      try {
+        const res  = await api('/admin/conductores/stats');
+        if (!res.ok) return;
+        const data = await res.json();
+        document.getElementById('tbl-conductores').innerHTML = data.length
+          ? data.map(c => `<tr>
+              <td>${c.nombre}</td><td>${c.email}</td>
+              <td>${badge(c.activo?'activo':'suspendido')}</td>
+              <td>${c.emergencias_atendidas}</td>
+              <td style="display:flex;gap:.4rem;flex-wrap:wrap">
+                ${c.activo
+                  ? `<button class="btn btn-sm btn-red" onclick="suspender(${c.id})">Suspender</button>`
+                  : `<button class="btn btn-sm btn-green" onclick="reactivar(${c.id})">Reactivar</button>`}
+                <button class="btn btn-sm btn-ghost" onclick="eliminar(${c.id},'${c.nombre}',cargarConductores)">Eliminar</button>
+              </td>
+            </tr>`).join('')
+          : emptyRow(5, 'Sin conductores', '🚘');
+      } catch(e) { console.error(e); }
+    }
 
-  // ── USUARIOS ──────────────────────────────────────────────────────────────
-  async function cargarUsuarios() {
-    try {
-      const res  = await api('/admin/usuarios');
-      if (!res.ok) return;
-      const data = await res.json();
-      document.getElementById('tbl-usuarios').innerHTML = data.length
-        ? data.map(u => `<tr>
-            <td>${u.nombre}</td><td>${u.email}</td>
-            <td>${badge(u.rol)}</td>
-            <td>${badge(u.activo?'activo':'suspendido')}</td>
-            <td style="display:flex;gap:.4rem;flex-wrap:wrap">
-              ${u.activo
-                ? `<button class="btn btn-sm btn-red" onclick="suspender(${u.id})">Suspender</button>`
-                : `<button class="btn btn-sm btn-green" onclick="reactivar(${u.id})">Reactivar</button>`}
-              <button class="btn btn-sm btn-ghost" onclick="eliminar(${u.id},'${u.nombre}',cargarUsuarios)">Eliminar</button>
-            </td>
-          </tr>`).join('')
-        : emptyRow(5, 'Sin usuarios', '👥');
-    } catch(e) { console.error(e); }
-  }
+    // ── USUARIOS ──────────────────────────────────────────────────────────────
+    async function cargarUsuarios() {
+      try {
+        const res  = await api('/admin/usuarios');
+        if (!res.ok) return;
+        const data = await res.json();
+        document.getElementById('tbl-usuarios').innerHTML = data.length
+          ? data.map(u => `<tr>
+              <td>${u.nombre}</td><td>${u.email}</td>
+              <td>${badge(u.rol)}</td>
+              <td>${badge(u.activo?'activo':'suspendido')}</td>
+              <td style="display:flex;gap:.4rem;flex-wrap:wrap">
+                ${u.activo
+                  ? `<button class="btn btn-sm btn-red" onclick="suspender(${u.id})">Suspender</button>`
+                  : `<button class="btn btn-sm btn-green" onclick="reactivar(${u.id})">Reactivar</button>`}
+                <button class="btn btn-sm btn-ghost" onclick="eliminar(${u.id},'${u.nombre}',cargarUsuarios)">Eliminar</button>
+              </td>
+            </tr>`).join('')
+          : emptyRow(5, 'Sin usuarios', '👥');
+      } catch(e) { console.error(e); }
+    }
 
-  // ── Acciones ──────────────────────────────────────────────────────────────
-  async function suspender(id) {
-    await api(`/admin/usuarios/${id}/suspender`, {method:'PUT'});
-    initDashboard(); cargarConductores(); cargarUsuarios();
-  }
-  async function reactivar(id) {
-    await api(`/admin/usuarios/${id}/reactivar`, {method:'PUT'});
-    initDashboard(); cargarConductores(); cargarUsuarios();
-  }
-  async function eliminar(id, nombre, recarga) {
-    if (!confirm(`¿Eliminar permanentemente a "${nombre}"?`)) return;
-    await api(`/admin/usuarios/${id}`, {method:'DELETE'});
-    initDashboard(); recarga();
-  }
+    // ── Acciones ──────────────────────────────────────────────────────────────
+    async function suspender(id) {
+      await api(`/admin/usuarios/${id}/suspender`, {method:'PUT'});
+      initDashboard(); cargarConductores(); cargarUsuarios();
+    }
+    async function reactivar(id) {
+      await api(`/admin/usuarios/${id}/reactivar`, {method:'PUT'});
+      initDashboard(); cargarConductores(); cargarUsuarios();
+    }
+    async function eliminar(id, nombre, recarga) {
+      if (!confirm(`¿Eliminar permanentemente a "${nombre}"?`)) return;
+      await api(`/admin/usuarios/${id}`, {method:'DELETE'});
+      initDashboard(); recarga();
+    }
 
-  // ── Modal ─────────────────────────────────────────────────────────────────
-  function abrirModal()  { document.getElementById('modal-crear').classList.add('open'); }
-  function cerrarModal() {
-    document.getElementById('modal-crear').classList.remove('open');
-    document.getElementById('m-error').textContent = '';
-    ['m-nombre','m-email','m-pass'].forEach(id => document.getElementById(id).value = '');
-  }
-  async function crearUsuario() {
-    const body = {
-      nombre:   document.getElementById('m-nombre').value,
-      email:    document.getElementById('m-email').value,
-      password: document.getElementById('m-pass').value,
-      rol:      document.getElementById('m-rol').value,
-    };
-    try {
-      const res  = await api('/admin/usuarios', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      if (!res.ok) { document.getElementById('m-error').textContent = data.error; return; }
-      cerrarModal();
-      toast('✅ Usuario creado', true);
-      initDashboard(); cargarUsuarios();
-    } catch(e) { console.error(e); }
-  }
+    // ── Modal ─────────────────────────────────────────────────────────────────
+    function abrirModal()  { document.getElementById('modal-crear').classList.add('open'); }
+    function cerrarModal() {
+      document.getElementById('modal-crear').classList.remove('open');
+      document.getElementById('m-error').textContent = '';
+      ['m-nombre','m-email','m-pass'].forEach(id => document.getElementById(id).value = '');
+    }
+    async function crearUsuario() {
+      const body = {
+        nombre:   document.getElementById('m-nombre').value,
+        email:    document.getElementById('m-email').value,
+        password: document.getElementById('m-pass').value,
+        rol:      document.getElementById('m-rol').value,
+      };
+      try {
+        const res  = await api('/admin/usuarios', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (!res.ok) { document.getElementById('m-error').textContent = data.error; return; }
+        cerrarModal();
+        toast('✅ Usuario creado', true);
+        initDashboard(); cargarUsuarios();
+      } catch(e) { console.error(e); }
+    }
 
-  // ── Logout ────────────────────────────────────────────────────────────────
-  async function cerrarSesion() {
-    try { await api('/logout', {method:'POST'}); } catch(e) {}
-    localStorage.clear();
-    window.location.href = '../index.html';
-  }
+    // ── Logout ────────────────────────────────────────────────────────────────
+    async function cerrarSesion() {
+      try { await api('/logout', {method:'POST'}); } catch(e) {}
+      localStorage.clear();
+      window.location.href = '../index.html';
+    }
 
-  // ── Init ──────────────────────────────────────────────────────────────────
-  initDashboard();
-</script>
-</body>
-</html>
+    // ── Init ──────────────────────────────────────────────────────────────────
+    initDashboard();
+  </script>
+  </body>
+  </html>
