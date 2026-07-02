@@ -588,7 +588,7 @@
     };
 
     // Si hay ID oculto es PUT (Editar), si está vacío es POST (Registrar)
-    const url = idEmergencia ? `http://127.0.0.1:5000/api/emergencias/${idEmergencia}` : 'http://127.0.0.1:5000/api/emergencias';
+    const url = idEmergencia ? `https://sistema-ambulancias-web.onrender.com/api/emergencias/${idEmergencia}` : 'https://sistema-ambulancias-web.onrender.com/api/emergencias';
     const metodo = idEmergencia ? 'PUT' : 'POST';
 
     fetch(url, {
@@ -622,7 +622,7 @@
 
   // 4. Cargar la lista de la derecha desde la base de datos
   function cargarEmergencias() {
-    fetch('http://127.0.0.1:5000/api/emergencias')
+    fetch('https://sistema-ambulancias-web.onrender.com/api/emergencias')
     .then(response => response.json())
     .then(data => {
       emergenciasGlobales = data; // Guarda en la variable global
@@ -733,7 +733,7 @@
   // 6. Eliminar una emergencia de la base de datos
   function eliminarEmergencia(id) {
     if(confirm("¿Estás seguro de que deseas eliminar esta emergencia?")) {
-      fetch(`http://127.0.0.1:5000/api/emergencias/${id}`, {
+      fetch(`https://sistema-ambulancias-web.onrender.com/api/emergencias/${id}`, {
         method: 'DELETE'
       })
       .then(response => {
