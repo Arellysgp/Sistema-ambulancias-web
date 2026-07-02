@@ -24,7 +24,7 @@ CORS(app, supports_credentials=True,
      origins=[
          'http://localhost:5173',
          'http://127.0.0.1:5173',
-         'https://tu-nuevo-sitio-frontend.onrender.com'    # ← y esta
+         'https://sistema-ambulancias-web-1.onrender.com'    # ← y esta
      ],
      allow_headers=['Content-Type', 'X-User-Id'],
      methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
