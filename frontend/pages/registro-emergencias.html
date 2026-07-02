@@ -589,7 +589,7 @@
     };
 
     // Si hay ID oculto es PUT (Editar), si está vacío es POST (Registrar)
-    const url = idEmergencia ? `${API_URL}/api/emergencias/${idEmergencia}` : '${API_URL}/api/emergencias';
+    const url = idEmergencia ? `${API_URL}/api/emergencias/${idEmergencia}` : `${API_URL}/api/emergencias`;
     const metodo = idEmergencia ? 'PUT' : 'POST';
 
     fetch(url, {
