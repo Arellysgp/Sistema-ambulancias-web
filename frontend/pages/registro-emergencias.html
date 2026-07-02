@@ -477,6 +477,7 @@
   </section>
 
   <script>
+    const API_URL = 'https://sistema-ambulancias-web.onrender.com/api';
 // 1. Mostrar nombre del usuario al cargar la página
 // 1. Mostrar nombre del usuario al cargar la página
   document.addEventListener('DOMContentLoaded', () => {
@@ -588,7 +589,7 @@
     };
 
     // Si hay ID oculto es PUT (Editar), si está vacío es POST (Registrar)
-    const url = idEmergencia ? `https://sistema-ambulancias-web.onrender.com/api/emergencias/${idEmergencia}` : 'https://sistema-ambulancias-web.onrender.com/api/emergencias';
+    const url = idEmergencia ? `${API_URL}/api/emergencias/${idEmergencia}` : '${API_URL}/api/emergencias';
     const metodo = idEmergencia ? 'PUT' : 'POST';
 
     fetch(url, {
@@ -622,7 +623,7 @@
 
   // 4. Cargar la lista de la derecha desde la base de datos
   function cargarEmergencias() {
-    fetch('https://sistema-ambulancias-web.onrender.com/api/emergencias')
+    fetch('${API_URL}/api/emergencias')
     .then(response => response.json())
     .then(data => {
       emergenciasGlobales = data; // Guarda en la variable global
@@ -733,7 +734,7 @@
   // 6. Eliminar una emergencia de la base de datos
   function eliminarEmergencia(id) {
     if(confirm("¿Estás seguro de que deseas eliminar esta emergencia?")) {
-      fetch(`https://sistema-ambulancias-web.onrender.com/api/emergencias/${id}`, {
+      fetch(`${API_URL}/api/emergencias/${id}`, {
         method: 'DELETE'
       })
       .then(response => {
