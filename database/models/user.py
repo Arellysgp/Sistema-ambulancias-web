@@ -17,3 +17,15 @@ class User(db.Model):
     telefono      = db.Column(db.String(20), nullable=True)
     foto_url      = db.Column(db.Text, nullable=True)
     fecha_registro= db.Column(db.DateTime, nullable=True)
+
+    def __init__(self, nombre, email, password_hash, rol='operador', activo=True, telefono=None, foto_url=None, fecha_registro=None, **kwargs):
+        self.nombre = nombre
+        self.email = email
+        self.password_hash = password_hash
+        self.rol = rol
+        self.activo = activo
+        self.telefono = telefono
+        self.foto_url = foto_url
+        self.fecha_registro = fecha_registro
+        for key, value in kwargs.items():
+            setattr(self, key, value)
