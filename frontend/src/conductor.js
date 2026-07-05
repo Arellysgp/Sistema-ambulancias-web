@@ -46,7 +46,7 @@ function mostrarDetalles(emergencia) {
     idEmergenciaActual = emergencia.id;
     // Llenar textos del HTML
     document.getElementById('cond-paciente').textContent = `${emergencia.nombre_paciente} (${emergencia.edad} años)`;
-    document.getElementById('cond-direccion').textContent = emergencia.direccion;
+    document.getElementById('cond-direccion').textContent = `${emergencia.direccion}${emergencia.distrito ? ', ' + emergencia.distrito : ''}${emergencia.provincia ? ' (' + emergencia.provincia + ')' : ''}`;
     document.getElementById('cond-descripcion').textContent = emergencia.descripcion;
 
     // Ocultar el mensaje de "Buscando..." y mostrar los detalles y botones
