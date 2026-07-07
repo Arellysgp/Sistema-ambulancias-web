@@ -35,9 +35,21 @@ def estadisticas():
 @requiere_rol('admin')
 def historial_emergencias():
     estado = request.args.get('estado')
+    prioridad = request.args.get('prioridad')
+    fecha_ini = request.args.get('fecha_ini')
+    fecha_fin = request.args.get('fecha_fin')
+    
     query  = Emergencia.query
     if estado:
         query = query.filter_by(estado=estado)
+    if prioridad:
+        query = query.filter_by(prioridad=int(prioridad))
+    if fecha_ini:
+        query = query.filter(Emergencia.fecha_registro >= datetime.fromisoformat(fecha_ini))
+    if fecha_fin:
+        fecha_fin_dt = datetime.fromisoformat(fecha_fin).replace(hour=23, minute=59, second=59)
+        query = query.filter(Emergencia.fecha_registro <= fecha_fin_dt)
+        
     emergencias = query.order_by(Emergencia.fecha_registro.desc()).all()
 
     def fmt_fecha(e):
@@ -66,7 +78,7 @@ def stats_conductores():
         'nombre':                c.nombre,
         'email':                 c.email,
         'activo':                c.activo,
-        'emergencias_atendidas': 0,
+        'emergencias_atendidas': Emergencia.query.filter_by(conductor_id=c.id, estado='atendida').count(),
     } for c in conductores]), 200
 
 
@@ -81,6 +93,25 @@ def listar_usuarios():
         'rol':    u.rol,
         'activo': u.activo,
     } for u in usuarios]), 200
+
+
+@admin_bp.route('/admin/usuarios/<int:id>', methods=['GET'])
+@requiere_rol('admin')
+def obtener_usuario(id):
+    u = db.session.get(User, id)
+    if not u:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+    return jsonify({
+        'id':             u.id,
+        'nombre':         u.nombre,
+        'apellido':       getattr(u, 'apellido', '') or '',
+        'email':          u.email,
+        'rol':            u.rol,
+        'telefono':       getattr(u, 'telefono', '') or '',
+        'foto_url':       getattr(u, 'foto_url', '') or '',
+        'activo':         u.activo,
+        'fecha_registro': u.fecha_registro.isoformat() if getattr(u,'fecha_registro',None) else None,
+    }), 200
 
 
 @admin_bp.route('/admin/usuarios', methods=['POST'])

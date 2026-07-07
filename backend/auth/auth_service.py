@@ -9,6 +9,8 @@ def validar_email(email):
     patron = r'^[\w\.-]+@[\w\.-]+\.\w{2,}$'
     return re.match(patron, email)
 
+from datetime import datetime, timezone
+
 def registrar_usuario(nombre, email, password, rol='operador'):
     if not nombre or len(nombre.strip()) < 3:
         return None, "El nombre debe tener al menos 3 caracteres"
@@ -31,7 +33,8 @@ def registrar_usuario(nombre, email, password, rol='operador'):
         email=email_normalizado,
         password_hash=hash_pw,
         rol=rol,
-        activo=True
+        activo=True,
+        fecha_registro=datetime.now(timezone.utc)
     )
     db.session.add(nuevo)
     db.session.commit()

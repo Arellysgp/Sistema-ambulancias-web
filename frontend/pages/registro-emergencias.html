@@ -412,6 +412,93 @@
                 <div class="columns">
                   <div class="column">
                     <div class="field">
+                      <label class="label" for="distrito">Distrito</label>
+                      <div class="control has-icons-left">
+                        <div class="select is-fullwidth">
+                          <select id="distrito">
+                            <option value="">Seleccione Distrito</option>
+                            <option value="Lima">Lima</option>
+                            <option value="Ate">Ate</option>
+                            <option value="Barranco">Barranco</option>
+                            <option value="Breña">Breña</option>
+                            <option value="Callao">Callao</option>
+                            <option value="Carabayllo">Carabayllo</option>
+                            <option value="Chorrillos">Chorrillos</option>
+                            <option value="Comas">Comas</option>
+                            <option value="El Agustino">El Agustino</option>
+                            <option value="Independencia">Independencia</option>
+                            <option value="Jesús María">Jesús María</option>
+                            <option value="La Molina">La Molina</option>
+                            <option value="La Victoria">La Victoria</option>
+                            <option value="Lince">Lince</option>
+                            <option value="Los Olivos">Los Olivos</option>
+                            <option value="Magdalena del Mar">Magdalena del Mar</option>
+                            <option value="Miraflores">Miraflores</option>
+                            <option value="Pueblo Libre">Pueblo Libre</option>
+                            <option value="Puente Piedra">Puente Piedra</option>
+                            <option value="Rímac">Rímac</option>
+                            <option value="San Borja">San Borja</option>
+                            <option value="San Isidro">San Isidro</option>
+                            <option value="San Juan de Lurigancho">San Juan de Lurigancho</option>
+                            <option value="San Juan de Miraflores">San Juan de Miraflores</option>
+                            <option value="San Luis">San Luis</option>
+                            <option value="San Martín de Porres">San Martín de Porres</option>
+                            <option value="San Miguel">San Miguel</option>
+                            <option value="Santa Anita">Santa Anita</option>
+                            <option value="Santiago de Surco">Santiago de Surco</option>
+                            <option value="Surquillo">Surquillo</option>
+                            <option value="Villa El Salvador">Villa El Salvador</option>
+                            <option value="Villa María del Triunfo">Villa María del Triunfo</option>
+                            <option value="Ventanilla">Ventanilla</option>
+                          </select>
+                        </div>
+                        <span class="icon is-left"><i class="fa-solid fa-building"></i></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="column">
+                    <div class="field">
+                      <label class="label" for="region">Región</label>
+                      <div class="control has-icons-left">
+                        <div class="select is-fullwidth">
+                          <select id="region">
+                            <option value="">Seleccione Región</option>
+                            <option value="Amazonas">Amazonas</option>
+                            <option value="Áncash">Áncash</option>
+                            <option value="Apurímac">Apurímac</option>
+                            <option value="Arequipa">Arequipa</option>
+                            <option value="Ayacucho">Ayacucho</option>
+                            <option value="Cajamarca">Cajamarca</option>
+                            <option value="Callao">Callao</option>
+                            <option value="Cusco">Cusco</option>
+                            <option value="Huancavelica">Huancavelica</option>
+                            <option value="Huánuco">Huánuco</option>
+                            <option value="Ica">Ica</option>
+                            <option value="Junín">Junín</option>
+                            <option value="La Libertad">La Libertad</option>
+                            <option value="Lambayeque">Lambayeque</option>
+                            <option value="Lima">Lima</option>
+                            <option value="Loreto">Loreto</option>
+                            <option value="Madre de Dios">Madre de Dios</option>
+                            <option value="Moquegua">Moquegua</option>
+                            <option value="Pasco">Pasco</option>
+                            <option value="Piura">Piura</option>
+                            <option value="Puno">Puno</option>
+                            <option value="San Martín">San Martín</option>
+                            <option value="Tacna">Tacna</option>
+                            <option value="Tumbes">Tumbes</option>
+                            <option value="Ucayali">Ucayali</option>
+                          </select>
+                        </div>
+                        <span class="icon is-left"><i class="fa-solid fa-map"></i></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="columns">
+                  <div class="column">
+                    <div class="field">
                       <label class="label" for="latitud">Latitud</label>
                       <div class="control has-icons-left">
                         <input id="latitud" class="input" type="number" step="any" placeholder="-12.0464" />
@@ -525,7 +612,7 @@
   </section>
 
   <script>
-    const API_URL = 'https://sistema-ambulancias-web.onrender.com';
+    const API_URL = 'http://127.0.0.1:5000';
 // 1. Mostrar nombre del usuario al cargar la página
 // 1. Mostrar nombre del usuario al cargar la página
   document.addEventListener('DOMContentLoaded', () => {
@@ -538,13 +625,23 @@
   });
 
   // --- BUSCADOR AUTOMÁTICO DE DIRECCIONES ---
-  // Se activa cuando el operador termina de escribir y sale de la casilla "Dirección"
-  document.getElementById('direccion').addEventListener('blur', function() {
-    const direccionTexto = this.value.trim();
+  function buscarDireccionEnMapa() {
+    const direccionTexto = document.getElementById('direccion').value.trim();
+    const distritoTexto = document.getElementById('distrito') ? document.getElementById('distrito').value : '';
+    const regionTexto = document.getElementById('region') ? document.getElementById('region').value : '';
+    
     if (!direccionTexto) return;
 
-    // Le agregamos "Lima, Perú" ocultamente para que no busque calles en otros países
-    const busqueda = `${direccionTexto}, Lima, Perú`;
+    let ubicacionContexto = 'Lima, Perú'; // Por defecto
+    if (distritoTexto || regionTexto) {
+        let partes = [];
+        if (distritoTexto) partes.push(distritoTexto);
+        if (regionTexto) partes.push(regionTexto);
+        partes.push('Perú');
+        ubicacionContexto = partes.join(', ');
+    }
+
+    const busqueda = `${direccionTexto}, ${ubicacionContexto}`;
     const urlBusqueda = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(busqueda)}`;
 
     // Llamamos al buscador gratuito de OpenStreetMap
@@ -569,13 +666,27 @@
           } else {
             marcador = L.marker([lat, lng]).addTo(mapa);
           }
-          mostrarAmbulanciaEstatica(lat, lng);
+          if (typeof mostrarAmbulanciaEstatica === 'function') {
+            mostrarAmbulanciaEstatica(lat, lng);
+          }
         } else {
           console.warn("No se encontró la dirección exacta. Ubíquela haciendo clic en el mapa.");
+          document.getElementById('latitud').value = '';
+          document.getElementById('longitud').value = '';
+          document.getElementById('latitud').placeholder = 'Dirección no encontrada';
+          document.getElementById('longitud').placeholder = 'Use el mapa para ubicarla';
         }
       })
-      .catch(error => console.error("Error en la búsqueda de dirección:", error));
-  });
+      .catch(error => {
+        console.error("Error en la búsqueda de dirección:", error);
+        document.getElementById('latitud').placeholder = 'Error de conexión';
+      });
+  }
+
+  // Se activa cuando el operador sale de la casilla "Dirección" o cambia Distrito/Región
+  document.getElementById('direccion').addEventListener('blur', buscarDireccionEnMapa);
+  if (document.getElementById('distrito')) document.getElementById('distrito').addEventListener('change', buscarDireccionEnMapa);
+  if (document.getElementById('region')) document.getElementById('region').addEventListener('change', buscarDireccionEnMapa);
 
   // 2. Función para cerrar sesión
   function ejecutarLogout() {
@@ -630,6 +741,8 @@
       edad: parseInt(document.getElementById('edad').value),
       descripcion: document.getElementById('descripcion').value,
       direccion: document.getElementById('direccion').value,
+      distrito: document.getElementById('distrito') ? document.getElementById('distrito').value : null,
+      provincia: document.getElementById('region') ? document.getElementById('region').value : null,
       latitud: parseFloat(document.getElementById('latitud').value) || null,
       longitud: parseFloat(document.getElementById('longitud').value) || null,
       prioridad: parseInt(document.getElementById('prioridad').value),
@@ -743,6 +856,8 @@
       document.getElementById('edad').value = emergencia.edad;
       document.getElementById('descripcion').value = emergencia.descripcion;
       document.getElementById('direccion').value = emergencia.direccion;
+      if(document.getElementById('distrito')) document.getElementById('distrito').value = emergencia.distrito || '';
+      if(document.getElementById('region')) document.getElementById('region').value = emergencia.provincia || '';
       document.getElementById('latitud').value = emergencia.latitud || '';
       document.getElementById('longitud').value = emergencia.longitud || '';
       document.getElementById('prioridad').value = emergencia.prioridad;

@@ -89,6 +89,9 @@ def actualizar_emergencia(emergencia_id):
     emergencia.longitud = datos.get('longitud', emergencia.longitud)
     emergencia.prioridad = datos.get('prioridad', emergencia.prioridad)
     emergencia.estado = datos.get('estado', emergencia.estado)
+    
+    if 'conductor_id' in datos:
+        emergencia.conductor_id = datos.get('conductor_id')
 
     db.session.commit()
     return jsonify({'mensaje': 'Emergencia actualizada correctamente'}), 200

@@ -2,7 +2,7 @@
 # Generación de PDF — Sistema SAMU
 
 from flask import Blueprint, jsonify, request, make_response, session
-from datetime import datetime
+from datetime import datetime, timedelta
 import io
 
 try:
@@ -15,6 +15,10 @@ try:
         Paragraph, Spacer, HRFlowable
     )
     from reportlab.lib.enums import TA_CENTER, TA_RIGHT
+    from reportlab.graphics.shapes import Drawing, String
+    from reportlab.graphics.charts.lineplots import LinePlot
+    from reportlab.graphics.charts.textlabels import Label
+    from reportlab.graphics.widgets.markers import makeMarker
     REPORTLAB_OK = True
 except ImportError:
     REPORTLAB_OK = False
@@ -70,44 +74,46 @@ def _estilos():
 
 def _header(elements, estilos, titulo, subtitulo=''):
     data = [[
-        Paragraph('SAMU - SISTEMA DE AMBULANCIAS', estilos['h_inst']),
-        Paragraph(datetime.now().strftime('%d/%m/%Y  %H:%M'), estilos['h_date']),
+        Paragraph('<font color="#FFFFFF"><b>SAMU - SISTEMA DE AMBULANCIAS</b></font>', estilos['h_inst']),
+        Paragraph(f'<font color="#FFFFFF">{datetime.now().strftime("%d/%m/%Y  %H:%M")}</font>', estilos['h_date']),
     ]]
     t = Table(data, colWidths=[13*cm, 5*cm])
     t.setStyle(TableStyle([
-        ('BACKGROUND',    (0,0), (-1,-1), ROJO),
+        ('BACKGROUND',    (0,0), (-1,-1), colors.HexColor('#2C3E50')), # Elegante gris azulado oscuro
         ('LEFTPADDING',   (0,0), (-1,-1), 12),
         ('RIGHTPADDING',  (0,0), (-1,-1), 12),
-        ('TOPPADDING',    (0,0), (-1,-1), 10),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 10),
+        ('TOPPADDING',    (0,0), (-1,-1), 8),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 8),
         ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
+        ('ROUNDEDCORNERS',[3, 3, 3, 3]), # Si lo soporta, aunque reportlab Table no soporta esto directamente sin canvas. Lo omitimos.
     ]))
     elements.append(t)
-    elements.append(Spacer(1, .4*cm))
-    elements.append(Paragraph(titulo, estilos['titulo']))
+    elements.append(Spacer(1, .6*cm))
+    elements.append(Paragraph(f'<font color="#2C3E50">{titulo}</font>', estilos['titulo']))
     if subtitulo:
-        elements.append(Paragraph(subtitulo, estilos['subtit']))
-    elements.append(HRFlowable(width='100%', thickness=2, color=ROJO))
-    elements.append(Spacer(1, .4*cm))
+        elements.append(Paragraph(f'<font color="#7F8C8D">{subtitulo}</font>', estilos['subtit']))
+    elements.append(Spacer(1, .2*cm))
+    elements.append(HRFlowable(width='100%', thickness=1, color=colors.HexColor('#ECF0F1')))
+    elements.append(Spacer(1, .6*cm))
 
 def _tabla_style():
     return TableStyle([
-        ('BACKGROUND',    (0,0), (-1,0), ROJO),
-        ('TEXTCOLOR',     (0,0), (-1,0), BLANCO),
+        ('BACKGROUND',    (0,0), (-1,0), colors.HexColor('#F8F9FA')),
+        ('TEXTCOLOR',     (0,0), (-1,0), colors.HexColor('#2C3E50')),
         ('FONTNAME',      (0,0), (-1,0), 'Helvetica-Bold'),
-        ('FONTSIZE',      (0,0), (-1,0), 9),
-        ('ALIGN',         (0,0), (-1,0), 'CENTER'),
-        ('TOPPADDING',    (0,0), (-1,0), 8),
-        ('BOTTOMPADDING', (0,0), (-1,0), 8),
-        ('LINEBELOW',     (0,0), (-1,0), 1.5, ROJO_OSC),
+        ('FONTSIZE',      (0,0), (-1,0), 8),
+        ('ALIGN',         (0,0), (-1,0), 'LEFT'),
+        ('TOPPADDING',    (0,0), (-1,0), 10),
+        ('BOTTOMPADDING', (0,0), (-1,0), 10),
+        ('LINEBELOW',     (0,0), (-1,0), 1.5, colors.HexColor('#BDC3C7')), # Línea más fuerte bajo el header
         ('FONTNAME',      (0,1), (-1,-1), 'Helvetica'),
         ('FONTSIZE',      (0,1), (-1,-1), 8),
-        ('ALIGN',         (0,1), (-1,-1), 'CENTER'),
+        ('TEXTCOLOR',     (0,1), (-1,-1), colors.HexColor('#34495E')),
+        ('ALIGN',         (0,1), (-1,-1), 'LEFT'),
         ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
-        ('TOPPADDING',    (0,1), (-1,-1), 5),
-        ('BOTTOMPADDING', (0,1), (-1,-1), 5),
-        ('ROWBACKGROUNDS',(0,1), (-1,-1), [BLANCO, CREMA]),
-        ('GRID',          (0,0), (-1,-1), .4, GRIS_BRD),
+        ('TOPPADDING',    (0,1), (-1,-1), 8),
+        ('BOTTOMPADDING', (0,1), (-1,-1), 8),
+        ('LINEBELOW',     (0,1), (-1,-1), 0.5, colors.HexColor('#ECF0F1')), # Solo líneas horizontales sutiles
     ])
 
 def _pie_pagina(canvas, doc):
@@ -156,7 +162,9 @@ def reporte_servicios_pdf():
     if fecha_ini:
         query = query.filter(Emergencia.fecha_registro >= datetime.fromisoformat(fecha_ini))
     if fecha_fin:
-        query = query.filter(Emergencia.fecha_registro <= datetime.fromisoformat(fecha_fin))
+        # Extender fecha_fin hasta el final del dia
+        fecha_fin_dt = datetime.fromisoformat(fecha_fin).replace(hour=23, minute=59, second=59)
+        query = query.filter(Emergencia.fecha_registro <= fecha_fin_dt)
 
     emergencias = query.limit(300).all()
     total      = len(emergencias)
@@ -248,87 +256,114 @@ def reporte_conductor_pdf(conductor_id):
 
     # ── Ficha ────────────────────────────────────────────────
     from reportlab.platypus import TableStyle as TS
-    elems.append(Paragraph('Datos del conductor', estilos['seccion']))
+    from reportlab.lib.colors import HexColor
+
+    elems.append(Paragraph('DATOS DEL CONDUCTOR', estilos['seccion']))
     info = [
-        ['Nombre', conductor.nombre or '-', 'Email',  conductor.email or '-'],
-        ['Rol',    conductor.rol    or '-', 'Estado', 'Activo' if conductor.activo else 'Inactivo'],
+        ['Nombre completo', conductor.nombre or '-', 'Email',  conductor.email or '-'],
+        ['Rol',    (conductor.rol or '-').capitalize(), 'Estado', 'Activo' if conductor.activo else 'Inactivo'],
     ]
-    t_info = Table(info, colWidths=[3*cm, 5.5*cm, 3*cm, 5.5*cm])
+    t_info = Table(info, colWidths=[4*cm, 4.5*cm, 4*cm, 4.5*cm])
     t_info.setStyle(TS([
+        ('FONTNAME',      (0,0), (-1,-1), 'Helvetica'),
         ('FONTNAME',      (0,0), (0,-1), 'Helvetica-Bold'),
         ('FONTNAME',      (2,0), (2,-1), 'Helvetica-Bold'),
         ('FONTSIZE',      (0,0), (-1,-1), 9),
-        ('BACKGROUND',    (0,0), (0,-1), CREMA),
-        ('BACKGROUND',    (2,0), (2,-1), CREMA),
-        ('TOPPADDING',    (0,0), (-1,-1), 6),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
-        ('LEFTPADDING',   (0,0), (-1,-1), 8),
-        ('GRID',          (0,0), (-1,-1), .4, GRIS_BRD),
+        ('TEXTCOLOR',     (0,0), (-1,-1), HexColor('#333333')),
+        ('BACKGROUND',    (0,0), (-1,-1), BLANCO),
+        ('ALIGN',         (0,0), (-1,-1), 'LEFT'),
+        ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
+        ('TOPPADDING',    (0,0), (-1,-1), 8),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 8),
+        ('LEFTPADDING',   (0,0), (-1,-1), 12),
+        ('GRID',          (0,0), (-1,-1), 0.5, HexColor('#E0E0E0')),
+        ('BOX',           (0,0), (-1,-1), 1, HexColor('#BDBDBD')),
     ]))
     elems.append(t_info)
-    elems.append(Spacer(1, .5*cm))
+    elems.append(Spacer(1, 0.6*cm))
 
     # ── KPIs ─────────────────────────────────────────────────
-    elems.append(Paragraph('Estadisticas de rendimiento', estilos['seccion']))
+    elems.append(Paragraph('ESTADÍSTICAS DE RENDIMIENTO', estilos['seccion']))
     kpis = [[
-        Paragraph(f'<font size="20"><b>{total}</b></font><br/>'
-                  f'<font size="8" color="gray">Emergencias totales</font>', estilos['pie']),
-        Paragraph(f'<font size="20"><b>{atendidas}</b></font><br/>'
-                  f'<font size="8" color="gray">Atendidas</font>', estilos['pie']),
-        Paragraph(f'<font size="20"><b>{total - atendidas}</b></font><br/>'
-                  f'<font size="8" color="gray">Pendientes/Canceladas</font>', estilos['pie']),
-        Paragraph(f'<font size="20"><b>{pct}%</b></font><br/>'
-                  f'<font size="8" color="gray">Tasa de atencion</font>', estilos['pie']),
+        Paragraph(f'<font size="24" color="#1A1410"><b>{total}</b></font><br/>'
+                  f'<font size="8" color="#666666">Emergencias totales</font>', estilos['pie']),
+        Paragraph(f'<font size="24" color="#1A1410"><b>{atendidas}</b></font><br/>'
+                  f'<font size="8" color="#666666">Atendidas</font>', estilos['pie']),
+        Paragraph(f'<font size="24" color="#1A1410"><b>{total - atendidas}</b></font><br/>'
+                  f'<font size="8" color="#666666">Pendientes / Canceladas</font>', estilos['pie']),
+        Paragraph(f'<font size="24" color="#1A1410"><b>{pct}%</b></font><br/>'
+                  f'<font size="8" color="#666666">Tasa de atención</font>', estilos['pie']),
     ]]
     t_kpi = Table(kpis, colWidths=[4.25*cm]*4)
     t_kpi.setStyle(TS([
         ('ALIGN',         (0,0), (-1,-1), 'CENTER'),
         ('VALIGN',        (0,0), (-1,-1), 'MIDDLE'),
-        ('TOPPADDING',    (0,0), (-1,-1), 14),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 14),
-        ('BACKGROUND',    (0,0), (0,-1), colors.HexColor('#EAF4FE')),
-        ('BACKGROUND',    (1,0), (1,-1), colors.HexColor('#EAFAF1')),
-        ('BACKGROUND',    (2,0), (2,-1), colors.HexColor('#FEF9E7')),
-        ('BACKGROUND',    (3,0), (3,-1), colors.HexColor('#FDECEA')),
-        ('BOX',           (0,0), (0,-1), 1, AZUL),
-        ('BOX',           (1,0), (1,-1), 1, VERDE),
-        ('BOX',           (2,0), (2,-1), 1, AMARILLO),
-        ('BOX',           (3,0), (3,-1), 1, ROJO),
+        ('TOPPADDING',    (0,0), (-1,-1), 15),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 15),
+        ('BACKGROUND',    (0,0), (-1,-1), BLANCO),
+        ('BOX',           (0,0), (0,0), 1, HexColor('#E0E0E0')),
+        ('BOX',           (1,0), (1,0), 1, HexColor('#E0E0E0')),
+        ('BOX',           (2,0), (2,0), 1, HexColor('#E0E0E0')),
+        ('BOX',           (3,0), (3,0), 1, HexColor('#E0E0E0')),
     ]))
     elems.append(t_kpi)
-    elems.append(Spacer(1, .5*cm))
+    elems.append(Spacer(1, 0.6*cm))
+
+
 
     # ── Historial ────────────────────────────────────────────
-    elems.append(Paragraph('Historial de emergencias', estilos['seccion']))
-    PRIO  = {1: 'P1 - Vital', 2: 'P2 - Urgente', 3: 'P3 - Normal'}
-    EST   = {'atendida': 'Atendida', 'pendiente': 'Pendiente',
-             'en_camino': 'En camino', 'cancelado': 'Cancelado'}
-    cols2 = ['#', 'Fecha', 'Paciente', 'Edad', 'Direccion', 'Prioridad', 'Estado']
-    cw2   = [.8*cm, 3*cm, 3.5*cm, 1.5*cm, 5*cm, 2.5*cm, 2.5*cm]
-    filas2 = [cols2]
-    for i, e in enumerate(emergencias, 1):
-        filas2.append([
-            str(i),
-            e.fecha_registro.strftime('%d/%m/%Y\n%H:%M') if e.fecha_registro else '-',
-            e.nombre_paciente or '-',
-            str(e.edad) if e.edad else '-',
-            (e.direccion or '-')[:45],
-            PRIO.get(e.prioridad, str(e.prioridad or '-')),
-            EST.get(e.estado, e.estado or '-'),
-        ])
-    tabla2 = Table(filas2, colWidths=cw2, repeatRows=1)
-    ts2 = _tabla_style()
-    for idx, e in enumerate(emergencias, 1):
-        c = _color_estado(e.estado)
-        if c: ts2.add('BACKGROUND', (6, idx), (6, idx), c)
-    tabla2.setStyle(ts2)
-    elems.append(tabla2)
-    elems.append(Spacer(1, .5*cm))
-    elems.append(Paragraph(
-        f'Reporte generado el {datetime.now().strftime("%d/%m/%Y a las %H:%M")}',
-        estilos['pie']))
+    elems.append(Paragraph('HISTORIAL DE EMERGENCIAS', estilos['seccion']))
+    if not emergencias:
+        empty = [[Paragraph('<font size="12" color="#999999">No se encontraron registros de emergencias</font><br/><font size="8" color="#BBBBBB">No hay datos para mostrar en este historial.</font>', estilos['pie'])]]
+        t_empty = Table(empty, colWidths=[17*cm], rowHeights=[3*cm])
+        t_empty.setStyle(TS([
+            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+            ('BOX', (0,0), (-1,-1), 1, HexColor('#E0E0E0')),
+            ('BACKGROUND', (0,0), (-1,-1), HexColor('#F9F9F9')),
+        ]))
+        elems.append(t_empty)
+    else:
+        PRIO  = {1: 'P1 - Vital', 2: 'P2 - Urgente', 3: 'P3 - Normal'}
+        EST   = {'atendida': 'Atendida', 'pendiente': 'Pendiente',
+                 'en_camino': 'En camino', 'cancelado': 'Cancelado'}
+        cols2 = ['#', 'Fecha', 'Paciente', 'Edad', 'Dirección', 'Prioridad', 'Estado']
+        cw2   = [.8*cm, 3*cm, 3.5*cm, 1.5*cm, 5*cm, 2.5*cm, 2.5*cm]
+        filas2 = [cols2]
+        for i, e in enumerate(emergencias, 1):
+            filas2.append([
+                str(i),
+                e.fecha_registro.strftime('%d/%m/%Y\n%H:%M') if e.fecha_registro else '-',
+                e.nombre_paciente or '-',
+                str(e.edad) if e.edad else '-',
+                (e.direccion or '-')[:45],
+                PRIO.get(e.prioridad, str(e.prioridad or '-')),
+                EST.get(e.estado, e.estado or '-'),
+            ])
+        tabla2 = Table(filas2, colWidths=cw2, repeatRows=1)
+        ts2 = _tabla_style()
+        for idx, e in enumerate(emergencias, 1):
+            c = _color_estado(e.estado)
+            if c: ts2.add('BACKGROUND', (6, idx), (6, idx), c)
+        tabla2.setStyle(ts2)
+        elems.append(tabla2)
+        
+    elems.append(Spacer(1, 1.5*cm))
 
-    doc.build(elems, onFirstPage=_pie_pagina, onLaterPages=_pie_pagina)
+    # ── FOOTER ───────────────────────────────────────────────
+    footer_data = [[
+        Paragraph(f'<font size="7" color="#999999">Reporte generado el<br/><b>{datetime.now().strftime("%d/%m/%Y a las %H:%M")}</b></font>', estilos['pie']),
+        Paragraph('<font size="7" color="#999999">Este documento es confidencial y de<br/>uso exclusivo del Sistema SAMU.</font>', estilos['pie'])
+    ]]
+    t_footer = Table(footer_data, colWidths=[8.5*cm, 8.5*cm])
+    t_footer.setStyle(TS([
+        ('ALIGN', (0,0), (0,0), 'LEFT'),
+        ('ALIGN', (1,0), (1,0), 'RIGHT'),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+    ]))
+    elems.append(t_footer)
+
+    doc.build(elems)
     buf.seek(0)
     resp = make_response(buf.read())
     resp.headers['Content-Type']        = 'application/pdf'

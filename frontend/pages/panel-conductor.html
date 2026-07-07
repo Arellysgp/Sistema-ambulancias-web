@@ -46,6 +46,194 @@
     
     .navbar-dropdown { border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     .navbar-dropdown .navbar-item:hover { background-color: #f5f5f5 !important; }
+
+    /* Estilos para el Modal de Finalización */
+    .modal-custom {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(4px);
+      transition: all 0.3s ease;
+    }
+    .modal-custom.is-active {
+      display: flex;
+    }
+    .modal-custom-content {
+      background-color: #ffffff;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 500px;
+      padding: 2rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      position: relative;
+      animation: slideUp 0.3s ease-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-custom-close {
+      position: absolute;
+      top: 1rem;
+      right: 1.2rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #999;
+      transition: color 0.2s;
+    }
+    .modal-custom-close:hover {
+      color: #333;
+    }
+    .modal-custom-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .checkmark-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: #e2f0d9;
+      color: #385723;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin: 0 auto 1rem;
+      border: 2px solid #385723;
+    }
+    .modal-custom-header h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+    .modal-custom-header p {
+      font-size: 0.9rem;
+      color: #666;
+    }
+    .summary-box {
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin-bottom: 1.5rem;
+      background-color: #fafafa;
+    }
+    .summary-box h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #444;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.6rem;
+      font-size: 0.88rem;
+    }
+    .summary-row:last-child {
+      margin-bottom: 0;
+    }
+    .summary-label {
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .summary-value {
+      font-weight: 600;
+      color: #333;
+      text-align: right;
+      max-width: 60%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .feedback-box {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .feedback-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #444;
+      margin-bottom: 0.8rem;
+    }
+    .feedback-options {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+    .feedback-btn {
+      flex: 1;
+      background-color: #ffffff;
+      border: 1px solid #dcdcdc;
+      border-radius: 8px;
+      padding: 0.6rem 0.4rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: #555;
+      transition: all 0.2s ease;
+    }
+    .feedback-btn i {
+      font-size: 1.2rem;
+    }
+    .feedback-btn:hover {
+      background-color: #f5f5f5;
+      border-color: #bbb;
+    }
+    .feedback-btn.is-active[data-rating="excelente"] {
+      background-color: #ecfdf5;
+      border-color: #10b981;
+      color: #047857;
+    }
+    .feedback-btn.is-active[data-rating="regular"] {
+      background-color: #fffbeb;
+      border-color: #f59e0b;
+      color: #b45309;
+    }
+    .feedback-btn.is-active[data-rating="deficiente"] {
+      background-color: #fef2f2;
+      border-color: #ef4444;
+      color: #b91c1c;
+    }
+    .modal-custom-footer {
+      text-align: center;
+    }
+    .btn-modal-aceptar {
+      background-color: #b71c1c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.8rem 2.5rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-modal-aceptar:hover {
+      background-color: #901616;
+    }
   </style>
 </head>
 
@@ -114,10 +302,64 @@
     </div>
   </div>
 
+  <!-- Modal de Finalización de Atención (Aesthetics Premium) -->
+  <div id="modal-finalizar-atencion" class="modal-custom">
+    <div class="modal-custom-content">
+      <button class="modal-custom-close" id="btn-close-modal-finalizar">&times;</button>
+      
+      <div class="modal-custom-header">
+        <div class="checkmark-circle">
+          <i class="fa-solid fa-check"></i>
+        </div>
+        <h3>Atención finalizada con éxito</h3>
+        <p>La unidad ha quedado libre y disponible para nuevas asignaciones.</p>
+      </div>
+      
+      <div class="summary-box">
+        <h4><i class="fa-regular fa-clipboard"></i> Resumen de la atención</h4>
+        <div class="summary-row">
+          <span class="summary-label"><i class="fa-regular fa-user"></i> Paciente</span>
+          <span class="summary-value" id="modal-paciente">-</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label"><i class="fa-solid fa-location-dot"></i> Dirección</span>
+          <span class="summary-value" id="modal-direccion">-</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label"><i class="fa-solid fa-notes-medical"></i> Detalle</span>
+          <span class="summary-value" id="modal-detalle">-</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label"><i class="fa-regular fa-clock"></i> Hora de finalización</span>
+          <span class="summary-value" id="modal-hora">-</span>
+        </div>
+      </div>
+      
+      <div class="feedback-box">
+        <p class="feedback-title">¿Cómo fue esta atención?</p>
+        <div class="feedback-options">
+          <button class="feedback-btn" data-rating="excelente">
+            <i class="fa-regular fa-face-smile"></i> Excelente
+          </button>
+          <button class="feedback-btn" data-rating="regular">
+            <i class="fa-regular fa-face-meh"></i> Regular
+          </button>
+          <button class="feedback-btn" data-rating="deficiente">
+            <i class="fa-regular fa-face-frown"></i> Deficiente
+          </button>
+        </div>
+      </div>
+      
+      <div class="modal-custom-footer">
+        <button class="btn-modal-aceptar" id="btn-modal-aceptar"><i class="fa-solid fa-check"></i> Aceptar</button>
+      </div>
+    </div>
+  </div>
+
   <script src="../src/header.js"></script>
   <script src="../src/conductor.js"></script>
   <script>
-    const API      = 'https://sistema-ambulancias-web.onrender.com/api';
+    const API      = 'http://127.0.0.1:5000/api';
     const USER_ID  = localStorage.getItem('user_id');
 
     function descargarMiReporte() {
