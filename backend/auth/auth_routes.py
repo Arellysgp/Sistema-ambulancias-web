@@ -5,17 +5,24 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
-    data = request.json
+    data = request.json or {}
+    print("DEBUG REGISTER DATA:", data)
     rol = data.get('rol', 'operador')
-    user, error = registrar_usuario(data['nombre'], data['email'], data['password'], rol)
+    nombre = data.get('nombre', '')
+    email = data.get('email', '')
+    password = data.get('password', '')
+    user, error = registrar_usuario(nombre, email, password, rol)
     if error:
         return jsonify({'error': error}), 400
     return jsonify({'mensaje': 'Usuario registrado correctamente'}), 201
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
-    data = request.json
-    user, error = verificar_login(data['email'], data['password'])
+    data = request.json or {}
+    print("DEBUG LOGIN DATA:", data)
+    email = data.get('email', '')
+    password = data.get('password', '')
+    user, error = verificar_login(email, password)
     if error:
         return jsonify({'error': error}), 401
     session.permanent = True

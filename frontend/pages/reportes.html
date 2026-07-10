@@ -8,6 +8,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
 
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <!-- Chart.js CDN para los gráficos interactivos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
       --dark-bg: #0f172a;
@@ -319,13 +321,41 @@
 
   </div>
 
+  <!-- Gráficos Interactivos (Chart.js) -->
+  <div class="charts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <div class="card-box" style="padding: 1.5rem; display: flex; flex-direction: column; align-items: center;">
+      <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; width: 100%; color: var(--text-main); display: flex; align-items: center;">
+        <i class="fa-solid fa-chart-pie" style="color: var(--text-muted); margin-right: 8px;"></i> Emergencias por Prioridad
+      </h3>
+      <div style="width: 100%; height: 220px; display: flex; justify-content: center; position: relative;">
+        <canvas id="chart-prioridad"></canvas>
+      </div>
+    </div>
+    <div class="card-box" style="padding: 1.5rem; display: flex; flex-direction: column; align-items: center;">
+      <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; width: 100%; color: var(--text-main); display: flex; align-items: center;">
+        <i class="fa-solid fa-chart-column" style="color: var(--text-muted); margin-right: 8px;"></i> Emergencias por Estado
+      </h3>
+      <div style="width: 100%; height: 220px; display: flex; justify-content: center; position: relative;">
+        <canvas id="chart-estado"></canvas>
+      </div>
+    </div>
+    <div class="card-box" style="padding: 1.5rem; display: flex; flex-direction: column; align-items: center;">
+      <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; width: 100%; color: var(--text-main); display: flex; align-items: center;">
+        <i class="fa-solid fa-users" style="color: var(--text-muted); margin-right: 8px;"></i> Servicios por Conductor
+      </h3>
+      <div style="width: 100%; height: 220px; display: flex; justify-content: center; position: relative;">
+        <canvas id="chart-conductor"></canvas>
+      </div>
+    </div>
+  </div>
+
   <!-- Tabla emergencias -->
   <div class="card-box">
     <div class="box-header">
-      <h2>📋 Historial de emergencias</h2>
+      <h2 style="display: flex; align-items: center;"><i class="fa-solid fa-clipboard-list" style="color: var(--text-muted); margin-right: 8px;"></i> Historial de emergencias</h2>
       <div class="box-actions">
         <span class="count-tag" id="badge-count">0 registros</span>
-        <button class="btn btn-red" onclick="exportarPDF()">📄 Exportar PDF</button>
+        <button class="btn btn-red" onclick="exportarPDF()"><i class="fa-solid fa-file-pdf" style="margin-right: 6px;"></i> Exportar PDF</button>
       </div>
     </div>
     <div class="filters">
@@ -371,7 +401,7 @@
   <!-- Conductores -->
   <div class="card-box">
     <div class="box-header">
-      <h2>🚘 Reporte por conductor</h2>
+      <h2 style="display: flex; align-items: center;"><i class="fa-solid fa-id-card" style="color: var(--text-muted); margin-right: 8px;"></i> Reporte por conductor</h2>
       <p style="font-size:.8rem;color:var(--gray)">Descarga el PDF individual de cada conductor</p>
     </div>
     <div class="conductores-grid" id="conductores-grid">
@@ -450,8 +480,9 @@
       if (!res.ok) throw new Error();
       const data = await res.json();
       emergenciasData = data;
-      renderKPIs(data); renderTabla(data);
-    } catch {
+      renderKPIs(data); renderTabla(data); actualizarGraficos(data);
+    } catch (err) {
+      console.error(err);
       document.getElementById('tbody-emergencias').innerHTML = emptyRow(9,'Error al cargar datos','⚠️');
     }
   }
@@ -550,11 +581,11 @@ function exportarPDFConductor(id) {
           <div class="cond-nombre">${esc(c.nombre)}</div>
           ${estBadge}
           <div class="cond-meta">
-            <span>📦 ${c.emergencias_atendidas||0} atendidas</span>
+            <span><i class="fa-solid fa-briefcase-medical" style="color: var(--text-muted); margin-right: 4px;"></i> ${c.emergencias_atendidas||0} atendidas</span>
             <span>${esc(c.email||'')}</span>
           </div>
           <div class="cond-actions">
-            <button class="btn btn-red btn-sm" onclick="exportarPDFConductor(${c.id})">📄 PDF</button>
+            <button class="btn btn-red btn-sm" onclick="exportarPDFConductor(${c.id})"><i class="fa-solid fa-file-pdf" style="margin-right: 4px;"></i> PDF</button>
             <a href="perfil.html?conductor_id=${c.id}" class="btn btn-ghost btn-sm">👤 Perfil</a>
           </div>
         </div>`;
@@ -563,6 +594,129 @@ function exportarPDFConductor(id) {
       document.getElementById('conductores-grid').innerHTML =
         '<p style="color:var(--gray);grid-column:1/-1">Error al cargar conductores.</p>';
     }
+  }
+
+  // Instancias de los gráficos para poder destruirlos y recrearlos al filtrar
+  let chartPrioridadInstance = null;
+  let chartEstadoInstance = null;
+  let chartConductorInstance = null;
+
+  function actualizarGraficos(data) {
+    // 1. Agrupar por prioridad
+    const prioCounts = { '1': 0, '2': 0, '3': 0 };
+    data.forEach(e => {
+      const prioStr = String(e.prioridad);
+      if (prioStr in prioCounts) {
+        prioCounts[prioStr]++;
+      }
+    });
+
+    // 2. Agrupar por estado
+    const estadoCounts = { 'pendiente': 0, 'en_camino': 0, 'atendida': 0, 'cancelado': 0 };
+    data.forEach(e => {
+      let est = e.estado || 'pendiente';
+      if (est === 'atendido') est = 'atendida';
+      if (est === 'cancelada') est = 'cancelado';
+      if (est in estadoCounts) {
+        estadoCounts[est]++;
+      }
+    });
+
+    // 3. Agrupar por conductor
+    const condCounts = {};
+    data.forEach(e => {
+      const cond = e.conductor || 'Sin asignar';
+      condCounts[cond] = (condCounts[cond] || 0) + 1;
+    });
+
+    const condLabels = Object.keys(condCounts);
+    const condValues = Object.values(condCounts);
+
+    // Configuración común para fuentes
+    const fontConfig = { family: 'Inter', size: 11 };
+
+    // --- GRÁFICO 1: PRIORIDAD (Doughnut) ---
+    if (chartPrioridadInstance) chartPrioridadInstance.destroy();
+    const ctxPrio = document.getElementById('chart-prioridad').getContext('2d');
+    chartPrioridadInstance = new Chart(ctxPrio, {
+      type: 'doughnut',
+      data: {
+        labels: ['Prioridad 1 (Vital)', 'Prioridad 2 (Urgente)', 'Prioridad 3 (Normal)'],
+        datasets: [{
+          data: [prioCounts['1'], prioCounts['2'], prioCounts['3']],
+          backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { boxWidth: 12, font: fontConfig }
+          }
+        }
+      }
+    });
+
+    // --- GRÁFICO 2: ESTADO (Pie) ---
+    if (chartEstadoInstance) chartEstadoInstance.destroy();
+    const ctxEst = document.getElementById('chart-estado').getContext('2d');
+    chartEstadoInstance = new Chart(ctxEst, {
+      type: 'pie',
+      data: {
+        labels: ['Pendiente', 'En camino', 'Atendida', 'Cancelado'],
+        datasets: [{
+          data: [estadoCounts['pendiente'], estadoCounts['en_camino'], estadoCounts['atendida'], estadoCounts['cancelado']],
+          backgroundColor: ['#f59e0b', '#3b82f6', '#10b981', '#94a3b8'],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { boxWidth: 12, font: fontConfig }
+          }
+        }
+      }
+    });
+
+    // --- GRÁFICO 3: CONDUCTOR (Barra horizontal) ---
+    if (chartConductorInstance) chartConductorInstance.destroy();
+    const ctxCond = document.getElementById('chart-conductor').getContext('2d');
+    chartConductorInstance = new Chart(ctxCond, {
+      type: 'bar',
+      data: {
+        labels: condLabels.length ? condLabels : ['Ninguno'],
+        datasets: [{
+          label: 'Servicios',
+          data: condValues.length ? condValues : [0],
+          backgroundColor: '#3b82f6',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: 'y',
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            ticks: { stepSize: 1, font: fontConfig }
+          },
+          y: {
+            ticks: { font: fontConfig }
+          }
+        }
+      }
+    });
   }
 
   function formatFecha(iso) {
