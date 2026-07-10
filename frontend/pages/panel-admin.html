@@ -374,8 +374,8 @@
       </div>
       <div class="table-container">
         <table class="t">
-          <thead><tr><th>ID</th><th>Paciente</th><th>Edad</th><th>Ubicación</th><th>Prioridad</th><th>Estado</th><th>Fecha</th></tr></thead>
-          <tbody id="tbl-historial"><tr class="loading-row"><td colspan="7"><span class="spin"></span></td></tr></tbody>
+          <thead><tr><th>ID</th><th>Paciente</th><th>Edad</th><th>Ubicación</th><th>Prioridad</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr></thead>
+          <tbody id="tbl-historial"><tr class="loading-row"><td colspan="8"><span class="spin"></span></td></tr></tbody>
         </table>
       </div>
     </div>
@@ -445,7 +445,7 @@
 
 
 <script>
-    const API     = 'https://sistema-ambulancias-web.onrender.com/api';
+    const API     = 'http://127.0.0.1:5000/api';
     const USER_ID = localStorage.getItem('user_id');
     const ROL     = localStorage.getItem('rol_usuario');
 
@@ -531,11 +531,11 @@
       } catch(e) { console.error(e); }
     }
 
-    // ── HISTORIAL (solo filtro por estado, sin fechas) ────────────────────────
+       // ── HISTORIAL Y ASIGNACIÓN ────────────────────────────────────────
     async function cargarHistorial() {
       const estado = document.getElementById('f-estado').value;
       const url    = '/admin/emergencias' + (estado ? `?estado=${estado}` : '');
-      document.getElementById('tbl-historial').innerHTML = spinRow(7);
+      document.getElementById('tbl-historial').innerHTML = spinRow(8);
       try {
         const res  = await api(url);
         if (!res.ok) return;
@@ -545,10 +545,73 @@
               <td>${e.id}</td><td>${e.nombre_paciente}</td><td>${e.edad??'—'}</td>
               <td>${e.direccion}</td><td>${badge(e.prioridad)}</td>
               <td>${badge(e.estado)}</td><td>${e.fecha_registro}</td>
+              <td>
+                ${e.estado === 'pendiente' 
+                  ? `<button class="btn btn-sm" style="background:var(--blue);color:white;" onclick="abrirModalAsignacion(${e.id})">Asignar <i class="fa-solid fa-bolt"></i></button>` 
+                  : '—'}
+              </td>
             </tr>`).join('')
-          : emptyRow(7, 'Sin resultados', '🔍');
+          : emptyRow(8, 'Sin resultados', '🔍');
       } catch(e) { console.error(e); }
     }
+
+    // Función que llama al Algoritmo y muestra el Modal
+    async function abrirModalAsignacion(emergencia_id) {
+      document.getElementById('modal-asignar').classList.add('open');
+      const listaDiv = document.getElementById('lista-conductores-recomendados');
+      listaDiv.innerHTML = '<div style="text-align:center; padding: 2rem;"><span class="spin"></span></div>';
+      
+      try {
+        const res = await api(`/admin/recomendacion/${emergencia_id}`);
+        const conductores = await res.json();
+        
+        if (conductores.length === 0) {
+          listaDiv.innerHTML = '<p style="color:red; text-align:center;">No hay conductores activos.</p>';
+          return;
+        }
+
+        // Renderizamos la lista, destacando al primero (el más cercano)
+        listaDiv.innerHTML = conductores.map((c, index) => {
+          let destacado = index === 0 
+            ? 'background: var(--green-bg); border: 1px solid var(--green-border);' 
+            : 'background: #fff; border: 1px solid var(--border);';
+          
+          let recomendacion = index === 0 
+            ? `<span style="font-size:0.7rem; color:var(--green); font-weight:bold;">🏆 Recomendado</span>` 
+            : '';
+
+          return `
+            <div style="padding: 1rem; border-radius: 8px; display:flex; justify-content:space-between; align-items:center; ${destacado}">
+              <div>
+                <strong>${c.nombre}</strong><br>
+                <span style="font-size:0.8rem; color:var(--text-muted);"><i class="fa-solid fa-location-dot"></i> A ${c.distancia_km} km</span>
+                ${recomendacion}
+              </div>
+              <button class="btn btn-sm btn-dark" onclick="asignarConductorFinal(${emergencia_id}, ${c.id})">Enviar</button>
+            </div>
+          `;
+        }).join('');
+
+      } catch(e) { console.error(e); }
+    }
+
+    async function asignarConductorFinal(emergencia_id, conductor_id) {
+      try {
+        const res = await api(`/admin/emergencias/${emergencia_id}/asignar`, {
+          method: 'PUT',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ conductor_id })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          document.getElementById('modal-asignar').classList.remove('open');
+          toast('✅ ' + data.mensaje, true);
+          cargarHistorial(); // Recarga la tabla
+          cargarRecientes(); // Recarga el dashboard
+        }
+      } catch(e) { console.error(e); }
+    }
+
 
     function limpiarFiltros() {
       document.getElementById('f-estado').value = '';
@@ -718,5 +781,23 @@ function mostrarModalLogout() {
     }
 
 </script>
+<!-- MODAL DE ASIGNACIÓN INTELIGENTE -->
+<div class="overlay" id="modal-asignar">
+  <div class="modal-box" style="max-width: 500px;">
+    <h3 class="modal-title"><i class="fa-solid fa-truck-medical" style="color: var(--blue);"></i> Asignar Ambulancia</h3>
+    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+      El algoritmo de Haversine ha ordenado a los conductores por distancia real hacia la emergencia.
+    </p>
+    
+    <div id="lista-conductores-recomendados" style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom: 1.5rem; max-height: 250px; overflow-y: auto;">
+      <!-- Se llenará con JavaScript -->
+      <div style="text-align:center;"><span class="spin"></span> Calculando distancias...</div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="document.getElementById('modal-asignar').classList.remove('open')">Cancelar</button>
+    </div>
+  </div>
+</div>
   </body>
   </html>

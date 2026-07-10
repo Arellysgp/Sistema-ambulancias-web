@@ -35,9 +35,21 @@ def estadisticas():
 @requiere_rol('admin')
 def historial_emergencias():
     estado = request.args.get('estado')
+    prioridad = request.args.get('prioridad')
+    fecha_ini = request.args.get('fecha_ini')
+    fecha_fin = request.args.get('fecha_fin')
+    
     query  = Emergencia.query
     if estado:
         query = query.filter_by(estado=estado)
+    if prioridad:
+        query = query.filter_by(prioridad=int(prioridad))
+    if fecha_ini:
+        query = query.filter(Emergencia.fecha_registro >= datetime.fromisoformat(fecha_ini))
+    if fecha_fin:
+        fecha_fin_dt = datetime.fromisoformat(fecha_fin).replace(hour=23, minute=59, second=59)
+        query = query.filter(Emergencia.fecha_registro <= fecha_fin_dt)
+        
     emergencias = query.order_by(Emergencia.fecha_registro.desc()).all()
 
     def fmt_fecha(e):
@@ -66,7 +78,7 @@ def stats_conductores():
         'nombre':                c.nombre,
         'email':                 c.email,
         'activo':                c.activo,
-        'emergencias_atendidas': 0,
+        'emergencias_atendidas': Emergencia.query.filter_by(conductor_id=c.id, estado='atendida').count(),
     } for c in conductores]), 200
 
 
@@ -81,6 +93,25 @@ def listar_usuarios():
         'rol':    u.rol,
         'activo': u.activo,
     } for u in usuarios]), 200
+
+
+@admin_bp.route('/admin/usuarios/<int:id>', methods=['GET'])
+@requiere_rol('admin')
+def obtener_usuario(id):
+    u = db.session.get(User, id)
+    if not u:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+    return jsonify({
+        'id':             u.id,
+        'nombre':         u.nombre,
+        'apellido':       getattr(u, 'apellido', '') or '',
+        'email':          u.email,
+        'rol':            u.rol,
+        'telefono':       getattr(u, 'telefono', '') or '',
+        'foto_url':       getattr(u, 'foto_url', '') or '',
+        'activo':         u.activo,
+        'fecha_registro': u.fecha_registro.isoformat() if getattr(u,'fecha_registro',None) else None,
+    }), 200
 
 
 @admin_bp.route('/admin/usuarios', methods=['POST'])
@@ -129,3 +160,67 @@ def reactivar_usuario(id):
     usuario.activo = True
     db.session.commit()
     return jsonify({'mensaje': f'{usuario.nombre} reactivado'}), 200
+
+import math
+from database.models.emergencia import Emergencia
+
+# Fórmula matemática de Haversine para calcular distancias en km
+def calcular_distancia(lat1, lon1, lat2, lon2):
+    if lat1 is None or lon1 is None or lat2 is None or lon2 is None:
+        return 9999.0 # Si no tiene GPS, lo mandamos al final
+        
+    R = 6371.0  # Radio de la Tierra en kilómetros
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = math.sin(dlat/2)**2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon/2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    return round(R * c, 2)
+
+@admin_bp.route('/admin/recomendacion/<int:emergencia_id>', methods=['GET'])
+@requiere_rol('admin')
+def recomendar_conductor(emergencia_id):
+    emergencia = Emergencia.query.get_or_404(emergencia_id)
+    
+    # Obtenemos solo a los conductores que están activos
+    conductores = User.query.filter_by(rol='conductor', activo=True).all()
+    
+    resultados = []
+    for c in conductores:
+        # Por ahora, si un conductor no tiene GPS real en la DB, le simularemos 
+        # uno temporal cerca de Lima para que el algoritmo siempre funcione en tu presentación.
+        # (Centro de Lima: -12.0463, -77.0427)
+        c_lat = c.latitud if c.latitud else -12.0463 + (c.id * 0.01)
+        c_lon = c.longitud if c.longitud else -77.0427 + (c.id * 0.01)
+        
+        distancia = calcular_distancia(emergencia.latitud, emergencia.longitud, c_lat, c_lon)
+        resultados.append({
+            'id': c.id,
+            'nombre': c.nombre,
+            'distancia_km': distancia
+        })
+    
+    # Ordenamos de menor a mayor distancia
+    resultados_ordenados = sorted(resultados, key=lambda x: x['distancia_km'])
+    
+    return jsonify(resultados_ordenados), 200
+
+@admin_bp.route('/admin/emergencias/<int:emergencia_id>/asignar', methods=['PUT'])
+@requiere_rol('admin')
+def asignar_emergencia_admin(emergencia_id):
+    emergencia = Emergencia.query.get_or_404(emergencia_id)
+    data = request.json
+    conductor_id = data.get('conductor_id')
+    
+    if not conductor_id:
+        return jsonify({'error': 'Falta conductor_id'}), 400
+        
+    conductor = User.query.get(conductor_id)
+    if not conductor or conductor.rol != 'conductor':
+        return jsonify({'error': 'Conductor inválido'}), 400
+        
+    # Asignamos al conductor
+    emergencia.conductor_id = conductor_id
+    db.session.commit()
+    
+    return jsonify({'mensaje': f'Ambulancia de {conductor.nombre} asignada correctamente'}), 200
+

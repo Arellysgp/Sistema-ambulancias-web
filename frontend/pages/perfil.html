@@ -433,7 +433,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
- const API = 'https://sistema-ambulancias-web.onrender.com//api';
+ const API = 'http://127.0.0.1:5000/api';
 
   const USER_ID = localStorage.getItem('user_id');
   if (!USER_ID) window.location.href = '../index.html';
@@ -475,17 +475,42 @@
   // ── CARGAR PERFIL ─────────────────────────────────────────────────────────
   async function cargarPerfil() {
     try {
-      const res = await apiFetch('/perfil');
+      const urlParams = new URLSearchParams(window.location.search);
+      const conductorId = urlParams.get('conductor_id');
+      
+      const endpoint = conductorId ? `/admin/usuarios/${conductorId}` : '/perfil';
+      const res = await apiFetch(endpoint);
       if (!res.ok) throw new Error();
       const u = await res.json();
-      poblarFormulario(u);
+      poblarFormulario(u, !conductorId);
+
+      if (conductorId) {
+        document.querySelector('.page-title').textContent = 'Perfil del Conductor';
+        document.querySelector('.page-subtitle').textContent = 'Información detallada del conductor';
+        
+        // Disable editing for other users
+        document.getElementById('p-nombre').disabled = true;
+        document.getElementById('p-apellido').disabled = true;
+        document.getElementById('p-telefono').disabled = true;
+        
+        // Hide actions and photo upload
+        document.querySelector('.form-actions').style.display = 'none';
+        document.querySelector('.foto-label').style.display = 'none';
+        document.getElementById('avatar-preview').style.pointerEvents = 'none';
+        
+        // Hide change password section
+        const passSection = document.querySelectorAll('.card-box')[1];
+        if(passSection) passSection.style.display = 'none';
+      }
     } catch { toast('Error al cargar el perfil'); }
   }
 
-  function poblarFormulario(u) {
+  function poblarFormulario(u, esMiPerfil = true) {
     const nombre = `${u.nombre||''} ${u.apellido||''}`.trim();
     // Sidebar
-    document.getElementById('sb-nombre').textContent = u.nombre||'Admin';
+    if (esMiPerfil) {
+        document.getElementById('sb-nombre').textContent = u.nombre||'Admin';
+    }
     // Panel izquierdo
     document.getElementById('av-nombre').textContent = nombre || '—';
     document.getElementById('av-rol').textContent    = rolLabel(u.rol);

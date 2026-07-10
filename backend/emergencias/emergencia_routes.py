@@ -21,7 +21,8 @@ def obtener_emergencias():
             'longitud': e.longitud,
             'prioridad': e.prioridad,
             'estado': e.estado,
-            'fecha_registro': e.fecha_registro.strftime('%Y-%m-%d %H:%M')
+            'fecha_registro': e.fecha_registro.strftime('%Y-%m-%d %H:%M'),
+            'conductor_id': e.conductor_id
         })
     return jsonify(resultado), 200
 ## ESTE ES EL METODO POST PARA REGISTRAR UNA NUEVA EMERGENCIA EN LA BASE DE DATOS
@@ -38,7 +39,7 @@ def registrar_emergencia():
             return jsonify({'error': f'El campo {campo} es requerido'}), 400
 
     nueva = Emergencia(
-        nombre_paciente=datos.get('nombre_paciente'),
+       nombre_paciente=datos.get('nombre_paciente'),
         edad=datos.get('edad'),
         descripcion=datos.get('descripcion'),
         direccion=datos.get('direccion'),
@@ -89,6 +90,9 @@ def actualizar_emergencia(emergencia_id):
     emergencia.longitud = datos.get('longitud', emergencia.longitud)
     emergencia.prioridad = datos.get('prioridad', emergencia.prioridad)
     emergencia.estado = datos.get('estado', emergencia.estado)
+    
+    if 'conductor_id' in datos:
+        emergencia.conductor_id = datos.get('conductor_id')
 
     db.session.commit()
     return jsonify({'mensaje': 'Emergencia actualizada correctamente'}), 200

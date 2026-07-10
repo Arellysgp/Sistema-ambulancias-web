@@ -10,6 +10,7 @@
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     /* ── Estilos de la Barra Superior (SAMU) ── */
@@ -46,6 +47,194 @@
     
     .navbar-dropdown { border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     .navbar-dropdown .navbar-item:hover { background-color: #f5f5f5 !important; }
+
+    /* Estilos para el Modal de Finalización */
+    .modal-custom {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(4px);
+      transition: all 0.3s ease;
+    }
+    .modal-custom.is-active {
+      display: flex;
+    }
+    .modal-custom-content {
+      background-color: #ffffff;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 500px;
+      padding: 2rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      position: relative;
+      animation: slideUp 0.3s ease-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-custom-close {
+      position: absolute;
+      top: 1rem;
+      right: 1.2rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #999;
+      transition: color 0.2s;
+    }
+    .modal-custom-close:hover {
+      color: #333;
+    }
+    .modal-custom-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .checkmark-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: #e2f0d9;
+      color: #385723;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin: 0 auto 1rem;
+      border: 2px solid #385723;
+    }
+    .modal-custom-header h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+    .modal-custom-header p {
+      font-size: 0.9rem;
+      color: #666;
+    }
+    .summary-box {
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin-bottom: 1.5rem;
+      background-color: #fafafa;
+    }
+    .summary-box h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #444;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.6rem;
+      font-size: 0.88rem;
+    }
+    .summary-row:last-child {
+      margin-bottom: 0;
+    }
+    .summary-label {
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .summary-value {
+      font-weight: 600;
+      color: #333;
+      text-align: right;
+      max-width: 60%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .feedback-box {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .feedback-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #444;
+      margin-bottom: 0.8rem;
+    }
+    .feedback-options {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+    .feedback-btn {
+      flex: 1;
+      background-color: #ffffff;
+      border: 1px solid #dcdcdc;
+      border-radius: 8px;
+      padding: 0.6rem 0.4rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: #555;
+      transition: all 0.2s ease;
+    }
+    .feedback-btn i {
+      font-size: 1.2rem;
+    }
+    .feedback-btn:hover {
+      background-color: #f5f5f5;
+      border-color: #bbb;
+    }
+    .feedback-btn.is-active[data-rating="excelente"] {
+      background-color: #ecfdf5;
+      border-color: #10b981;
+      color: #047857;
+    }
+    .feedback-btn.is-active[data-rating="regular"] {
+      background-color: #fffbeb;
+      border-color: #f59e0b;
+      color: #b45309;
+    }
+    .feedback-btn.is-active[data-rating="deficiente"] {
+      background-color: #fef2f2;
+      border-color: #ef4444;
+      color: #b91c1c;
+    }
+    .modal-custom-footer {
+      text-align: center;
+    }
+    .btn-modal-aceptar {
+      background-color: #b71c1c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.8rem 2.5rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-modal-aceptar:hover {
+      background-color: #901616;
+    }
   </style>
 </head>
 
@@ -81,6 +270,43 @@
             </div>
           </div>
         </div>
+
+        <!-- Mis Emergencias (Tailwind) -->
+        <div class="mt-6 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl p-5 shadow-sm">
+          <h2 class="text-lg font-semibold text-gray-800 mb-4 font-sans">Mis Emergencias</h2>
+          
+          <div class="bg-gray-200/60 rounded-lg p-3 flex justify-between items-center mb-3">
+            <span class="text-gray-700 font-medium font-sans">Todas</span>
+            <span class="text-gray-900 font-bold text-lg" id="resumen-todas">0</span>
+          </div>
+          
+          <div class="space-y-3 px-1">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <div class="w-2.5 h-2.5 rounded-full bg-orange-500 border-2 border-white shadow-sm"></div>
+                <span class="text-gray-600 text-sm font-medium font-sans">Pendientes</span>
+              </div>
+              <span class="text-gray-700 font-semibold" id="resumen-pendientes">0</span>
+            </div>
+            
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <div class="w-2.5 h-2.5 rounded-full bg-blue-500 border-2 border-white shadow-sm"></div>
+                <span class="text-gray-600 text-sm font-medium font-sans">En camino</span>
+              </div>
+              <span class="text-gray-700 font-semibold" id="resumen-encamino">0</span>
+            </div>
+            
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <div class="w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-white shadow-sm"></div>
+                <span class="text-gray-600 text-sm font-medium font-sans">Atendidas</span>
+              </div>
+              <span class="text-gray-700 font-semibold" id="resumen-atendidas">0</span>
+            </div>
+          </div>
+        </div>
+        
       </div>
       
       <div class="column is-8">
@@ -110,14 +336,333 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Emergencias Registradas (Tailwind) -->
+        <div class="mt-6 bg-white border border-[#e2e8f0] rounded-xl p-6 shadow-sm mb-6">
+          <h2 class="text-xl font-bold text-gray-800 mb-6 font-sans">Emergencias Registradas</h2>
+          
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <!-- Tabs -->
+            <div class="flex space-x-6 border-b border-gray-200 w-full md:w-auto overflow-x-auto" id="tabla-tabs">
+              <button class="pb-2 border-b-2 border-gray-900 text-gray-900 font-semibold text-sm transition-colors whitespace-nowrap tab-filtro" data-filter="todas">
+                Todas (<span id="tab-todas">0</span>)
+              </button>
+              <button class="pb-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm transition-colors whitespace-nowrap tab-filtro" data-filter="pendiente">
+                Pendientes (<span id="tab-pendientes">0</span>)
+              </button>
+              <button class="pb-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm transition-colors whitespace-nowrap tab-filtro" data-filter="en_camino">
+                En camino (<span id="tab-encamino">0</span>)
+              </button>
+              <button class="pb-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm transition-colors whitespace-nowrap tab-filtro" data-filter="finalizado">
+                Atendidas (<span id="tab-atendidas">0</span>)
+              </button>
+            </div>
+            
+            <!-- Search & Filters -->
+            <div class="flex gap-3 w-full md:w-auto">
+              <div class="relative w-full md:w-64">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i class="fa-solid fa-search text-gray-400 text-sm"></i>
+                </div>
+                <input type="text" id="input-buscar-emergencia" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-shadow" placeholder="Buscar emergencia...">
+              </div>
+              <button class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none transition-colors">
+                <i class="fa-solid fa-filter mr-2 text-gray-500"></i> Filtros
+              </button>
+            </div>
+          </div>
+          
+          <!-- Table -->
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead>
+                <tr>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 rounded-tl-lg">#</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50">Paciente</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50">Dirección</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50">Detalle</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50">Estado</th>
+                  <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50">Hora</th>
+                  <th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 rounded-tr-lg">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-emergencias-conductor" class="bg-white divide-y divide-gray-100">
+                <!-- Filas dinámicas -->
+                <tr><td colspan="7" class="text-center py-6 text-gray-500 text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Cargando registros...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Pagination -->
+          <div class="flex items-center justify-center mt-6" id="paginacion-conductor">
+            <!-- Paginación dinámica -->
+          </div>
+        </div>
+
+  </div>
+
+  <!-- Modal de Finalización de Atención (Aesthetics Premium) -->
+  <div id="modal-finalizar-atencion" class="modal-custom">
+    <div class="modal-custom-content">
+      <button class="modal-custom-close" id="btn-close-modal-finalizar">&times;</button>
       
+      <div class="modal-custom-header">
+        <div class="checkmark-circle">
+          <i class="fa-solid fa-check"></i>
+        </div>
+        <h3>Atención finalizada con éxito</h3>
+        <p>La unidad ha quedado libre y disponible para nuevas asignaciones.</p>
+      </div>
+      
+      <div class="summary-box">
+        <h4><i class="fa-regular fa-clipboard"></i> Resumen de la atención</h4>
+        <div class="summary-row">
+          <span class="summary-label"><i class="fa-regular fa-user"></i> Paciente</span>
+          <span class="summary-value" id="modal-paciente">-</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label"><i class="fa-solid fa-location-dot"></i> Dirección</span>
+          <span class="summary-value" id="modal-direccion">-</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label"><i class="fa-solid fa-notes-medical"></i> Detalle</span>
+          <span class="summary-value" id="modal-detalle">-</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label"><i class="fa-regular fa-clock"></i> Hora de finalización</span>
+          <span class="summary-value" id="modal-hora">-</span>
+        </div>
+      </div>
+      
+      <div class="feedback-box">
+        <p class="feedback-title">¿Cómo fue esta atención?</p>
+        <div class="feedback-options">
+          <button class="feedback-btn" data-rating="excelente">
+            <i class="fa-regular fa-face-smile"></i> Excelente
+          </button>
+          <button class="feedback-btn" data-rating="regular">
+            <i class="fa-regular fa-face-meh"></i> Regular
+          </button>
+          <button class="feedback-btn" data-rating="deficiente">
+            <i class="fa-regular fa-face-frown"></i> Deficiente
+          </button>
+        </div>
+      </div>
+      
+      <div class="modal-custom-footer">
+        <button class="btn-modal-aceptar" id="btn-modal-aceptar"><i class="fa-solid fa-check"></i> Aceptar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Detalle de Emergencia (Tailwind Premium) -->
+  <div id="modal-detalle-emergencia" class="fixed inset-0 z-[100] hidden">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-gray-900 bg-opacity-50 transition-opacity" onclick="cerrarModalDetalle()"></div>
+    
+    <!-- Modal Content -->
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0 pointer-events-none">
+      <div class="relative bg-white rounded-xl shadow-xl text-left overflow-hidden transform transition-all sm:my-8 sm:max-w-2xl w-full pointer-events-auto border border-gray-100 flex flex-col font-sans max-h-[90vh]">
+        
+        <!-- Header -->
+        <div class="bg-white px-6 py-4 border-b border-gray-200 flex justify-between items-center sticky top-0 z-10">
+          <div class="flex items-center gap-3">
+            <div class="p-2 bg-gray-100 rounded-lg text-gray-600">
+              <i class="fa-solid fa-clipboard-list"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800">Detalle de Emergencia</h3>
+          </div>
+          <button onclick="cerrarModalDetalle()" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+        </div>
+        
+        <!-- Body (Scrollable) -->
+        <div class="px-6 py-5 overflow-y-auto bg-gray-50/50 flex-1 space-y-5">
+          
+          <div class="flex justify-between items-center">
+            <div id="md-estado-badge">
+              <!-- Estado Badge -->
+            </div>
+            <span class="text-sm font-medium text-gray-500 font-mono" id="md-id-emergencia">EMG-2026-0000</span>
+          </div>
+
+          <!-- Información del Paciente -->
+          <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+            <h4 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2"><i class="fa-regular fa-user text-gray-400"></i> Información del Paciente</h4>
+            <div class="flex justify-between items-center">
+              <div class="space-y-2 flex-1">
+                <div class="grid grid-cols-3 gap-2 text-sm">
+                  <span class="text-gray-500">Nombre:</span>
+                  <span class="font-medium text-gray-900 col-span-2" id="md-nombre">-</span>
+                </div>
+                <div class="grid grid-cols-3 gap-2 text-sm">
+                  <span class="text-gray-500">Edad:</span>
+                  <span class="font-medium text-gray-900 col-span-2" id="md-edad">-</span>
+                </div>
+                <div class="grid grid-cols-3 gap-2 text-sm">
+                  <span class="text-gray-500">Teléfono:</span>
+                  <span class="font-medium text-gray-900 col-span-2" id="md-telefono">-</span>
+                </div>
+                <div class="grid grid-cols-3 gap-2 text-sm">
+                  <span class="text-gray-500">Condición:</span>
+                  <span class="font-medium text-gray-900 col-span-2">No especificada</span>
+                </div>
+              </div>
+              <div class="w-16 h-16 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 mr-4">
+                <i class="fa-regular fa-user text-3xl"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ubicación del Incidente -->
+          <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+            <h4 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2"><i class="fa-solid fa-location-dot text-gray-400"></i> Ubicación del Incidente</h4>
+            <div class="flex justify-between">
+              <div class="space-y-2 flex-1 pr-4">
+                <div class="grid grid-cols-3 gap-2 text-sm">
+                  <span class="text-gray-500">Dirección:</span>
+                  <span class="font-medium text-gray-900 col-span-2" id="md-direccion">-</span>
+                </div>
+                <div class="grid grid-cols-3 gap-2 text-sm">
+                  <span class="text-gray-500">Referencia:</span>
+                  <span class="font-medium text-gray-900 col-span-2">Sin referencia adicional</span>
+                </div>
+                <div class="grid grid-cols-3 gap-2 text-sm">
+                  <span class="text-gray-500">Coordenadas:</span>
+                  <span class="font-medium text-gray-900 col-span-2 font-mono text-xs">-12.0463, -77.0427</span>
+                </div>
+              </div>
+              <div class="w-24 h-24 bg-gray-100 rounded border border-gray-200 overflow-hidden relative shadow-inner">
+                <img src="https://a.tile.openstreetmap.org/15/9409/17395.png" alt="map" class="w-full h-full object-cover opacity-70">
+                <div class="absolute inset-0 flex items-center justify-center text-red-500"><i class="fa-solid fa-location-pin text-2xl drop-shadow-md"></i></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detalle del Incidente -->
+          <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+            <h4 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2"><i class="fa-solid fa-notes-medical text-gray-400"></i> Detalle del Incidente</h4>
+            <div class="space-y-2">
+              <div class="grid grid-cols-3 gap-2 text-sm">
+                <span class="text-gray-500">Descripción:</span>
+                <span class="font-medium text-gray-900 col-span-2" id="md-descripcion">-</span>
+              </div>
+              <div class="grid grid-cols-3 gap-2 text-sm">
+                <span class="text-gray-500">Prioridad:</span>
+                <span class="font-medium text-orange-600 col-span-2">P2 - Moderado</span>
+              </div>
+              <div class="grid grid-cols-3 gap-2 text-sm">
+                <span class="text-gray-500">Fecha / Hora:</span>
+                <span class="font-medium text-gray-900 col-span-2" id="md-fecha">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información Adicional -->
+          <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+            <h4 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2"><i class="fa-solid fa-circle-info text-gray-400"></i> Información Adicional</h4>
+            <div class="space-y-2">
+              <div class="grid grid-cols-3 gap-2 text-sm">
+                <span class="text-gray-500">Unidad asignada:</span>
+                <span class="font-medium text-gray-900 col-span-2" id="md-unidad">-</span>
+              </div>
+              <div class="grid grid-cols-3 gap-2 text-sm">
+                <span class="text-gray-500">Conductor:</span>
+                <span class="font-medium text-gray-900 col-span-2" id="md-conductor">-</span>
+              </div>
+              <div class="grid grid-cols-3 gap-2 text-sm">
+                <span class="text-gray-500">Tiempo estimado:</span>
+                <span class="font-medium text-gray-900 col-span-2">Calculando...</span>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        
+        <!-- Footer -->
+        <div class="bg-white px-6 py-4 border-t border-gray-200 flex justify-between items-center sticky bottom-0 z-10">
+          <button onclick="cerrarModalDetalle()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+            Cerrar
+          </button>
+          <button onclick="cerrarModalDetalle()" class="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gray-500 hover:bg-gray-600 focus:outline-none transition-colors">
+            <i class="fa-solid fa-arrows-rotate mr-2"></i> Actualizar Estado
+          </button>
+        </div>
+        
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <!-- Modal Detalle de Ruta (Basado en el diseño Tailwind) -->
+  <div id="modal-info-ruta" class="fixed inset-0 z-[110] hidden">
+    <!-- Backdrop oscuro -->
+    <div class="fixed inset-0 bg-gray-500/75 transition-opacity" onclick="cerrarModalRuta()"></div>
+
+    <!-- Contenedor centrado -->
+    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0 pointer-events-none">
+      <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg pointer-events-auto">
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div id="mr-icon-bg" class="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+              <i id="mr-icon" class="fa-solid fa-road text-xl text-blue-600"></i>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3 id="mr-titulo" class="text-base font-semibold text-gray-900">Detalles de la Ruta</h3>
+              <div class="mt-2">
+                <p id="mr-mensaje" class="text-sm text-gray-500">Mensaje de la ruta.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+          <button type="button" onclick="cerrarModalRuta()" class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 sm:ml-3 sm:w-auto">
+            Entendido
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Alerta Asignación -->
+  <div id="modal-alerta-asignacion" class="fixed inset-0 z-[120] hidden">
+    <!-- Backdrop oscuro -->
+    <div class="fixed inset-0 bg-gray-500/75 transition-opacity" onclick="cerrarModalAsignacion()"></div>
+
+    <!-- Contenedor centrado -->
+    <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0 pointer-events-none">
+      <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg pointer-events-auto">
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+              <i class="fa-solid fa-triangle-exclamation text-xl text-red-600"></i>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3 class="text-base font-semibold text-gray-900">¡Emergencia Asignada!</h3>
+              <div class="mt-2">
+                <p id="maa-mensaje" class="text-sm text-gray-500">Has sido asignado para atender un incidente. Por favor, confirma tu salida e inicia la ruta en el mapa.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+          <button type="button" onclick="aceptarAsignacion()" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto">
+            Iniciar Ruta 🚑
+          </button>
+          <button type="button" onclick="cerrarModalAsignacion()" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">
+            Cerrar
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
   <script src="../src/header.js"></script>
   <script src="../src/conductor.js"></script>
   <script>
-    const API      = 'https://sistema-ambulancias-web.onrender.com/api';
+    const API      = 'http://127.0.0.1:5000/api';
     const USER_ID  = localStorage.getItem('user_id');
 
     function descargarMiReporte() {

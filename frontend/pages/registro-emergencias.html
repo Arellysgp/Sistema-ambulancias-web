@@ -330,18 +330,22 @@
         <p>Complete los datos del incidente para asignar una ambulancia disponible</p>
       </div>
 
-      <!-- Notificación de éxito (oculta por defecto) -->
-      <div id="alerta-exito" class="notification is-success is-light is-hidden alerta">
-        <button class="delete" aria-label="cerrar" onclick="document.getElementById('alerta-exito').classList.add('is-hidden')"></button>
-        <i class="fa-solid fa-circle-check"></i>
-        Emergencia registrada correctamente.
+      <!-- Notificación de éxito (oculta por defecto, estilo Tailwind CSS) -->
+      <div id="alerta-exito" class="is-hidden" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1.25rem; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; color: #166534; font-family: 'Inter', sans-serif; font-size: 0.875rem; font-weight: 500; margin-bottom: 1.5rem; transition: opacity 0.3s ease;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-circle-check" style="color: #15803d; font-size: 1.1rem;"></i>
+          <span id="texto-alerta-exito">Emergencia registrada correctamente.</span>
+        </div>
+        <button onclick="document.getElementById('alerta-exito').classList.add('is-hidden')" style="background: none; border: none; color: #166534; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: background 0.2s;" onmouseover="this.style.background='rgba(22, 101, 52, 0.08)'" onmouseout="this.style.background='none'">✕</button>
       </div>
 
-      <!-- Notificación de error (oculta por defecto) -->
-      <div id="alerta-error" class="notification is-danger is-light is-hidden alerta">
-        <button class="delete" aria-label="cerrar" onclick="document.getElementById('alerta-error').classList.add('is-hidden')"></button>
-        <i class="fa-solid fa-circle-xmark"></i>
-        Error al registrar la emergencia. Intente nuevamente.
+      <!-- Notificación de error (oculta por defecto, estilo Tailwind CSS) -->
+      <div id="alerta-error" class="is-hidden" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1.25rem; background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; color: #991b1b; font-family: 'Inter', sans-serif; font-size: 0.875rem; font-weight: 500; margin-bottom: 1.5rem; transition: opacity 0.3s ease;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-circle-xmark" style="color: #b91c1c; font-size: 1.1rem;"></i>
+          <span>Error al registrar la emergencia. Intente nuevamente.</span>
+        </div>
+        <button onclick="document.getElementById('alerta-error').classList.add('is-hidden')" style="background: none; border: none; color: #991b1b; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: background 0.2s;" onmouseover="this.style.background='rgba(153, 27, 27, 0.08)'" onmouseout="this.style.background='none'">✕</button>
       </div>
 
       <div class="columns">
@@ -403,9 +407,136 @@
 
                 <div class="field">
                   <label class="label" for="direccion">Dirección</label>
-                  <div class="control has-icons-left">
-                    <input id="direccion" class="input" type="text" placeholder="Ej: Av. Abancay 123, Cercado de Lima" required />
-                    <span class="icon is-left"><i class="fa-solid fa-map-pin"></i></span>
+                  <div class="control has-icons-left" style="position:relative;">
+                    <input id="direccion" class="input" type="text" placeholder="Ej: Av. Abancay 123, Cercado de Lima" required autocomplete="off" />
+    <span class="icon is-left"><i class="fa-solid fa-map-pin"></i></span>
+    <!-- Aquí aparecerán las sugerencias mágicas de Nominatim -->
+    <div id="lista-direcciones" style="position:absolute; top:100%; left:0; right:0; background:white; z-index:9999; border-radius:8px; box-shadow:0 10px 25px rgba(0,0,0,0.15); max-height:220px; overflow-y:auto; display:none; border:1px solid #e2e8f0;"></div>
+  </div>
+</div>
+
+
+                <div class="columns">
+                  <div class="column">
+                    <div class="field">
+                      <label class="label" for="distrito">Distrito</label>
+                      <div class="control has-icons-left">
+                        <div class="select is-fullwidth">
+                          <select id="distrito">
+                            <option value="">Seleccione Distrito</option>
+                            <!-- Lima Metropolitana -->
+                            <option value="Ancón">Ancón</option>
+                            <option value="Ate">Ate</option>
+                            <option value="Barranco">Barranco</option>
+                            <option value="Breña">Breña</option>
+                            <option value="Carabayllo">Carabayllo</option>
+                            <option value="Chaclacayo">Chaclacayo</option>
+                            <option value="Chorrillos">Chorrillos</option>
+                            <option value="Cieneguilla">Cieneguilla</option>
+                            <option value="Comas">Comas</option>
+                            <option value="El Agustino">El Agustino</option>
+                            <option value="Independencia">Independencia</option>
+                            <option value="Jesús María">Jesús María</option>
+                            <option value="La Molina">La Molina</option>
+                            <option value="La Victoria">La Victoria</option>
+                            <option value="Lima">Lima</option>
+                            <option value="Lince">Lince</option>
+                            <option value="Los Olivos">Los Olivos</option>
+                            <option value="Lurigancho">Lurigancho (Chosica)</option>
+                            <option value="Lurín">Lurín</option>
+                            <option value="Magdalena del Mar">Magdalena del Mar</option>
+                            <option value="Miraflores">Miraflores</option>
+                            <option value="Pachacámac">Pachacámac</option>
+                            <option value="Pucusana">Pucusana</option>
+                            <option value="Pueblo Libre">Pueblo Libre</option>
+                            <option value="Puente Piedra">Puente Piedra</option>
+                            <option value="Punta Hermosa">Punta Hermosa</option>
+                            <option value="Punta Negra">Punta Negra</option>
+                            <option value="Rímac">Rímac</option>
+                            <option value="San Bartolo">San Bartolo</option>
+                            <option value="San Borja">San Borja</option>
+                            <option value="San Isidro">San Isidro</option>
+                            <option value="San Juan de Lurigancho">San Juan de Lurigancho</option>
+                            <option value="San Juan de Miraflores">San Juan de Miraflores</option>
+                            <option value="San Luis">San Luis</option>
+                            <option value="San Martín de Porres">San Martín de Porres</option>
+                            <option value="San Miguel">San Miguel</option>
+                            <option value="Santa Anita">Santa Anita</option>
+                            <option value="Santa María del Mar">Santa María del Mar</option>
+                            <option value="Santa Rosa">Santa Rosa</option>
+                            <option value="Santiago de Surco">Santiago de Surco</option>
+                            <option value="Surquillo">Surquillo</option>
+                            <option value="Villa El Salvador">Villa El Salvador</option>
+                            <option value="Villa María del Triunfo">Villa María del Triunfo</option>
+                            <!-- Callao -->
+                            <option value="Bellavista">Bellavista</option>
+                            <option value="Callao">Callao</option>
+                            <option value="Carmen de La Legua">Carmen de La Legua</option>
+                            <option value="La Perla">La Perla</option>
+                            <option value="La Punta">La Punta</option>
+                            <option value="Ventanilla">Ventanilla</option>
+                            <option value="Mi Perú">Mi Perú</option>
+                            <!-- Lima Provincias (Destacados) -->
+                            <option value="Antioquía">Antioquía</option>
+                            <option value="Azpitia">Azpitia</option>
+                            <option value="Barranca">Barranca</option>
+                            <option value="Canta">Canta</option>
+                            <option value="Cañete">Cañete (San Vicente)</option>
+                            <option value="Cerro Azul">Cerro Azul</option>
+                            <option value="Chancay">Chancay</option>
+                            <option value="Chicla">Chicla (Ticlio)</option>
+                            <option value="Chilca">Chilca</option>
+                            <option value="Huacho">Huacho</option>
+                            <option value="Huaral">Huaral</option>
+                            <option value="Lunahuaná">Lunahuaná</option>
+                            <option value="Mala">Mala</option>
+                            <option value="Matucana">Matucana</option>
+                            <option value="San Mateo">San Mateo</option>
+                            <option value="Santa Eulalia">Santa Eulalia</option>
+                            <option value="Yauyos">Yauyos</option>
+                          </select>
+                        </div>
+                        <span class="icon is-left"><i class="fa-solid fa-building"></i></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="column">
+                    <div class="field">
+                      <label class="label" for="region">Región</label>
+                      <div class="control has-icons-left">
+                        <div class="select is-fullwidth">
+                          <select id="region">
+                            <option value="">Seleccione Región</option>
+                            <option value="Amazonas">Amazonas</option>
+                            <option value="Áncash">Áncash</option>
+                            <option value="Apurímac">Apurímac</option>
+                            <option value="Arequipa">Arequipa</option>
+                            <option value="Ayacucho">Ayacucho</option>
+                            <option value="Cajamarca">Cajamarca</option>
+                            <option value="Callao">Callao</option>
+                            <option value="Cusco">Cusco</option>
+                            <option value="Huancavelica">Huancavelica</option>
+                            <option value="Huánuco">Huánuco</option>
+                            <option value="Ica">Ica</option>
+                            <option value="Junín">Junín</option>
+                            <option value="La Libertad">La Libertad</option>
+                            <option value="Lambayeque">Lambayeque</option>
+                            <option value="Lima">Lima</option>
+                            <option value="Loreto">Loreto</option>
+                            <option value="Madre de Dios">Madre de Dios</option>
+                            <option value="Moquegua">Moquegua</option>
+                            <option value="Pasco">Pasco</option>
+                            <option value="Piura">Piura</option>
+                            <option value="Puno">Puno</option>
+                            <option value="San Martín">San Martín</option>
+                            <option value="Tacna">Tacna</option>
+                            <option value="Tumbes">Tumbes</option>
+                            <option value="Ucayali">Ucayali</option>
+                          </select>
+                        </div>
+                        <span class="icon is-left"><i class="fa-solid fa-map"></i></span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -525,7 +656,7 @@
   </section>
 
   <script>
-    const API_URL = 'https://sistema-ambulancias-web.onrender.com';
+    const API_URL = 'http://127.0.0.1:5000';
 // 1. Mostrar nombre del usuario al cargar la página
 // 1. Mostrar nombre del usuario al cargar la página
   document.addEventListener('DOMContentLoaded', () => {
@@ -538,13 +669,23 @@
   });
 
   // --- BUSCADOR AUTOMÁTICO DE DIRECCIONES ---
-  // Se activa cuando el operador termina de escribir y sale de la casilla "Dirección"
-  document.getElementById('direccion').addEventListener('blur', function() {
-    const direccionTexto = this.value.trim();
+  function buscarDireccionEnMapa() {
+    const direccionTexto = document.getElementById('direccion').value.trim();
+    const distritoTexto = document.getElementById('distrito') ? document.getElementById('distrito').value : '';
+    const regionTexto = document.getElementById('region') ? document.getElementById('region').value : '';
+    
     if (!direccionTexto) return;
 
-    // Le agregamos "Lima, Perú" ocultamente para que no busque calles en otros países
-    const busqueda = `${direccionTexto}, Lima, Perú`;
+    let ubicacionContexto = 'Lima, Perú'; // Por defecto
+    if (distritoTexto || regionTexto) {
+        let partes = [];
+        if (distritoTexto) partes.push(distritoTexto);
+        if (regionTexto) partes.push(regionTexto);
+        partes.push('Perú');
+        ubicacionContexto = partes.join(', ');
+    }
+
+    const busqueda = `${direccionTexto}, ${ubicacionContexto}`;
     const urlBusqueda = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(busqueda)}`;
 
     // Llamamos al buscador gratuito de OpenStreetMap
@@ -569,13 +710,27 @@
           } else {
             marcador = L.marker([lat, lng]).addTo(mapa);
           }
-          mostrarAmbulanciaEstatica(lat, lng);
+          if (typeof mostrarAmbulanciaEstatica === 'function') {
+            mostrarAmbulanciaEstatica(lat, lng);
+          }
         } else {
           console.warn("No se encontró la dirección exacta. Ubíquela haciendo clic en el mapa.");
+          document.getElementById('latitud').value = '';
+          document.getElementById('longitud').value = '';
+          document.getElementById('latitud').placeholder = 'Dirección no encontrada';
+          document.getElementById('longitud').placeholder = 'Use el mapa para ubicarla';
         }
       })
-      .catch(error => console.error("Error en la búsqueda de dirección:", error));
-  });
+      .catch(error => {
+        console.error("Error en la búsqueda de dirección:", error);
+        document.getElementById('latitud').placeholder = 'Error de conexión';
+      });
+  }
+
+  // Se activa cuando el operador sale de la casilla "Dirección" o cambia Distrito/Región
+  document.getElementById('direccion').addEventListener('blur', buscarDireccionEnMapa);
+  if (document.getElementById('distrito')) document.getElementById('distrito').addEventListener('change', buscarDireccionEnMapa);
+  if (document.getElementById('region')) document.getElementById('region').addEventListener('change', buscarDireccionEnMapa);
 
   // 2. Función para cerrar sesión
   function ejecutarLogout() {
@@ -630,6 +785,8 @@
       edad: parseInt(document.getElementById('edad').value),
       descripcion: document.getElementById('descripcion').value,
       direccion: document.getElementById('direccion').value,
+      distrito: document.getElementById('distrito') ? document.getElementById('distrito').value : null,
+      provincia: document.getElementById('region') ? document.getElementById('region').value : null,
       latitud: parseFloat(document.getElementById('latitud').value) || null,
       longitud: parseFloat(document.getElementById('longitud').value) || null,
       prioridad: parseInt(document.getElementById('prioridad').value),
@@ -650,8 +807,8 @@
       return response.json();
     })
     .then(data => {
-      // Muestra el mensaje correcto dependiendo de lo que se hizo
-      document.getElementById('alerta-exito').textContent = idEmergencia ? 'Emergencia actualizada correctamente.' : 'Emergencia registrada correctamente.';
+       // Muestra el mensaje correcto dependiendo de lo que se hizo
+      document.getElementById('texto-alerta-exito').textContent = idEmergencia ? 'Emergencia actualizada correctamente.' : 'Emergencia registrada correctamente.';
       document.getElementById('alerta-exito').classList.remove('is-hidden');
       document.getElementById('alerta-error').classList.add('is-hidden');
       
@@ -743,6 +900,8 @@
       document.getElementById('edad').value = emergencia.edad;
       document.getElementById('descripcion').value = emergencia.descripcion;
       document.getElementById('direccion').value = emergencia.direccion;
+      if(document.getElementById('distrito')) document.getElementById('distrito').value = emergencia.distrito || '';
+      if(document.getElementById('region')) document.getElementById('region').value = emergencia.provincia || '';
       document.getElementById('latitud').value = emergencia.latitud || '';
       document.getElementById('longitud').value = emergencia.longitud || '';
       document.getElementById('prioridad').value = emergencia.prioridad;
@@ -978,6 +1137,109 @@
     const infoDiv = document.getElementById('info-ruta');
     if (infoDiv) infoDiv.style.display = 'none';
   }
+    // ── BUSCADOR PREDICTIVO (NOMINATIM / OPENSTREETMAP) ──
+  const inputDireccion = document.getElementById('direccion');
+  const listaDir = document.getElementById('lista-direcciones');
+  let timeoutBusqueda;
+
+  inputDireccion.addEventListener('input', function(e) {
+    clearTimeout(timeoutBusqueda);
+    const query = e.target.value;
+    
+    // Solo busca si ha escrito más de 4 letras
+    if (query.length < 4) {
+      listaDir.style.display = 'none';
+      return;
+    }
+
+    // Esperamos 600ms a que termine de teclear para no saturar la red
+    timeoutBusqueda = setTimeout(async () => {
+      try {
+        // Pedimos datos a OpenStreetMap (limitado a Perú)
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=pe&addressdetails=1&limit=5`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.length > 0) {
+          listaDir.innerHTML = data.map(l => {
+            // Extraemos los datos del distrito y región si existen
+            const distrito = l.address.city_district || l.address.suburb || l.address.town || l.address.village || l.address.county || '';
+            const region = l.address.state || l.address.region || l.address.city || '';
+            
+            // Limpiamos comillas simples para evitar errores en JavaScript
+            const nombreSeguro = l.display_name.replace(/'/g, "\\'");
+            const distSeguro = distrito.replace(/'/g, "\\'");
+            const regSeguro = region.replace(/'/g, "\\'");
+            
+            return `
+              <div style="padding:12px; border-bottom:1px solid #f1f5f9; cursor:pointer; font-size:0.85rem; color:#0f172a;" 
+                   onmouseover="this.style.background='#f8fafc'" 
+                   onmouseout="this.style.background='white'"
+                   onclick="seleccionarDireccionMagica('${nombreSeguro}', ${l.lat}, ${l.lon}, '${distSeguro}', '${regSeguro}')">
+                <i class="fa-solid fa-location-dot" style="color:var(--blue); margin-right:8px;"></i> ${l.display_name}
+              </div>
+            `;
+          }).join('');
+          listaDir.style.display = 'block';
+        } else {
+          listaDir.style.display = 'none';
+        }
+      } catch (e) { console.error("Error buscando:", e); }
+    }, 600); 
+  });
+
+  // Ocultar si hace clic fuera
+  document.addEventListener('click', (e) => {
+    if(e.target !== inputDireccion) listaDir.style.display = 'none';
+  });
+
+  // Cuando el operador hace clic en una de las opciones sugeridas
+  window.seleccionarDireccionMagica = function(nombreCompleto, lat, lon, distritoApi, regionApi) {
+    // 1. Rellena la dirección en la caja de texto
+    inputDireccion.value = nombreCompleto;
+    listaDir.style.display = 'none';
+
+    // 2. ¡Efecto Wow! El mapa hace un "FlyTo" (vuelo animado) hacia esa calle
+    mapa.flyTo([lat, lon], 17, { animate: true, duration: 1.5 });
+    
+    // 3. Colocamos o movemos el pin del accidente
+    if (marcador) {
+      marcador.setLatLng([lat, lon]);
+    } else {
+      marcador = L.marker([lat, lon], {draggable: true}).addTo(mapa);
+      // Mantener función de arrastre si el operador quiere ser más preciso
+      marcador.on('dragend', function(e) {
+          document.getElementById('latitud').value = e.target.getLatLng().lat;
+          document.getElementById('longitud').value = e.target.getLatLng().lng;
+      });
+    }
+    
+    // 4. Rellenamos la Latitud y Longitud para guardar en DB
+    document.getElementById('latitud').value = lat;
+    document.getElementById('longitud').value = lon;
+
+    // 5. ¡Súper Inteligencia! Seleccionamos los 'Selects' de Distrito y Región automáticamente
+    if (distritoApi) {
+      const selDistrito = document.getElementById('distrito');
+      for(let i = 0; i < selDistrito.options.length; i++) {
+        if(selDistrito.options[i].text.toLowerCase().includes(distritoApi.toLowerCase()) || distritoApi.toLowerCase().includes(selDistrito.options[i].text.toLowerCase())) {
+          selDistrito.selectedIndex = i;
+          break;
+        }
+      }
+    }
+    
+    if (regionApi) {
+      const selRegion = document.getElementById('region');
+      for(let i = 0; i < selRegion.options.length; i++) {
+        if(selRegion.options[i].text.toLowerCase().includes(regionApi.toLowerCase()) || regionApi.toLowerCase().includes(selRegion.options[i].text.toLowerCase())) {
+          selRegion.selectedIndex = i;
+          break;
+        }
+      }
+    }
+  };
+
   
 </script><script src="../src/header.js">
 // ── INJECT LOGOUT MODAL ──
