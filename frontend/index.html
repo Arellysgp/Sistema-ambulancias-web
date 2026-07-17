@@ -6,398 +6,156 @@
   <title>Sistema de Ambulancias — Acceso</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --red: #D0342C;
-      --red-dark: #A0251F;
-      --red-light: #F5E8E7;
-      --cream: #FAF8F5;
-      --dark: #1A1410;
-      --gray: #6B6560;
-      --border: #E2DDD8;
-      --white: #FFFFFF;
+      --dark-bg: #0f172a;
+      --dark-border: #1e293b;
+      --main-bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      
+      --blue: #3b82f6;
+      --blue-bg: #eff6ff;
+      --blue-border: #bfdbfe;
+      
+      --red: #ef4444;
+      --red-bg: #fef2f2;
+      --green: #10b981;
     }
 
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--cream);
-      min-height: 100vh;
-      display: flex;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--main-bg); min-height: 100vh; display: flex; color: var(--text-main); }
 
-    .left-panel {
-      width: 45%;
-      background: var(--dark);
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 3rem;
-      overflow: hidden;
-    }
+    /* ── LEFT PANEL (BRAND/HERO) ── */
+    .left-panel { width: 45%; background: var(--dark-bg); position: relative; display: flex; flex-direction: column; justify-content: space-between; padding: 3.5rem; overflow: hidden; border-right: 1px solid var(--dark-border); }
+    .left-panel::before { content: ''; position: absolute; top: -150px; left: -100px; width: 500px; height: 500px; border-radius: 50%; background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(59,130,246,0)); filter: blur(40px); }
+    .left-panel::after { content: ''; position: absolute; bottom: -100px; right: -50px; width: 400px; height: 400px; border-radius: 50%; background: linear-gradient(135deg, rgba(239,68,68,0.1), rgba(239,68,68,0)); filter: blur(40px); }
+    .grid-deco { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 30px 30px; pointer-events: none; }
 
-    .left-panel::before {
-      content: '';
-      position: absolute;
-      top: -120px; left: -120px;
-      width: 400px; height: 400px;
-      border-radius: 50%;
-      background: var(--red);
-      opacity: 0.12;
-    }
-
-    .left-panel::after {
-      content: '';
-      position: absolute;
-      bottom: -80px; right: -80px;
-      width: 300px; height: 300px;
-      border-radius: 50%;
-      background: var(--red);
-      opacity: 0.08;
-    }
-
-    .brand { position: relative; z-index: 1; }
-
-    .brand-icon {
-      width: 52px; height: 52px;
-      background: var(--red);
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 1.5rem;
-      font-size: 24px;
-    }
-
-    .brand h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--white);
-      letter-spacing: 0.02em;
-      line-height: 1.3;
-    }
-
-    .brand span { color: var(--red); }
+    .brand { position: relative; z-index: 1; display: flex; align-items: center; gap: 1rem; }
+    .brand-icon { width: 48px; height: 48px; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--red); }
+    .brand h1 { font-family: 'Inter', sans-serif; font-size: 1.25rem; font-weight: 700; color: #fff; letter-spacing: -0.02em; line-height: 1.2; }
+    .brand span { color: var(--text-muted); font-size: 0.85rem; display: block; font-weight: 500; }
 
     .hero-text { position: relative; z-index: 1; }
+    .hero-text h2 { font-size: 3rem; font-weight: 800; color: #fff; line-height: 1.1; margin-bottom: 1.25rem; letter-spacing: -0.03em; }
+    .hero-text h2 em { font-style: normal; color: var(--blue); }
+    .hero-text p { font-size: 1rem; color: #94a3b8; line-height: 1.6; max-width: 320px; font-weight: 400; }
 
-    .hero-text h2 {
-      font-family: 'Syne', sans-serif;
-      font-size: 2.8rem;
-      font-weight: 800;
-      color: var(--white);
-      line-height: 1.1;
-      margin-bottom: 1rem;
-    }
+    .stats { position: relative; z-index: 1; display: flex; gap: 2.5rem; }
+    .stat-item { border-left: 2px solid rgba(255,255,255,0.1); padding-left: 1rem; }
+    .stat-num { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; font-weight: 600; color: #fff; }
+    .stat-label { font-size: 0.75rem; color: #64748b; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
 
-    .hero-text h2 em { font-style: normal; color: var(--red); }
+    /* ── RIGHT PANEL (FORM) ── */
+    .right-panel { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: 4vh 2rem 2rem 2rem; overflow-y: auto; }
+    .form-container { width: 100%; max-width: 440px; animation: fadeUp 0.5s ease both; background: var(--card-bg); padding: 2rem; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05); border: 1px solid var(--border); margin: auto 0; }
+    @media (min-height: 800px) { .right-panel { align-items: center; padding: 2rem; } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    .hero-text p {
-      font-size: 0.9rem;
-      color: rgba(255,255,255,0.45);
-      line-height: 1.6;
-      max-width: 280px;
-    }
+    .form-header { margin-bottom: 2rem; }
+    .form-header h3 { font-size: 1.75rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+    .form-header p { font-size: 0.9rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem; }
+    .online-dot { display: inline-block; width: 8px; height: 8px; background: var(--green); border-radius: 50%; box-shadow: 0 0 0 2px rgba(16,185,129,0.2); }
 
-    .stats { position: relative; z-index: 1; display: flex; gap: 2rem; }
-
-    .stat-num {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: var(--white);
-    }
-
-    .stat-label {
-      font-size: 0.75rem;
-      color: rgba(255,255,255,0.35);
-      margin-top: 2px;
-    }
-
-    .grid-deco {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none;
-    }
-
-    .right-panel {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 3rem;
-    }
-
-    .form-container {
-      width: 100%;
-      max-width: 400px;
-      animation: fadeUp 0.5s ease both;
-    }
-
-    .form-header { margin-bottom: 2.5rem; }
-
-    .form-header h3 {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: var(--dark);
-      margin-bottom: 0.4rem;
-    }
-
-    .form-header p { font-size: 0.88rem; color: var(--gray); }
-
-    .tabs {
-      display: flex;
-      background: var(--border);
-      border-radius: 10px;
-      padding: 4px;
-      margin-bottom: 2rem;
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 0.55rem 1rem;
-      border: none;
-      background: transparent;
-      border-radius: 7px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.88rem;
-      font-weight: 500;
-      color: var(--gray);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .tab-btn.active {
-      background: var(--white);
-      color: var(--dark);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-    }
+    .tabs { display: flex; background: var(--main-bg); border-radius: 10px; padding: 4px; margin-bottom: 2rem; border: 1px solid var(--border); }
+    .tab-btn { flex: 1; padding: 0.65rem 1rem; border: none; background: transparent; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
+    .tab-btn:hover { color: var(--text-main); }
+    .tab-btn.active { background: #fff; color: var(--text-main); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
     .form-section { display: none; }
-    .form-section.active { display: block; }
+    .form-section.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    .field { margin-bottom: 1.1rem; }
+    .field { margin-bottom: 1.25rem; }
+    .field label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .field input, .field select { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.9rem; color: var(--text-main); background: #fff; outline: none; transition: all 0.2s; }
+    .field input::placeholder { color: #94a3b8; }
+    .field input:focus, .field select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+    .field input.invalid { border-color: var(--red); background: var(--red-bg); }
+    .field input.valid { border-color: var(--green); }
 
-    .field label {
-      display: block;
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--dark);
-      margin-bottom: 0.4rem;
-      letter-spacing: 0.01em;
-    }
+    /* ── PASSWORD TOGGLE ── */
+    .password-container { position: relative; }
+    .btn-toggle-pass { position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1rem; color: #94a3b8; cursor: pointer; padding: 0.5rem; transition: color 0.2s; }
+    .btn-toggle-pass:hover { color: var(--text-main); }
+    .field-hint { font-size: 0.75rem; margin-top: 0.4rem; min-height: 1rem; color: var(--text-muted); }
+    .field-hint.error { color: var(--red); }
+    .field-hint.success { color: var(--green); }
 
-    .field input, .field select {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.9rem;
-      color: var(--dark);
-      background: var(--white);
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .field select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B6560' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem; }
-
-    .field input:focus, .field select:focus {
-      border-color: var(--red);
-      box-shadow: 0 0 0 3px rgba(208,52,44,0.08);
-    }
-
-    .field input.invalid { border-color: var(--red); background: var(--red-light); }
-    .field input.valid, .field select.valid { border-color: #4CAF50; }
-    .field input::placeholder { color: #C5BFB9; }
-
-    .rol-cards {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 4px;
-    }
-
-    .rol-card {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.15s;
-      background: var(--white);
-    }
-
-    .rol-card:hover { border-color: var(--red); background: var(--red-light); }
-
-    .rol-card.selected {
-      border-color: var(--red);
-      background: var(--red-light);
-    }
-
+    /* ── ROLES CARDS ── */
+    .rol-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.5rem; }
+    .rol-card { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; padding: 1rem 0.5rem; border: 1px solid var(--border); border-radius: 10px; cursor: pointer; transition: all 0.2s; background: #fff; position: relative; overflow: hidden; }
+    .rol-card:hover { border-color: var(--blue-border); background: var(--blue-bg); }
+    .rol-card.selected { border-color: var(--blue); background: var(--blue-bg); box-shadow: 0 0 0 1px var(--blue); }
     .rol-card input[type="radio"] { display: none; }
-
-    .rol-icon { font-size: 20px; flex-shrink: 0; }
-
+    .rol-icon { font-size: 1.5rem; color: var(--text-muted); width: 40px; height: 40px; border-radius: 8px; background: var(--main-bg); display: flex; align-items: center; justify-content: center; transition: all 0.2s; margin-bottom: 0.25rem; }
+    .rol-card.selected .rol-icon { color: var(--blue); background: #fff; }
     .rol-info { flex: 1; }
+    .rol-name { font-weight: 600; font-size: 0.85rem; color: var(--text-main); margin-bottom: 2px; }
+    .rol-desc { font-size: 0.65rem; color: var(--text-muted); line-height: 1.2; }
+    .rol-check { width: 16px; height: 16px; border: 2px solid var(--border); border-radius: 50%; position: absolute; top: 0.5rem; right: 0.5rem; transition: all 0.2s; }
+    .rol-card.selected .rol-check { border-color: var(--blue); background: var(--blue); }
+    .rol-card.selected .rol-check::after { content: ''; position: absolute; top: 4px; left: 4px; width: 6px; height: 6px; background: #fff; border-radius: 50%; }
 
-    .rol-name {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--dark);
+    /* ── BOTONES GLOBALES ── */
+    .submit-btn { width: 100%; padding: 0.85rem; background: var(--text-main); color: #fff; border: none; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background 0.2s; margin-top: 1.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+    .submit-btn:hover { background: #334155; }
+    .submit-btn:disabled { background: var(--text-muted); cursor: not-allowed; }
+
+    .alert { padding: 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 500; margin-bottom: 1.5rem; display: none; }
+    .alert.error { background: var(--red-bg); color: var(--red); border: 1px solid rgba(239,68,68,0.2); display: block; }
+    .alert.success { background: #d1fae5; color: var(--green); border: 1px solid rgba(16,185,129,0.2); display: block; }
+
+    .footer-note { text-align: center; margin-top: 2rem; font-size: 0.75rem; color: var(--text-muted); }
+
+    @media (max-width: 900px) {
+      body { flex-direction: column; }
+      .left-panel { width: 100%; padding: 2rem; }
+      .right-panel { padding: 2rem 1rem; }
+      .form-container { padding: 1.5rem; }
+    }
+        /* ── DISEÑO RESPONSIVE (Móviles y Tablets) ── */
+    @media (max-width: 900px) {
+      body { flex-direction: column; }
+      
+      /* Ajuste del Panel Izquierdo (Hero) */
+      .left-panel { 
+        width: 100%; 
+        padding: 2.5rem 2rem; 
+        min-height: auto; 
+        border-right: none; 
+        border-bottom: 1px solid var(--dark-border); 
+      }
+      .left-panel::before, .left-panel::after { display: none; } /* Ocultar luces traseras en móvil */
+      
+      .hero-text h2 { font-size: 2.2rem; }
+      .stats { flex-wrap: wrap; gap: 1.5rem; }
+      
+      /* Ajuste del Panel Derecho (Formulario) */
+      .right-panel { padding: 2rem 1rem; align-items: center; overflow-y: visible; }
+      .form-container { padding: 1.5rem; margin: 0 auto; width: 100%; max-width: 100%; }
+      .form-header h3 { font-size: 1.4rem; }
     }
 
-    .rol-desc {
-      font-size: 0.75rem;
-      color: var(--gray);
-      margin-top: 1px;
+    /* Ajuste extra para celulares muy pequeños */
+    @media (max-width: 480px) {
+      .rol-cards { grid-template-columns: 1fr; } /* Apilar tarjetas de rol verticalmente */
+      .tabs { flex-direction: column; }
     }
 
-    .rol-check {
-      width: 18px; height: 18px;
-      border-radius: 50%;
-      border: 2px solid var(--border);
-      flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.15s;
-    }
-
-    .rol-card.selected .rol-check {
-      background: var(--red);
-      border-color: var(--red);
-    }
-
-    .rol-card.selected .rol-check::after {
-      content: '';
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: white;
-    }
-
-    .field-hint {
-      font-size: 0.75rem;
-      margin-top: 4px;
-      display: none;
-    }
-
-    .field-hint.error { display: block; color: var(--red); }
-    .field-hint.success { display: block; color: #2E7D32; }
-
-    .submit-btn {
-      width: 100%;
-      padding: 0.85rem;
-      background: var(--red);
-      color: var(--white);
-      border: none;
-      border-radius: 10px;
-      font-family: 'Syne', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 0.5rem;
-      transition: background 0.2s, transform 0.1s;
-      letter-spacing: 0.01em;
-    }
-
-    .submit-btn:hover { background: var(--red-dark); }
-    .submit-btn:active { transform: scale(0.99); }
-    .submit-btn.loading { pointer-events: none; opacity: 0.7; }
-
-    .alert {
-      padding: 0.75rem 1rem;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      margin-bottom: 1rem;
-      display: none;
-    }
-
-    .alert.error {
-      background: var(--red-light);
-      color: var(--red-dark);
-      border: 1px solid rgba(208,52,44,0.2);
-      display: block;
-    }
-
-    .alert.success {
-      background: #E8F5E9;
-      color: #2E7D32;
-      border: 1px solid rgba(46,125,50,0.2);
-      display: block;
-    }
-
-    .footer-note {
-      margin-top: 2rem;
-      text-align: center;
-      font-size: 0.78rem;
-      color: var(--gray);
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes pulse-dot {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    .online-dot {
-      display: inline-block;
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: #4CAF50;
-      margin-right: 6px;
-      animation: pulse-dot 2s infinite;
-    }
-
-    /* --- BOTÓN DE VER CONTRASEÑA --- */
-    .password-container {
-      position: relative;
-      display: block;
-      width: 100%;
-    }
-    
-    .password-container input {
-      width: 100%;
-      padding-right: 45px !important; /* Espacio para que el texto no pise el ojo */
-    }
-
-    .btn-toggle-pass {
-      position: absolute;
-      top: 50%;
-      right: 12px;
-      transform: translateY(-50%); /* Centra el icono verticalmente perfecto */
-      background: transparent; /* Fondo transparente, sin cuadro gris */
-      border: none; /* Sin bordes */
-      font-size: 1.2rem;
-      cursor: pointer;
-      padding: 0;
-      margin: 0;
-      z-index: 10;
-    }
-
-    .btn-toggle-pass:hover {
-      transform: translateY(-50%) scale(1.1); /* Efecto al pasar el mouse */
-    }
-
-
-  </style>
+</style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
 </head>
 <body>
 
   <div class="left-panel">
     <div class="grid-deco"></div>
     <div class="brand">
-      <div class="brand-icon">🚑</div>
-      <h1>Sistema de<br><span>Ambulancias</span></h1>
+      <div class="brand-icon"><i class="fa-solid fa-truck-medical"></i></div>
+      <h1>SAMU<br><span>Sistema de Emergencias</span></h1>
     </div>
     <div class="hero-text">
       <h2>Cada segundo<br><em>importa.</em></h2>
@@ -445,7 +203,7 @@
           <label>Contraseña</label>
           <div class="password-container">
             <input type="password" id="login-password" placeholder="••••••••" oninput="clearHint('login-password', 'hint-login-pass')">
-            <button type="button" class="btn-toggle-pass" onclick="togglePassword('login-password', this)">👁️</button>
+            <button type="button" class="btn-toggle-pass" onclick="togglePassword('login-password', this)"><i class="fa-solid fa-eye"></i></button>
           </div>
           <div class="field-hint" id="hint-login-pass"></div>
         </div>
@@ -470,7 +228,7 @@
           <label>Contraseña</label>
           <div class="password-container">
             <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" oninput="checkPasswordStrength()">
-            <button type="button" class="btn-toggle-pass" onclick="togglePassword('reg-password', this)">👁️</button>
+            <button type="button" class="btn-toggle-pass" onclick="togglePassword('reg-password', this)"><i class="fa-solid fa-eye"></i></button>
           </div>
           <div class="field-hint" id="hint-password"></div>
         </div>
@@ -480,7 +238,7 @@
           <div class="rol-cards">
             <label class="rol-card selected" onclick="selectRol(this, 'operador')">
               <input type="radio" name="rol" value="operador" checked>
-              <div class="rol-icon">🖥️</div>
+              <div class="rol-icon"><i class="fa-solid fa-desktop"></i></div>
               <div class="rol-info">
                 <div class="rol-name">Operador</div>
                 <div class="rol-desc">Registra emergencias y monitorea el mapa</div>
@@ -489,19 +247,10 @@
             </label>
             <label class="rol-card" onclick="selectRol(this, 'conductor')">
               <input type="radio" name="rol" value="conductor">
-              <div class="rol-icon">🚑</div>
+              <div class="rol-icon"><i class="fa-solid fa-truck-medical"></i></div>
               <div class="rol-info">
                 <div class="rol-name">Conductor</div>
                 <div class="rol-desc">Chofer de ambulancia, recibe notificaciones</div>
-              </div>
-              <div class="rol-check"></div>
-            </label>
-            <label class="rol-card" onclick="selectRol(this, 'admin')">
-              <input type="radio" name="rol" value="admin">
-              <div class="rol-icon">👔</div>
-              <div class="rol-info">
-                <div class="rol-name">Administrador</div>
-                <div class="rol-desc">Gestiona ambulancias y recibe reportes</div>
               </div>
               <div class="rol-check"></div>
             </label>
@@ -521,7 +270,7 @@
   </div>
 
   <script>
-    const API = 'http://127.0.0.1:5000/api';
+    const API = 'https://sistema-ambulancias-web-1.onrender.com/api';
     const EMAIL_REGEX = /^[\w\.-]+@[\w\.-]+\.\w{2,}$/;
     let rolSeleccionado = 'operador';
 

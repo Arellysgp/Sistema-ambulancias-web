@@ -6,7 +6,7 @@ emergencias_bp = Blueprint('emergencias', __name__)
 # ESTAS ES EL METODO GET PARA OBTENER TODAS LAS EMERGENCIAS REGISTRADAS EN LA BASE DE DATOS
 @emergencias_bp.route('/emergencias', methods=['GET'])
 def obtener_emergencias():
-    emergencias = Emergencia.query.order_by(Emergencia.fecha_registro.desc()).all()
+    emergencias = db.session.execute(db.select(Emergencia).order_by(Emergencia.fecha_registro.desc())).scalars().all()
     resultado = []
     for e in emergencias:
         resultado.append({
@@ -15,11 +15,14 @@ def obtener_emergencias():
             'edad': e.edad,
             'descripcion': e.descripcion,
             'direccion': e.direccion,
+            'distrito': e.distrito,
+            'provincia': e.provincia,
             'latitud': e.latitud,
             'longitud': e.longitud,
             'prioridad': e.prioridad,
             'estado': e.estado,
-            'fecha_registro': e.fecha_registro.strftime('%Y-%m-%d %H:%M')
+            'fecha_registro': e.fecha_registro.strftime('%Y-%m-%d %H:%M'),
+            'conductor_id': e.conductor_id
         })
     return jsonify(resultado), 200
 ## ESTE ES EL METODO POST PARA REGISTRAR UNA NUEVA EMERGENCIA EN LA BASE DE DATOS
@@ -36,10 +39,12 @@ def registrar_emergencia():
             return jsonify({'error': f'El campo {campo} es requerido'}), 400
 
     nueva = Emergencia(
-        nombre_paciente=datos.get('nombre_paciente'),
+       nombre_paciente=datos.get('nombre_paciente'),
         edad=datos.get('edad'),
         descripcion=datos.get('descripcion'),
         direccion=datos.get('direccion'),
+        distrito=datos.get('distrito'),
+        provincia=datos.get('provincia'),
         latitud=datos.get('latitud'),
         longitud=datos.get('longitud'),
         prioridad=datos.get('prioridad'),
@@ -51,9 +56,9 @@ def registrar_emergencia():
 
 ## ESTE ES EL METODO PUT PARA ACTUALIZAR EL ESTADO DE UNA EMERGENCIA EXISTENTE EN LA BASE DE DATOS
 
-@emergencias_bp.route('/emergencias/<int:id>/estado', methods=['PUT'])
-def actualizar_estado(id):
-    emergencia = db.session.get(Emergencia, id)
+@emergencias_bp.route('/emergencias/<int:emergencia_id>/estado', methods=['PUT'])
+def actualizar_estado(emergencia_id):
+    emergencia = db.session.get(Emergencia, emergencia_id)
     if not emergencia:
         return jsonify({'error': 'Emergencia no encontrada'}), 404
 
@@ -64,9 +69,9 @@ def actualizar_estado(id):
 
 
     ## ESTE ES EL METODO PUT PARA ACTUALIZAR TODA LA EMERGENCIA (EDITAR)
-@emergencias_bp.route('/emergencias/<int:id>', methods=['PUT'])
-def actualizar_emergencia(id):
-    emergencia = db.session.get(Emergencia, id)
+@emergencias_bp.route('/emergencias/<int:emergencia_id>', methods=['PUT'])
+def actualizar_emergencia(emergencia_id):
+    emergencia = db.session.get(Emergencia, emergencia_id)
     if not emergencia:
         return jsonify({'error': 'Emergencia no encontrada'}), 404
 
@@ -79,18 +84,23 @@ def actualizar_emergencia(id):
     emergencia.edad = datos.get('edad', emergencia.edad)
     emergencia.descripcion = datos.get('descripcion', emergencia.descripcion)
     emergencia.direccion = datos.get('direccion', emergencia.direccion)
+    emergencia.distrito = datos.get('distrito', emergencia.distrito)
+    emergencia.provincia = datos.get('provincia', emergencia.provincia)
     emergencia.latitud = datos.get('latitud', emergencia.latitud)
     emergencia.longitud = datos.get('longitud', emergencia.longitud)
     emergencia.prioridad = datos.get('prioridad', emergencia.prioridad)
     emergencia.estado = datos.get('estado', emergencia.estado)
+    
+    if 'conductor_id' in datos:
+        emergencia.conductor_id = datos.get('conductor_id')
 
     db.session.commit()
     return jsonify({'mensaje': 'Emergencia actualizada correctamente'}), 200
 
 ## ESTE ES EL METODO DELETE PARA ELIMINAR UNA EMERGENCIA
-@emergencias_bp.route('/emergencias/<int:id>', methods=['DELETE'])
-def eliminar_emergencia(id):
-    emergencia = db.session.get(Emergencia, id)
+@emergencias_bp.route('/emergencias/<int:emergencia_id>', methods=['DELETE'])
+def eliminar_emergencia(emergencia_id):
+    emergencia = db.session.get(Emergencia, emergencia_id)
     if not emergencia:
         return jsonify({'error': 'Emergencia no encontrada'}), 404
 

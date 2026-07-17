@@ -10,6 +10,8 @@ class Emergencia(db.Model):
     edad            = db.Column(db.Integer, nullable=False)
     descripcion     = db.Column(db.Text, nullable=False)
     direccion       = db.Column(db.String(200), nullable=False)
+    distrito        = db.Column(db.String(100), nullable=True)
+    provincia       = db.Column(db.String(100), nullable=True)
     latitud         = db.Column(db.Float, nullable=True)
     longitud        = db.Column(db.Float, nullable=True)
     prioridad       = db.Column(db.Integer, nullable=False)

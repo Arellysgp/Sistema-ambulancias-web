@@ -9,25 +9,32 @@ def validar_email(email):
     patron = r'^[\w\.-]+@[\w\.-]+\.\w{2,}$'
     return re.match(patron, email)
 
+from datetime import datetime, timezone
+
 def registrar_usuario(nombre, email, password, rol='operador'):
     if not nombre or len(nombre.strip()) < 3:
         return None, "El nombre debe tener al menos 3 caracteres"
-    if not email or not validar_email(email):
+    if not email:
+        return None, "El correo electrónico no es válido"
+    
+    email_normalizado = email.strip().lower()
+    if not validar_email(email_normalizado):
         return None, "El correo electrónico no es válido"
     if not password or len(password) < 6:
         return None, "La contraseña debe tener al menos 6 caracteres"
     if rol not in ROLES_VALIDOS:
         return None, "Rol inválido. Solo se permite: operador o conductor"
-    if User.query.filter_by(email=email).first():
+    if User.query.filter_by(email=email_normalizado).first():
         return None, "El email ya está registrado"
 
     hash_pw = generate_password_hash(password)
     nuevo = User(
         nombre=nombre.strip(),
-        email=email.lower(),
+        email=email_normalizado,
         password_hash=hash_pw,
         rol=rol,
-        activo=True
+        activo=True,
+        fecha_registro=datetime.now(timezone.utc)
     )
     db.session.add(nuevo)
     db.session.commit()
@@ -36,9 +43,11 @@ def registrar_usuario(nombre, email, password, rol='operador'):
 def verificar_login(email, password):
     if not email or not password:
         return None, "Completa todos los campos"
-    if not validar_email(email):
+    
+    email_normalizado = email.strip().lower()
+    if not validar_email(email_normalizado):
         return None, "El correo electrónico no es válido"
-    user = User.query.filter_by(email=email.lower()).first()
+    user = User.query.filter_by(email=email_normalizado).first()
     if not user:
         return None, "Email no encontrado"
     if not check_password_hash(user.password_hash, password):

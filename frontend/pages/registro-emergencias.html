@@ -7,14 +7,14 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     * { font-family: 'Inter', sans-serif; }
 
-    body { background-color: #f0f2f5; }
+    body { background-color: #f8fafc; color: #1e293b; }
 
     /* ── Navbar ── */
     .navbar-samu {
@@ -57,156 +57,240 @@
       margin-right: 1rem;
     }
     .operador-badge i { opacity: 0.8; }
+    
+    .navbar-samu .navbar-item.has-dropdown:hover .navbar-link,
+    .navbar-samu .navbar-item.has-dropdown.is-active .navbar-link,
+    .navbar-samu .navbar-link:hover,
+    .navbar-samu .navbar-link:focus {
+        background-color: #901616 !important; 
+        color: #ffffff !important;
+    }
+    .navbar-samu .navbar-link::after { border-color: #ffffff !important; }
+    .navbar-dropdown { border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .navbar-dropdown .navbar-item:hover { background-color: #f5f5f5 !important; }
 
     /* ── Encabezado de página ── */
     .page-header {
-      margin-bottom: 1.5rem;
-      border-bottom: 2px solid #e0e0e0;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid #e2e8f0;
       padding-bottom: 1rem;
     }
     .page-header h1 {
       font-size: 1.5rem;
       font-weight: 700;
-      color: #1a1a1a;
+      color: #0f172a;
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .page-header h1 i { color: #b71c1c; }
-    .page-header p { color: #666; font-size: 0.9rem; margin-top: 4px; }
+    .page-header h1 i { color: #dc2626; }
+    .page-header p { color: #64748b; font-size: 0.9rem; margin-top: 4px; }
 
     /* ── Cards ── */
     .card {
-      border-radius: 10px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
-      border: 1px solid #e8e8e8;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+      border: 1px solid #e2e8f0;
+      background-color: #ffffff;
     }
     .card-header {
-      border-radius: 10px 10px 0 0;
-      background-color: #fff;
-      border-bottom: 1px solid #eee;
-      padding: 0.2rem 0;
+      background-color: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      border-radius: 12px 12px 0 0;
+      padding: 0.75rem 1.25rem;
+      box-shadow: none;
     }
     .card-header-title {
-      color: #1a1a1a;
+      color: #1e293b;
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 0.875rem;
       display: flex;
       align-items: center;
       gap: 8px;
+      padding: 0;
     }
-    .card-header-title i { color: #b71c1c; }
+    .card-header-title i { color: #dc2626; }
 
     /* ── Secciones del formulario ── */
     .seccion-titulo {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 0.8rem;
-      font-weight: 600;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: #888;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
       margin-bottom: 1rem;
     }
-    .seccion-titulo i { color: #b71c1c; font-size: 0.9rem; }
+    .seccion-titulo i { color: #ef4444; font-size: 0.875rem; }
     .seccion-divider {
       border: none;
-      border-top: 1px solid #ebebeb;
-      margin: 1.4rem 0;
+      border-top: 1px solid #f1f5f9;
+      margin: 1.5rem 0;
     }
 
     /* ── Inputs ── */
     .label {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: #444;
+      font-size: 0.65rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: #64748b;
       margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
     .input, .textarea, .select select {
-      font-size: 0.9rem;
-      border-color: #ddd;
-      border-radius: 6px;
-      box-shadow: none;
-      transition: border-color 0.2s;
+      font-size: 0.875rem;
+      border-color: #cbd5e1;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      transition: all 0.2s;
+      background-color: #ffffff;
+      color: #334155;
     }
     .input:focus, .textarea:focus, .select select:focus {
-      border-color: #b71c1c;
-      box-shadow: 0 0 0 2px rgba(183,28,28,0.1);
+      border-color: #ef4444;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
     }
-    .control.has-icons-left .icon { color: #aaa; }
+    .input[readonly] { background-color: #f8fafc; color: #94a3b8; }
+    .control.has-icons-left .icon { color: #94a3b8; }
     .textarea { resize: vertical; min-height: 90px; }
-
+    
     /* ── Botones ── */
     .btn-registrar {
-      background-color: #b71c1c;
+      background-color: #dc2626;
       color: white;
       border: none;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      padding: 10px 22px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .btn-registrar:hover { background-color: #8b0000; color: white; }
-    .btn-limpiar {
-      background-color: #f5f5f5;
-      color: #555;
-      border: 1px solid #ddd;
-      border-radius: 6px;
+      border-radius: 8px;
       font-weight: 500;
-      font-size: 0.9rem;
-      padding: 10px 18px;
+      font-size: 0.875rem;
+      padding: 0.6rem 1.25rem;
       display: flex;
       align-items: center;
       gap: 8px;
       cursor: pointer;
-      transition: background 0.2s;
+      box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.2);
+      transition: all 0.2s;
     }
-    .btn-limpiar:hover { background-color: #eaeaea; }
+    .btn-registrar:hover { background-color: #b91c1c; transform: translateY(-1px); color: white; }
+    
+    .btn-limpiar, .button.is-danger.is-light {
+      background-color: #ffffff !important;
+      color: #475569 !important;
+      border: 1px solid #cbd5e1 !important;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 0.875rem;
+      padding: 0.6rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      transition: all 0.2s;
+      height: auto;
+    }
+    .btn-limpiar:hover, .button.is-danger.is-light:hover { background-color: #f8fafc !important; color: #1e293b !important; }
 
     /* ── Tarjetas emergencias recientes ── */
     .emergencia-card {
-      border-radius: 8px;
-      border: 1px solid #eee;
-      padding: 14px 16px;
-      margin-bottom: 12px;
-      background: #fff;
-      transition: box-shadow 0.2s;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      background: #ffffff;
+      transition: all 0.2s;
+      position: relative;
     }
-    .emergencia-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
-    .prioridad-1 { border-left: 4px solid #c62828; }
-    .prioridad-2 { border-left: 4px solid #e65100; }
-    .prioridad-3 { border-left: 4px solid #2e7d32; }
+    .emergencia-card:hover { 
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); 
+      border-color: #cbd5e1;
+    }
+    .prioridad-1 { border-left: 4px solid #ef4444; }
+    .prioridad-2 { border-left: 4px solid #f97316; }
+    .prioridad-3 { border-left: 4px solid #22c55e; }
+    
     .emergencia-nombre {
       font-weight: 600;
-      font-size: 0.92rem;
-      color: #1a1a1a;
+      font-size: 0.875rem;
+      color: #0f172a;
       display: flex;
       align-items: center;
       gap: 6px;
     }
-    .emergencia-nombre i { color: #999; font-size: 0.85rem; }
+    .emergencia-nombre i { color: #94a3b8; font-size: 0.875rem; }
+    .emergencia-nombre .edad { font-family: 'JetBrains Mono', monospace; font-weight: 400; color: #64748b; margin-left: 4px; font-size: 0.75rem; }
+    
     .emergencia-detalle {
-      font-size: 0.8rem;
-      color: #777;
-      margin-top: 3px;
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-top: 6px;
       display: flex;
       align-items: center;
       gap: 5px;
     }
-    .emergencia-detalle i { font-size: 0.75rem; }
     .emergencia-desc {
-      font-size: 0.82rem;
-      color: #444;
-      margin-top: 4px;
+      font-size: 0.875rem;
+      color: #334155;
+      margin-top: 6px;
     }
-    .tags-emergencia { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
-    .tag { border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+    
+    .tags-emergencia { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+    
+    .badge-premium {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.625rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border: 1px solid transparent;
+    }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+    
+    .badge-p1 { background-color: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+    .badge-p1 .badge-dot { background-color: #ef4444; }
+    
+    .badge-p2 { background-color: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+    .badge-p2 .badge-dot { background-color: #f97316; }
+    
+    .badge-p3 { background-color: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+    .badge-p3 .badge-dot { background-color: #22c55e; }
+    
+    .badge-estado { background-color: #f8fafc; color: #475569; border-color: #e2e8f0; }
+
+    .acciones-hover {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .emergencia-card:hover .acciones-hover { opacity: 1; }
+    
+    .btn-accion {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-editar { color: #2563eb; }
+    .btn-editar:hover { background-color: #eff6ff; }
+    .btn-eliminar { color: #dc2626; }
+    .btn-eliminar:hover { background-color: #fef2f2; }
 
     /* ── Notificaciones ── */
     .notification {
@@ -218,53 +302,17 @@
     }
     .section-main { padding: 1.8rem 1.5rem; }
     .alerta { margin-bottom: 1rem; }
-/* ── Contenedor con Scroll para emergencias ── */
+    
     #lista-emergencias { 
       padding: 1rem; 
-      max-height: 550px; /* Altura máxima antes de que aparezca la barra */
-      overflow-y: auto;  /* Activa el scroll vertical automáticamente */
+      max-height: 550px; 
+      overflow-y: auto;  
     }
-
-    /* Diseño moderno para la barra de scroll */
-    #lista-emergencias::-webkit-scrollbar {
-      width: 6px;
-    }
-    #lista-emergencias::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 8px;
-    }
-    #lista-emergencias::-webkit-scrollbar-thumb {
-      background: #cccccc;
-      border-radius: 8px;
-    }
-    #lista-emergencias::-webkit-scrollbar-thumb:hover {
-      background: #b71c1c; /* Se pone roja al pasar el mouse */
-    }
-/* --- CORRECCIÓN DEL MENÚ BLANCO AL PASAR EL MOUSE --- */
-    .navbar-samu .navbar-item.has-dropdown:hover .navbar-link,
-    .navbar-samu .navbar-item.has-dropdown.is-active .navbar-link,
-    .navbar-samu .navbar-link:hover,
-    .navbar-samu .navbar-link:focus {
-        background-color: #901616 !important; /* Un rojo oscuro elegante */
-        color: #ffffff !important;
-    }
-
-    /* Obliga a la flechita desplegable a mantenerse blanca */
-    .navbar-samu .navbar-link::after {
-        border-color: #ffffff !important;
-    }
-    
-    /* Diseño del menú desplegable (Cerrar Sesión) */
-    .navbar-dropdown {
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .navbar-dropdown .navbar-item:hover {
-        background-color: #f5f5f5 !important;
-    }
-
-
-  </style>
+    #lista-emergencias::-webkit-scrollbar { width: 6px; }
+    #lista-emergencias::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 8px; }
+    #lista-emergencias::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+    #lista-emergencias::-webkit-scrollbar-thumb:hover { background: #dc2626; }
+</style>
 </head>
 <body>
 
@@ -282,18 +330,22 @@
         <p>Complete los datos del incidente para asignar una ambulancia disponible</p>
       </div>
 
-      <!-- Notificación de éxito (oculta por defecto) -->
-      <div id="alerta-exito" class="notification is-success is-light is-hidden alerta">
-        <button class="delete" aria-label="cerrar" onclick="document.getElementById('alerta-exito').classList.add('is-hidden')"></button>
-        <i class="fa-solid fa-circle-check"></i>
-        Emergencia registrada correctamente.
+      <!-- Notificación de éxito (oculta por defecto, estilo Tailwind CSS) -->
+      <div id="alerta-exito" class="is-hidden" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1.25rem; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; color: #166534; font-family: 'Inter', sans-serif; font-size: 0.875rem; font-weight: 500; margin-bottom: 1.5rem; transition: opacity 0.3s ease;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-circle-check" style="color: #15803d; font-size: 1.1rem;"></i>
+          <span id="texto-alerta-exito">Emergencia registrada correctamente.</span>
+        </div>
+        <button onclick="document.getElementById('alerta-exito').classList.add('is-hidden')" style="background: none; border: none; color: #166534; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: background 0.2s;" onmouseover="this.style.background='rgba(22, 101, 52, 0.08)'" onmouseout="this.style.background='none'">✕</button>
       </div>
 
-      <!-- Notificación de error (oculta por defecto) -->
-      <div id="alerta-error" class="notification is-danger is-light is-hidden alerta">
-        <button class="delete" aria-label="cerrar" onclick="document.getElementById('alerta-error').classList.add('is-hidden')"></button>
-        <i class="fa-solid fa-circle-xmark"></i>
-        Error al registrar la emergencia. Intente nuevamente.
+      <!-- Notificación de error (oculta por defecto, estilo Tailwind CSS) -->
+      <div id="alerta-error" class="is-hidden" style="display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1.25rem; background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; color: #991b1b; font-family: 'Inter', sans-serif; font-size: 0.875rem; font-weight: 500; margin-bottom: 1.5rem; transition: opacity 0.3s ease;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-circle-xmark" style="color: #b91c1c; font-size: 1.1rem;"></i>
+          <span>Error al registrar la emergencia. Intente nuevamente.</span>
+        </div>
+        <button onclick="document.getElementById('alerta-error').classList.add('is-hidden')" style="background: none; border: none; color: #991b1b; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: background 0.2s;" onmouseover="this.style.background='rgba(153, 27, 27, 0.08)'" onmouseout="this.style.background='none'">✕</button>
       </div>
 
       <div class="columns">
@@ -355,9 +407,136 @@
 
                 <div class="field">
                   <label class="label" for="direccion">Dirección</label>
-                  <div class="control has-icons-left">
-                    <input id="direccion" class="input" type="text" placeholder="Ej: Av. Abancay 123, Cercado de Lima" required />
-                    <span class="icon is-left"><i class="fa-solid fa-map-pin"></i></span>
+                  <div class="control has-icons-left" style="position:relative;">
+                    <input id="direccion" class="input" type="text" placeholder="Ej: Av. Abancay 123, Cercado de Lima" required autocomplete="off" />
+    <span class="icon is-left"><i class="fa-solid fa-map-pin"></i></span>
+    <!-- Aquí aparecerán las sugerencias mágicas de Nominatim -->
+    <div id="lista-direcciones" style="position:absolute; top:100%; left:0; right:0; background:white; z-index:9999; border-radius:8px; box-shadow:0 10px 25px rgba(0,0,0,0.15); max-height:220px; overflow-y:auto; display:none; border:1px solid #e2e8f0;"></div>
+  </div>
+</div>
+
+
+                <div class="columns">
+                  <div class="column">
+                    <div class="field">
+                      <label class="label" for="distrito">Distrito</label>
+                      <div class="control has-icons-left">
+                        <div class="select is-fullwidth">
+                          <select id="distrito">
+                            <option value="">Seleccione Distrito</option>
+                            <!-- Lima Metropolitana -->
+                            <option value="Ancón">Ancón</option>
+                            <option value="Ate">Ate</option>
+                            <option value="Barranco">Barranco</option>
+                            <option value="Breña">Breña</option>
+                            <option value="Carabayllo">Carabayllo</option>
+                            <option value="Chaclacayo">Chaclacayo</option>
+                            <option value="Chorrillos">Chorrillos</option>
+                            <option value="Cieneguilla">Cieneguilla</option>
+                            <option value="Comas">Comas</option>
+                            <option value="El Agustino">El Agustino</option>
+                            <option value="Independencia">Independencia</option>
+                            <option value="Jesús María">Jesús María</option>
+                            <option value="La Molina">La Molina</option>
+                            <option value="La Victoria">La Victoria</option>
+                            <option value="Lima">Lima</option>
+                            <option value="Lince">Lince</option>
+                            <option value="Los Olivos">Los Olivos</option>
+                            <option value="Lurigancho">Lurigancho (Chosica)</option>
+                            <option value="Lurín">Lurín</option>
+                            <option value="Magdalena del Mar">Magdalena del Mar</option>
+                            <option value="Miraflores">Miraflores</option>
+                            <option value="Pachacámac">Pachacámac</option>
+                            <option value="Pucusana">Pucusana</option>
+                            <option value="Pueblo Libre">Pueblo Libre</option>
+                            <option value="Puente Piedra">Puente Piedra</option>
+                            <option value="Punta Hermosa">Punta Hermosa</option>
+                            <option value="Punta Negra">Punta Negra</option>
+                            <option value="Rímac">Rímac</option>
+                            <option value="San Bartolo">San Bartolo</option>
+                            <option value="San Borja">San Borja</option>
+                            <option value="San Isidro">San Isidro</option>
+                            <option value="San Juan de Lurigancho">San Juan de Lurigancho</option>
+                            <option value="San Juan de Miraflores">San Juan de Miraflores</option>
+                            <option value="San Luis">San Luis</option>
+                            <option value="San Martín de Porres">San Martín de Porres</option>
+                            <option value="San Miguel">San Miguel</option>
+                            <option value="Santa Anita">Santa Anita</option>
+                            <option value="Santa María del Mar">Santa María del Mar</option>
+                            <option value="Santa Rosa">Santa Rosa</option>
+                            <option value="Santiago de Surco">Santiago de Surco</option>
+                            <option value="Surquillo">Surquillo</option>
+                            <option value="Villa El Salvador">Villa El Salvador</option>
+                            <option value="Villa María del Triunfo">Villa María del Triunfo</option>
+                            <!-- Callao -->
+                            <option value="Bellavista">Bellavista</option>
+                            <option value="Callao">Callao</option>
+                            <option value="Carmen de La Legua">Carmen de La Legua</option>
+                            <option value="La Perla">La Perla</option>
+                            <option value="La Punta">La Punta</option>
+                            <option value="Ventanilla">Ventanilla</option>
+                            <option value="Mi Perú">Mi Perú</option>
+                            <!-- Lima Provincias (Destacados) -->
+                            <option value="Antioquía">Antioquía</option>
+                            <option value="Azpitia">Azpitia</option>
+                            <option value="Barranca">Barranca</option>
+                            <option value="Canta">Canta</option>
+                            <option value="Cañete">Cañete (San Vicente)</option>
+                            <option value="Cerro Azul">Cerro Azul</option>
+                            <option value="Chancay">Chancay</option>
+                            <option value="Chicla">Chicla (Ticlio)</option>
+                            <option value="Chilca">Chilca</option>
+                            <option value="Huacho">Huacho</option>
+                            <option value="Huaral">Huaral</option>
+                            <option value="Lunahuaná">Lunahuaná</option>
+                            <option value="Mala">Mala</option>
+                            <option value="Matucana">Matucana</option>
+                            <option value="San Mateo">San Mateo</option>
+                            <option value="Santa Eulalia">Santa Eulalia</option>
+                            <option value="Yauyos">Yauyos</option>
+                          </select>
+                        </div>
+                        <span class="icon is-left"><i class="fa-solid fa-building"></i></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="column">
+                    <div class="field">
+                      <label class="label" for="region">Región</label>
+                      <div class="control has-icons-left">
+                        <div class="select is-fullwidth">
+                          <select id="region">
+                            <option value="">Seleccione Región</option>
+                            <option value="Amazonas">Amazonas</option>
+                            <option value="Áncash">Áncash</option>
+                            <option value="Apurímac">Apurímac</option>
+                            <option value="Arequipa">Arequipa</option>
+                            <option value="Ayacucho">Ayacucho</option>
+                            <option value="Cajamarca">Cajamarca</option>
+                            <option value="Callao">Callao</option>
+                            <option value="Cusco">Cusco</option>
+                            <option value="Huancavelica">Huancavelica</option>
+                            <option value="Huánuco">Huánuco</option>
+                            <option value="Ica">Ica</option>
+                            <option value="Junín">Junín</option>
+                            <option value="La Libertad">La Libertad</option>
+                            <option value="Lambayeque">Lambayeque</option>
+                            <option value="Lima">Lima</option>
+                            <option value="Loreto">Loreto</option>
+                            <option value="Madre de Dios">Madre de Dios</option>
+                            <option value="Moquegua">Moquegua</option>
+                            <option value="Pasco">Pasco</option>
+                            <option value="Piura">Piura</option>
+                            <option value="Puno">Puno</option>
+                            <option value="San Martín">San Martín</option>
+                            <option value="Tacna">Tacna</option>
+                            <option value="Tumbes">Tumbes</option>
+                            <option value="Ucayali">Ucayali</option>
+                          </select>
+                        </div>
+                        <span class="icon is-left"><i class="fa-solid fa-map"></i></span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -477,6 +656,7 @@
   </section>
 
   <script>
+    const API_URL = 'https://sistema-ambulancias-web-1.onrender.com';
 // 1. Mostrar nombre del usuario al cargar la página
 // 1. Mostrar nombre del usuario al cargar la página
   document.addEventListener('DOMContentLoaded', () => {
@@ -489,13 +669,23 @@
   });
 
   // --- BUSCADOR AUTOMÁTICO DE DIRECCIONES ---
-  // Se activa cuando el operador termina de escribir y sale de la casilla "Dirección"
-  document.getElementById('direccion').addEventListener('blur', function() {
-    const direccionTexto = this.value.trim();
+  function buscarDireccionEnMapa() {
+    const direccionTexto = document.getElementById('direccion').value.trim();
+    const distritoTexto = document.getElementById('distrito') ? document.getElementById('distrito').value : '';
+    const regionTexto = document.getElementById('region') ? document.getElementById('region').value : '';
+    
     if (!direccionTexto) return;
 
-    // Le agregamos "Lima, Perú" ocultamente para que no busque calles en otros países
-    const busqueda = `${direccionTexto}, Lima, Perú`;
+    let ubicacionContexto = 'Lima, Perú'; // Por defecto
+    if (distritoTexto || regionTexto) {
+        let partes = [];
+        if (distritoTexto) partes.push(distritoTexto);
+        if (regionTexto) partes.push(regionTexto);
+        partes.push('Perú');
+        ubicacionContexto = partes.join(', ');
+    }
+
+    const busqueda = `${direccionTexto}, ${ubicacionContexto}`;
     const urlBusqueda = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(busqueda)}`;
 
     // Llamamos al buscador gratuito de OpenStreetMap
@@ -520,16 +710,30 @@
           } else {
             marcador = L.marker([lat, lng]).addTo(mapa);
           }
-          mostrarAmbulanciaEstatica(lat, lng);
+          if (typeof mostrarAmbulanciaEstatica === 'function') {
+            mostrarAmbulanciaEstatica(lat, lng);
+          }
         } else {
           console.warn("No se encontró la dirección exacta. Ubíquela haciendo clic en el mapa.");
+          document.getElementById('latitud').value = '';
+          document.getElementById('longitud').value = '';
+          document.getElementById('latitud').placeholder = 'Dirección no encontrada';
+          document.getElementById('longitud').placeholder = 'Use el mapa para ubicarla';
         }
       })
-      .catch(error => console.error("Error en la búsqueda de dirección:", error));
-  });
+      .catch(error => {
+        console.error("Error en la búsqueda de dirección:", error);
+        document.getElementById('latitud').placeholder = 'Error de conexión';
+      });
+  }
+
+  // Se activa cuando el operador sale de la casilla "Dirección" o cambia Distrito/Región
+  document.getElementById('direccion').addEventListener('blur', buscarDireccionEnMapa);
+  if (document.getElementById('distrito')) document.getElementById('distrito').addEventListener('change', buscarDireccionEnMapa);
+  if (document.getElementById('region')) document.getElementById('region').addEventListener('change', buscarDireccionEnMapa);
 
   // 2. Función para cerrar sesión
-  function cerrarSesion() {
+  function ejecutarLogout() {
     localStorage.clear(); // Limpia los datos
     window.location.href = '/index.html'; // Te manda al login
   }
@@ -581,6 +785,8 @@
       edad: parseInt(document.getElementById('edad').value),
       descripcion: document.getElementById('descripcion').value,
       direccion: document.getElementById('direccion').value,
+      distrito: document.getElementById('distrito') ? document.getElementById('distrito').value : null,
+      provincia: document.getElementById('region') ? document.getElementById('region').value : null,
       latitud: parseFloat(document.getElementById('latitud').value) || null,
       longitud: parseFloat(document.getElementById('longitud').value) || null,
       prioridad: parseInt(document.getElementById('prioridad').value),
@@ -588,7 +794,7 @@
     };
 
     // Si hay ID oculto es PUT (Editar), si está vacío es POST (Registrar)
-    const url = idEmergencia ? `http://127.0.0.1:5000/api/emergencias/${idEmergencia}` : 'http://127.0.0.1:5000/api/emergencias';
+    const url = idEmergencia ? `${API_URL}/api/emergencias/${idEmergencia}` : `${API_URL}/api/emergencias`;
     const metodo = idEmergencia ? 'PUT' : 'POST';
 
     fetch(url, {
@@ -601,8 +807,8 @@
       return response.json();
     })
     .then(data => {
-      // Muestra el mensaje correcto dependiendo de lo que se hizo
-      document.getElementById('alerta-exito').textContent = idEmergencia ? 'Emergencia actualizada correctamente.' : 'Emergencia registrada correctamente.';
+       // Muestra el mensaje correcto dependiendo de lo que se hizo
+      document.getElementById('texto-alerta-exito').textContent = idEmergencia ? 'Emergencia actualizada correctamente.' : 'Emergencia registrada correctamente.';
       document.getElementById('alerta-exito').classList.remove('is-hidden');
       document.getElementById('alerta-error').classList.add('is-hidden');
       
@@ -622,7 +828,7 @@
 
   // 4. Cargar la lista de la derecha desde la base de datos
   function cargarEmergencias() {
-    fetch('http://127.0.0.1:5000/api/emergencias')
+    fetch(`${API_URL}/api/emergencias`) 
     .then(response => response.json())
     .then(data => {
       emergenciasGlobales = data; // Guarda en la variable global
@@ -653,15 +859,14 @@
       data.forEach(e => {
         lista.innerHTML += `
           <div class="emergencia-card prioridad-${esc(e.prioridad)}">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <div class="emergencia-nombre">
-                <i class="fa-regular fa-user"></i>
-                ${esc(e.nombre_paciente)}, ${esc(e.edad)} años
-              </div>
-              <div style="display: flex; gap: 12px;">
-                <button type="button" onclick="editarEmergencia(${e.id})" style="background: none; border: none; cursor: pointer; color: #1976d2;" title="Editar"><i class="fa-solid fa-eye"></i></button>
-                <button type="button" onclick="eliminarEmergencia(${e.id})" style="background: none; border: none; cursor: pointer; color: #c62828;" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-              </div>
+            <div class="acciones-hover">
+              <button type="button" onclick="editarEmergencia(${e.id})" class="btn-accion btn-editar" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button type="button" onclick="eliminarEmergencia(${e.id})" class="btn-accion btn-eliminar" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+            </div>
+            
+            <div class="emergencia-nombre">
+              <i class="fa-regular fa-user"></i>
+              ${esc(e.nombre_paciente)} <span class="edad">${esc(e.edad)} años</span>
             </div>
             <div class="emergencia-detalle">
               <i class="fa-solid fa-location-dot"></i>
@@ -669,8 +874,11 @@
             </div>
             <div class="emergencia-desc">${esc(e.descripcion)}</div>
             <div class="tags-emergencia">
-              <span class="tag is-${colores[e.prioridad]}">Prioridad ${esc(e.prioridad)}</span>
-              <span class="tag ${estados[e.estado]}">${textoEstados[e.estado] || esc(e.estado)}</span>
+              <span class="badge-premium badge-p${esc(e.prioridad)}">
+                <span class="badge-dot"></span>
+                P${esc(e.prioridad)} — ${esc(e.prioridad) == '1' ? 'Crítico' : (esc(e.prioridad) == '2' ? 'Urgente' : 'Moderado')}
+              </span>
+              <span class="badge-premium badge-estado">${textoEstados[e.estado] || esc(e.estado)}</span>
             </div>
           </div>
         `;
@@ -692,6 +900,8 @@
       document.getElementById('edad').value = emergencia.edad;
       document.getElementById('descripcion').value = emergencia.descripcion;
       document.getElementById('direccion').value = emergencia.direccion;
+      if(document.getElementById('distrito')) document.getElementById('distrito').value = emergencia.distrito || '';
+      if(document.getElementById('region')) document.getElementById('region').value = emergencia.provincia || '';
       document.getElementById('latitud').value = emergencia.latitud || '';
       document.getElementById('longitud').value = emergencia.longitud || '';
       document.getElementById('prioridad').value = emergencia.prioridad;
@@ -731,20 +941,68 @@
   }
 
   // 6. Eliminar una emergencia de la base de datos
+  let idEmergenciaEliminar = null;
+
   function eliminarEmergencia(id) {
-    if(confirm("¿Estás seguro de que deseas eliminar esta emergencia?")) {
-      fetch(`http://127.0.0.1:5000/api/emergencias/${id}`, {
-        method: 'DELETE'
-      })
-      .then(response => {
-        if(response.ok) {
-          cargarEmergencias(); // Recarga la lista limpia
-        } else {
-          alert("Error al eliminar la emergencia.");
-        }
-      })
-      .catch(err => alert("Error de conexión al eliminar."));
-    }
+    const e = emergenciasGlobales.find(x => x.id === id);
+    if (!e) return;
+    
+    idEmergenciaEliminar = id;
+    
+    // Poblar el modal
+    document.getElementById('md-nombre').textContent = e.nombre_paciente;
+    document.getElementById('md-edad').textContent = `· ${e.edad} años`;
+    document.getElementById('md-ubicacion').textContent = e.direccion;
+    document.getElementById('md-desc').textContent = e.descripcion;
+    
+    const fechaObj = e.fecha_creacion ? new Date(e.fecha_creacion) : new Date();
+    document.getElementById('md-fecha').textContent = fechaObj.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+    document.getElementById('md-hora').textContent = fechaObj.toLocaleTimeString('es-ES', { hour: '2-digit', minute:'2-digit' });
+    
+    const textoPrioridad = e.prioridad == '1' ? 'P1 - CRÍTICO' : (e.prioridad == '2' ? 'P2 - URGENTE' : 'P3 - MODERADO');
+    const colorPrioridad = e.prioridad == '1' ? '#ef4444' : (e.prioridad == '2' ? '#f59e0b' : '#10b981');
+    const bgPrioridad = e.prioridad == '1' ? '#fef2f2' : (e.prioridad == '2' ? '#fffbeb' : '#ecfdf5');
+    
+    const badgeP = document.getElementById('md-prioridad');
+    badgeP.innerHTML = `<span class="dot" style="background:${colorPrioridad}"></span> ${textoPrioridad}`;
+    badgeP.style.color = colorPrioridad;
+    badgeP.style.backgroundColor = bgPrioridad;
+    badgeP.style.borderColor = `${colorPrioridad}40`;
+    
+    const textoEstados = { 'pendiente': 'PENDIENTE', 'en_camino': 'EN CAMINO', 'atendida': 'ATENDIDA', 'cerrada': 'CERRADA' };
+    document.getElementById('md-estado').textContent = textoEstados[e.estado] || e.estado.toUpperCase();
+    
+    document.getElementById('modal-eliminar').classList.add('open');
+  }
+
+  function cerrarModalEliminar() {
+    document.getElementById('modal-eliminar').classList.remove('open');
+    idEmergenciaEliminar = null;
+  }
+
+  function confirmarEliminar() {
+    if (!idEmergenciaEliminar) return;
+    const btn = document.querySelector('.btn-del-confirm');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Eliminando...';
+    btn.disabled = true;
+
+    fetch(`${API_URL}/api/emergencias/${idEmergenciaEliminar}`, {
+      method: 'DELETE'
+    })
+    .then(response => {
+      if(response.ok) {
+        cerrarModalEliminar();
+        cargarEmergencias(); // Recarga la lista limpia
+      } else {
+        alert("Error al eliminar la emergencia.");
+      }
+    })
+    .catch(err => alert("Error de conexión al eliminar."))
+    .finally(() => {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    });
   }
 
 // 7. Limpiar el formulario por completo y regresar el botón a su estado original
@@ -879,7 +1137,229 @@
     const infoDiv = document.getElementById('info-ruta');
     if (infoDiv) infoDiv.style.display = 'none';
   }
+    // ── BUSCADOR PREDICTIVO (NOMINATIM / OPENSTREETMAP) ──
+  const inputDireccion = document.getElementById('direccion');
+  const listaDir = document.getElementById('lista-direcciones');
+  let timeoutBusqueda;
+
+  inputDireccion.addEventListener('input', function(e) {
+    clearTimeout(timeoutBusqueda);
+    const query = e.target.value;
+    
+    // Solo busca si ha escrito más de 4 letras
+    if (query.length < 4) {
+      listaDir.style.display = 'none';
+      return;
+    }
+
+    // Esperamos 600ms a que termine de teclear para no saturar la red
+    timeoutBusqueda = setTimeout(async () => {
+      try {
+        // Pedimos datos a OpenStreetMap (limitado a Perú)
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=pe&addressdetails=1&limit=5`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.length > 0) {
+          listaDir.innerHTML = data.map(l => {
+            // Extraemos los datos del distrito y región si existen
+            const distrito = l.address.city_district || l.address.suburb || l.address.town || l.address.village || l.address.county || '';
+            const region = l.address.state || l.address.region || l.address.city || '';
+            
+            // Limpiamos comillas simples para evitar errores en JavaScript
+            const nombreSeguro = l.display_name.replace(/'/g, "\\'");
+            const distSeguro = distrito.replace(/'/g, "\\'");
+            const regSeguro = region.replace(/'/g, "\\'");
+            
+            return `
+              <div style="padding:12px; border-bottom:1px solid #f1f5f9; cursor:pointer; font-size:0.85rem; color:#0f172a;" 
+                   onmouseover="this.style.background='#f8fafc'" 
+                   onmouseout="this.style.background='white'"
+                   onclick="seleccionarDireccionMagica('${nombreSeguro}', ${l.lat}, ${l.lon}, '${distSeguro}', '${regSeguro}')">
+                <i class="fa-solid fa-location-dot" style="color:var(--blue); margin-right:8px;"></i> ${l.display_name}
+              </div>
+            `;
+          }).join('');
+          listaDir.style.display = 'block';
+        } else {
+          listaDir.style.display = 'none';
+        }
+      } catch (e) { console.error("Error buscando:", e); }
+    }, 600); 
+  });
+
+  // Ocultar si hace clic fuera
+  document.addEventListener('click', (e) => {
+    if(e.target !== inputDireccion) listaDir.style.display = 'none';
+  });
+
+  // Cuando el operador hace clic en una de las opciones sugeridas
+  window.seleccionarDireccionMagica = function(nombreCompleto, lat, lon, distritoApi, regionApi) {
+    // 1. Rellena la dirección en la caja de texto
+    inputDireccion.value = nombreCompleto;
+    listaDir.style.display = 'none';
+
+    // 2. ¡Efecto Wow! El mapa hace un "FlyTo" (vuelo animado) hacia esa calle
+    mapa.flyTo([lat, lon], 17, { animate: true, duration: 1.5 });
+    
+    // 3. Colocamos o movemos el pin del accidente
+    if (marcador) {
+      marcador.setLatLng([lat, lon]);
+    } else {
+      marcador = L.marker([lat, lon], {draggable: true}).addTo(mapa);
+      // Mantener función de arrastre si el operador quiere ser más preciso
+      marcador.on('dragend', function(e) {
+          document.getElementById('latitud').value = e.target.getLatLng().lat;
+          document.getElementById('longitud').value = e.target.getLatLng().lng;
+      });
+    }
+    
+    // 4. Rellenamos la Latitud y Longitud para guardar en DB
+    document.getElementById('latitud').value = lat;
+    document.getElementById('longitud').value = lon;
+
+    // 5. ¡Súper Inteligencia! Seleccionamos los 'Selects' de Distrito y Región automáticamente
+    if (distritoApi) {
+      const selDistrito = document.getElementById('distrito');
+      for(let i = 0; i < selDistrito.options.length; i++) {
+        if(selDistrito.options[i].text.toLowerCase().includes(distritoApi.toLowerCase()) || distritoApi.toLowerCase().includes(selDistrito.options[i].text.toLowerCase())) {
+          selDistrito.selectedIndex = i;
+          break;
+        }
+      }
+    }
+    
+    if (regionApi) {
+      const selRegion = document.getElementById('region');
+      for(let i = 0; i < selRegion.options.length; i++) {
+        if(selRegion.options[i].text.toLowerCase().includes(regionApi.toLowerCase()) || regionApi.toLowerCase().includes(selRegion.options[i].text.toLowerCase())) {
+          selRegion.selectedIndex = i;
+          break;
+        }
+      }
+    }
+  };
+
   
-</script><script src="../src/header.js"></script>
+</script><script src="../src/header.js">
+// ── INJECT LOGOUT MODAL ──
+function mostrarModalLogout() {
+  if (!document.getElementById('modal-logout-global')) {
+    const modalHTML = `
+    <style>
+      #modal-logout-global { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 999999; align-items: center; justify-content: center; backdrop-filter: blur(4px); font-family: 'Inter', sans-serif; }
+      #modal-logout-global.open { display: flex; animation: fadeIn 0.2s ease; }
+      .ml-box { background: #fff; border-radius: 16px; padding: 2.5rem 2rem; width: 100%; max-width: 400px; text-align: center; position: relative; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+      .ml-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.25rem; color: #64748b; cursor: pointer; transition: color 0.2s; }
+      .ml-close:hover { color: #0f172a; }
+      .ml-icon { width: 80px; height: 80px; border-radius: 50%; border: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #475569; margin: 0 auto 1.5rem; }
+      .ml-title { font-size: 1.25rem; font-weight: 600; color: #0f172a; margin-bottom: 0.75rem; }
+      .ml-text { font-size: 0.875rem; color: #64748b; margin-bottom: 2rem; line-height: 1.5; }
+      .ml-actions { display: flex; gap: 1rem; justify-content: center; }
+      .btn-ml-cancel { flex: 1; padding: 0.75rem; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; font-weight: 500; color: #0f172a; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+      .btn-ml-cancel:hover { background: #f8fafc; border-color: #94a3b8; }
+      .btn-ml-confirm { flex: 1; padding: 0.75rem; background: #475569; border: 1px solid #475569; border-radius: 8px; font-weight: 500; color: #fff; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+      .btn-ml-confirm:hover { background: #334155; }
+    </style>
+    <div id="modal-logout-global">
+      <div class="ml-box">
+        <button class="ml-close" onclick="document.getElementById('modal-logout-global').classList.remove('open')">✕</button>
+        <div class="ml-icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
+        <div class="ml-title">¿Seguro que deseas cerrar sesión?</div>
+        <div class="ml-text">Vas a cerrar tu sesión actual.<br>Podrás iniciar sesión nuevamente cuando lo desees.</div>
+        <div class="ml-actions">
+          <button class="btn-ml-cancel" onclick="document.getElementById('modal-logout-global').classList.remove('open')">Cancelar</button>
+          <button class="btn-ml-confirm" onclick="ejecutarLogout()">Sí, cerrar sesión</button>
+        </div>
+      </div>
+    </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    // Include FontAwesome if missing
+    if (!document.querySelector('link[href*="font-awesome"]')) {
+      document.head.insertAdjacentHTML('beforeend', '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>');
+    }
+  }
+  document.getElementById('modal-logout-global').classList.add('open');
+}
+</script>
+
+<!-- Modal Confirmar Eliminación -->
+<div class="modal-overlay" id="modal-eliminar">
+  <div class="modal-del-box">
+    <button class="modal-del-close" onclick="cerrarModalEliminar()">✕</button>
+    <div class="modal-del-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+    <h3 class="modal-del-title">¿Seguro que deseas eliminar esta emergencia?</h3>
+    <p class="modal-del-subtitle">Esta acción no se puede deshacer. Se eliminará permanentemente el registro de la emergencia seleccionada.</p>
+    
+    <div class="modal-del-preview">
+      <div class="mdp-header">
+        <div style="display:flex; gap: 0.75rem;">
+          <div class="mdp-avatar"><i class="fa-regular fa-user"></i></div>
+          <div class="mdp-info">
+            <div class="mdp-name"><span id="md-nombre">Maria Sanchez</span> <span class="mdp-age" id="md-edad">· 56 años</span></div>
+            <div class="mdp-loc"><i class="fa-solid fa-location-dot"></i> <span id="md-ubicacion">Chorrillos</span></div>
+          </div>
+        </div>
+        <div class="mdp-time">
+          <div><i class="fa-regular fa-calendar"></i> <span id="md-fecha">24 May 2025</span></div>
+          <div><i class="fa-regular fa-clock"></i> <span id="md-hora">10:24 AM</span></div>
+        </div>
+      </div>
+      <div class="mdp-desc" id="md-desc">Problemas cardiacos</div>
+      <div class="mdp-badges">
+        <span class="badge-priority" id="md-prioridad"><span class="dot" style="background:#f59e0b"></span> P2 - URGENTE</span>
+        <span class="badge-status" id="md-estado">ATENDIDA</span>
+      </div>
+    </div>
+
+    <div class="modal-del-warning">
+      <i class="fa-solid fa-shield-halved"></i>
+      <span>Se eliminarán todos los datos relacionados con esta emergencia, incluyendo historial, asignaciones y comentarios.</span>
+    </div>
+
+    <div class="modal-del-actions">
+      <button class="btn-del-cancel" onclick="cerrarModalEliminar()"><i class="fa-solid fa-xmark"></i> Cancelar</button>
+      <button class="btn-del-confirm" onclick="confirmarEliminar()"><i class="fa-solid fa-trash-can"></i> Sí, eliminar emergencia</button>
+    </div>
+  </div>
+</div>
+
+<style>
+/* CSS del modal de eliminar */
+#modal-eliminar { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 999999; align-items: center; justify-content: center; backdrop-filter: blur(4px); font-family: 'Inter', sans-serif; }
+#modal-eliminar.open { display: flex; animation: fadeIn 0.2s ease; }
+.modal-del-box { background: #fff; border-radius: 16px; padding: 2rem 2.5rem; width: 100%; max-width: 500px; position: relative; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+.modal-del-close { position: absolute; top: 1.25rem; right: 1.25rem; background: none; border: none; font-size: 1.25rem; color: #64748b; cursor: pointer; transition: color 0.2s; }
+.modal-del-close:hover { color: #0f172a; }
+.modal-del-icon { width: 64px; height: 64px; border-radius: 50%; border: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #64748b; margin: 0 auto 1.25rem; }
+.modal-del-title { font-size: 1.25rem; font-weight: 600; color: #0f172a; margin-bottom: 0.5rem; text-align: center; }
+.modal-del-subtitle { font-size: 0.85rem; color: #64748b; margin-bottom: 1.5rem; line-height: 1.5; text-align: center; max-width: 400px; margin-inline: auto; }
+
+.modal-del-preview { border: 1px solid #e2e8f0; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; background: #f8fafc; }
+.mdp-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+.mdp-avatar { width: 36px; height: 36px; border-radius: 50%; border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: #94a3b8; background: #fff; }
+.mdp-info { display: flex; flex-direction: column; gap: 2px; }
+.mdp-name { font-size: 0.95rem; font-weight: 600; color: #0f172a; }
+.mdp-age { font-weight: 400; color: #64748b; font-size: 0.8rem; }
+.mdp-loc { font-size: 0.8rem; color: #64748b; }
+.mdp-time { text-align: right; font-size: 0.75rem; color: #64748b; display: flex; flex-direction: column; gap: 4px; }
+.mdp-desc { font-size: 0.9rem; color: #334155; margin-bottom: 0.75rem; }
+.mdp-badges { display: flex; gap: 0.5rem; align-items: center; }
+.badge-priority { display: inline-flex; align-items: center; gap: 6px; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700; border: 1px solid transparent; }
+.badge-priority .dot { width: 6px; height: 6px; border-radius: 50%; }
+.badge-status { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+
+.modal-del-warning { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 1.5rem; }
+.modal-del-warning i { color: #64748b; margin-top: 2px; }
+.modal-del-warning span { font-size: 0.8rem; color: #64748b; line-height: 1.4; }
+
+.modal-del-actions { display: flex; gap: 1rem; }
+.btn-del-cancel { flex: 1; padding: 0.75rem; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; font-weight: 500; color: #0f172a; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-del-cancel:hover { background: #f8fafc; border-color: #94a3b8; }
+.btn-del-confirm { flex: 1; padding: 0.75rem; background: #475569; border: 1px solid #475569; border-radius: 8px; font-weight: 500; color: #fff; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-del-confirm:hover { background: #334155; }
+</style>
+
 </body>
 </html>

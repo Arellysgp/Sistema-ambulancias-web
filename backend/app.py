@@ -7,11 +7,11 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 load_dotenv()
 
 from database.models.user import db
-from backend.emergencias.emergencia_routes import emergencias_bp
-from backend.auth.auth_routes import auth_bp
-from backend.admin.admin_routes import admin_bp
-from backend.routes.reportes import reportes_bp   # ← ruta correcta en tu proyecto
-from backend.routes.perfil   import perfil_bp     # ← ruta correcta en tu proyecto
+from emergencias.emergencia_routes import emergencias_bp
+from auth.auth_routes import auth_bp
+from admin.admin_routes import admin_bp
+from routes.reportes import reportes_bp
+from routes.perfil import perfil_bp
 
 app = Flask(__name__)
 app.config['SECRET_KEY']                     = os.getenv('SECRET_KEY')
@@ -24,8 +24,8 @@ CORS(app, supports_credentials=True,
      origins=[
          'http://localhost:5173',
          'http://127.0.0.1:5173',
-         'http://127.0.0.1:5501',   # ← agrega esta línea
-         'http://localhost:5501',    # ← y esta
+         'https://sistema-ambulancias-web-1.onrender.com',
+         'https://TU-LINK-DE-VERCEL-AQUI.vercel.app'  # <-- CAMBIAR POR TU LINK DE VERCEL CUANDO LO TENGAS
      ],
      allow_headers=['Content-Type', 'X-User-Id'],
      methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
