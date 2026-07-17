@@ -13,7 +13,7 @@ let filtroActual = 'todas';
 let paginaActual = 1;
 const itemsPorPagina = 5;
 
-const CONDUCTOR_API_URL = 'https://sistema-ambulancias-web-1.onrender.com/api';
+const CONDUCTOR_API_URL = 'https://sistema-ambulancias-web-enbc.onrender.com/api';
 
 document.addEventListener('DOMContentLoaded', () => {
     iniciarMapa();
