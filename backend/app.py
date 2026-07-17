@@ -25,7 +25,7 @@ CORS(app, supports_credentials=True,
          'http://localhost:5173',
          'http://127.0.0.1:5173',
          'https://sistema-ambulancias-web-1.onrender.com',
-         'https://TU-LINK-DE-VERCEL-AQUI.vercel.app'  # <-- CAMBIAR POR TU LINK DE VERCEL CUANDO LO TENGAS
+         'https://sistema-ambulancias-web.vercel.app'
      ],
      allow_headers=['Content-Type', 'X-User-Id'],
      methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
