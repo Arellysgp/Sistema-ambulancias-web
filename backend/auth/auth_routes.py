@@ -10,11 +10,34 @@ def register():
     rol = data.get('rol', 'operador')
     nombre = data.get('nombre', '')
     email = data.get('email', '')
-    password = data.get('password', '')
-    user, error = registrar_usuario(nombre, email, password, rol)
-    if error:
-        return jsonify({'error': error}), 400
-    return jsonify({'mensaje': 'Usuario registrado correctamente'}), 201
+    try:
+        data = request.get_json()
+        
+        nombre = data.get('nombre')
+        email = data.get('email')
+        password = data.get('password')
+        rol = data.get('rol', 'operador') # por defecto operador
+
+        if not all([nombre, email, password]):
+            return jsonify({'error': 'Faltan datos obligatorios'}), 400
+
+        user, error = registrar_usuario(nombre, email, password, rol)
+        if error:
+            return jsonify({'error': error}), 400
+        
+        return jsonify({
+            'message': 'Usuario registrado exitosamente',
+            'user': {
+                'id': user.id,
+                'nombre': user.nombre,
+                'email': user.email,
+                'rol': user.rol
+            }
+        }), 201
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': 'SERVER EXCEPTION: ' + str(e), 'trace': traceback.format_exc()}), 500
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
