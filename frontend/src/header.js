@@ -99,7 +99,7 @@ window.ejecutarLogout = function () {
 };
 
 // ── INJECT LOGOUT MODAL ──
-function mostrarModalLogout() {
+window.mostrarModalLogout = function() {
     if (!document.getElementById('modal-logout-global')) {
         const modalHTML = `
     <style>
